@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+    container_name: E-learning-nodejs-app
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/usr/src/app
+
+networks:
+  nodejs-exa:
+    driver: bridge

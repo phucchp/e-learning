@@ -1,0 +1,28 @@
+{
+  "name": "e-learning",
+  "version": "1.0.0",
+  "description": "E-learning project - DATN",
+  "main": "src/server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+		"start:dev": "npx nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phucchp/e-learning.git"
+  },
+  "author": "Cao Huu Phuc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phucchp/e-learning/issues"
+  },
+  "homepage": "https://github.com/phucchp/e-learning#readme",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "arg": "^5.0.2",
+    "nodemon": "^3.0.2"
+  }
+}
