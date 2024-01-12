@@ -41,8 +41,7 @@ class App {
 	private plugins(): void {
 		this.app.use(express.json());
 		this.app.use(express.urlencoded({ extended: true }));
-		// Enable CORS for all routes
-		this.app.use(cors()); // Use the cors middleware here
+		this.app.use(cors()); // Use the cors middleware
 	}
 }
 
