@@ -35,6 +35,13 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    docker compose up
    ```
+4. Open new terminal and run commands below:
+   ```
+   docker compose exec app sh -c "npm install"
+   ```
+   ```
+   docker compose exec app sh -c "npx sequelize-cli db:create"
+   ```
 ### If you get an error
    ###### Try this command
    ```
