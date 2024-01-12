@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import express, { Application, Request, Response } from 'express';
 import Database from './config/database';
+import CategoryRoutes from './routes/CategoryRoutes';
 
 class App {
 	public app: Application;
@@ -28,6 +29,7 @@ class App {
 		this.app.route('/').get((req: Request, res: Response) => {
 			res.send('<h1> Hello world!!! </h1>');
 		});
+		this.app.use('/api/categories', CategoryRoutes);
 	}
 
 	private plugins(): void {
