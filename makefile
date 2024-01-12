@@ -17,7 +17,7 @@ build:
 
 # Execute a bash shell inside the app container (non-sudo)
 exec:
-	$(DOCKER_COMPOSE) exec app bash
+	$(DOCKER_COMPOSE) exec app sh
 
 # Bring up the Docker containers (non-sudo)
 up:
@@ -37,3 +37,26 @@ refresh: down up
 #Restart app
 restart: 
 	$(DOCKER_COMPOSE) restart app
+#Start app
+start: 
+	$(DOCKER_COMPOSE) start app
+#Stop app
+stop: 
+	$(DOCKER_COMPOSE) stop app
+create-database:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:create"
+#Running migration
+migration:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate"
+#Undo the most recent migration
+migration-undo:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate:undo"
+#Undo all migration
+migration-undo:
+# Rule to generate a new seed file
+#Example : make generate-seed SEED_NAME=name-seed
+generate-seed:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli seed:generate --name $(SEED_NAME)"
+# Rule to generate a new migration file
+generate-migration:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli migration:generate --name $(NAME)"

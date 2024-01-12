@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-		"start:dev": "npx nodemon"
+    "start:dev": "npx nodemon"
   },
   "repository": {
     "type": "git",
@@ -18,11 +18,17 @@
   },
   "homepage": "https://github.com/phucchp/e-learning#readme",
   "devDependencies": {
+    "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@types/express": "^4.17.21",
     "arg": "^5.0.2",
-    "nodemon": "^3.0.2"
+    "dotenv": "^16.3.1",
+    "nodemon": "^3.0.2",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.35.2"
   }
 }
