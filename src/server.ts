@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express, { Application, Request, Response } from 'express';
 import Database from './config/database';
 import CategoryRoutes from './routes/CategoryRoutes';
+import cors from 'cors';
 
 class App {
 	public app: Application;
@@ -30,13 +31,18 @@ class App {
 			res.send('<h1> Hello world!!! </h1>');
 		});
 		this.app.use('/api/categories', CategoryRoutes);
+
+		// Middleware cuối cùng để xử lý khi không có route nào khớp
+		this.app.use((req, res) => {
+			res.status(404).send('Not Found');
+		});
 	}
 
 	private plugins(): void {
 		this.app.use(express.json());
 		this.app.use(express.urlencoded({ extended: true }));
 		// Enable CORS for all routes
-		// this.app.use(cors()); // Use the cors middleware here
+		this.app.use(cors()); // Use the cors middleware here
 	}
 }
 
