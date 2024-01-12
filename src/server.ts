@@ -8,6 +8,7 @@ class App {
 	constructor() {
 		this.app = express();
 		this.databaseSync();
+		this.routes();
 		this.plugins();
 	}
 
@@ -21,6 +22,12 @@ class App {
 			.catch((error) => {
 				console.error('❌ Lỗi đồng bộ hóa cơ sở dữ liệu:', error);
 			});
+	}
+
+	private routes(): void {
+		this.app.route('/').get((req: Request, res: Response) => {
+			res.send('<h1> Hello world!!! </h1>');
+		});
 	}
 
 	private plugins(): void {

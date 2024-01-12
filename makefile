@@ -52,11 +52,12 @@ migration:
 migration-undo:
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate:undo"
 #Undo all migration
-migration-undo:
+migration-undo-all:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate:undo:all"
 # Rule to generate a new seed file
-#Example : make generate-seed SEED_NAME=name-seed
+#Example : make generate-seed NAME=name-seed
 generate-seed:
-	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli seed:generate --name $(SEED_NAME)"
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli seed:generate --name $(NAME)"
 # Rule to generate a new migration file
 generate-migration:
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli migration:generate --name $(NAME)"

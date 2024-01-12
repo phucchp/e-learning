@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
+import { Category } from '../models/Category';
 
 dotenv.config();
 
@@ -46,7 +47,7 @@ class Database {
 			},
 		});
 		this.sequelize.addModels([
-
+			Category
 		]);
 
 		await this.sequelize
