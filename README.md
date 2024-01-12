@@ -14,8 +14,7 @@ e-learning is an online learning platform built with Node.js, designed to provid
 
 ### Prerequisites
 
-- Node.js installed
-- MongoDB installed and running
+- Docker installed and running
 
 ### Installation
 
@@ -23,3 +22,21 @@ e-learning is an online learning platform built with Node.js, designed to provid
 
    ```bash
    git clone https://github.com/phucchp/e-learning.git
+2. Build docker image:
+   >With Window or MacOS
+   ```bash
+   docker compose build
+   ```
+   >With Linux
+   ```
+   sudo docker compose build
+   ```
+3. Run project:
+   ```
+   docker compose up
+   ```
+### If you get an error
+   ###### Try this command
+   ```
+   docker compose exec app sh -c "npm install"
+   ```
