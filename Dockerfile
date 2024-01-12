@@ -8,7 +8,7 @@ COPY package*.json ./
 
 RUN npm install
 RUN npm install --save-dev nodemon
-RUN npm i -g ts-node-dev
+RUN npm i -g ts-node
 RUN npm i -g rimraf
 
 # If you are building your code for production
