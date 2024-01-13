@@ -35,7 +35,12 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    docker compose up
    ```
-4. Open new terminal and run commands below:
+4. Set up environment:
+   >Copy environment example to .env and fill values in .env file
+   ```
+   cp .env.example .env
+   ```
+5. Open new terminal and run commands below:
    ```
    docker compose exec app sh -c "npm install"
    ```
@@ -47,3 +52,87 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    docker compose exec app sh -c "npm install"
    ```
+   ###### Or use Makefile command
+   ```
+   make fix
+   ```
+## Project Makefile Guide
+This Makefile provides a set of convenient commands to manage a Dockerized application. It simplifies the execution of various tasks related to building, starting, stopping, and managing the database of your application. Below are the available commands and their descriptions:
+## Prerequisites
+- [Docker](https://www.docker.com/)
+- [Node.js](https://nodejs.org/)
+- [npm](https://www.npmjs.com/)
+- [sequelize-cli](https://sequelize.org/)
+### Usage
+
+#### 1. Build Docker Containers
+Build the Docker containers for the application.
+```
+make build
+```
+#### 2. Execute Bash Shell in App Container
+Access a bash shell inside the application container.
+```
+make exec
+```
+#### 3. Start Docker Containers
+Start the Docker containers for the application.
+```
+make up
+```
+#### 4. Stop Docker Containers
+```
+make down
+```
+#### 5. Run Database Seeders
+Run database seeders to populate the database with initial data.
+```
+make seeder
+```
+#### 6. Refresh Environment
+Bring down and then up the Docker containers to refresh the environment.
+```
+make refresh
+```
+#### 7. Restart App Container
+```
+make restart
+```
+#### 8. Start & Stop App Container
+```
+make start
+```
+```
+make stop
+```
+#### 9. Create Database
+Create the database using sequelize-cli.
+```
+make create-database
+```
+#### 10. Run Migrations
+```
+make migration
+```
+#### 11. Undo Migration
+>Undo Last Migration (Undo the most recent database migration.)
+```
+make migration
+```
+>Undo All Migrations (Undo all database migrations.)
+```
+make migration-undo-all
+```
+#### 12. Generate Seed File
+```
+make generate-seed NAME=name-seed
+```
+#### 12. Generate Migration File
+```
+make generate-migration NAME=name-migration
+```
+#### 12. Fix Dependencies
+Reinstall npm dependencies and restart the application container.
+```
+make fix
+```

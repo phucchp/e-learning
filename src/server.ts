@@ -34,7 +34,10 @@ class App {
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {
-			res.status(404).send('Not Found');
+            const url = req.url;
+			res.status(404).json({
+                message: `API ${url} not found!`
+            });
 		});
 	}
 
