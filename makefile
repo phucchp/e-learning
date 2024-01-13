@@ -61,3 +61,6 @@ generate-seed:
 # Rule to generate a new migration file
 generate-migration:
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli migration:generate --name $(NAME)"
+fix:
+	$(DOCKER_COMPOSE) exec app sh -c "npm install" && \
+	$(DOCKER_COMPOSE) restart app
