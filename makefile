@@ -64,3 +64,6 @@ generate-migration:
 fix:
 	$(DOCKER_COMPOSE) exec app sh -c "npm install" && \
 	$(DOCKER_COMPOSE) restart app
+migration-refresh:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate:undo" && \
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate"
