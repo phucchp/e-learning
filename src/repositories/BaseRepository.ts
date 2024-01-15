@@ -12,23 +12,66 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
         return this.model.findAll(options);
     }
 
-    async getById(id: number, options?: any): Promise<T | null> {
-        return this.model.findByPk(id, options);
+    /**
+     * 
+     * @param id 
+     * @param paranoid : Default false, if paranoid = true will return soft delete record
+     * @returns model
+     */
+    async findById(id: number, paranoid:boolean = false): Promise<T | null> {
+        return this.model.findByPk(id, {
+            paranoid: paranoid
+        });
     }
 
-    async create(entity: any): Promise<T> {
-        return await this.model.create(entity);
+        /**
+     * 
+     * @param id 
+     * @param paranoid : Default false, if paranoid = true will return soft delete record
+     * @returns model
+     */
+    async findOneByCondition(condition: any, options: any = [], paranoid:boolean = false): Promise<T | null> {
+        return this.model.findOne({
+            where: condition,
+            attributes: { exclude: options }
+        });
     }
 
-    async update(id: number, entity: any): Promise<[number, T[]]> {
-        return this.model.update(entity, { where: { id } as any, returning: true }) as any; // Adjust the type here
+    async create(data: any): Promise<T> {
+        try{
+            return await this.model.create(data);
+        }catch(error){
+            console.log(error);
+            throw(error);
+        }
     }
 
+    async update(id: number, updateFields: Partial<T>): Promise<T | null> {
+        try{
+            const instance = await this.model.findByPk(id);
+            if (!instance) {
+              return null;
+            }
+            await instance.update(updateFields);
+            return instance;
+        }catch(error){
+            console.log(error);
+            throw(error);
+        }
+      }
+
+    /**
+     * 
+     * @param id 
+     * @param force : default false (soft delete) , if force = true will delete all
+     * @returns 
+     */
     async delete(id: number, force: boolean = false): Promise<number> {
         try {
             const result = await this.model.destroy({ where: { id } as any, force });
             return result;
         } catch (error) {
+            console.log(error);
             throw error;
         }
     }

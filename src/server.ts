@@ -10,8 +10,8 @@ class App {
 	constructor() {
 		this.app = express();
 		this.databaseSync();
-		this.routes();
 		this.plugins();
+		this.routes();
 	}
 
 	private databaseSync(): void {
