@@ -83,6 +83,12 @@ export class EmptyDataError extends CustomError {
 	}
 }
 
+export class RecordExistsError extends CustomError {
+	constructor(message: string = 'Record already exists') {
+		super(message, 409, 'Bad Request');
+	}
+}
+
 export function handleErrorController(error: any, res: Response) {
 	const status = error.statusCode || 500;
 	const statusText = error.statusText || 'Internal Server Error';
