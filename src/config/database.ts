@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize-typescript';
+import { Comment, Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
 import { Category } from '../models/Category';
 import { Language } from '../models/Language';
@@ -6,6 +6,10 @@ import { Course } from '../models/Course';
 import { Level } from '../models/Level';
 import { User } from '../models/User';
 import { Profile } from '../models/Profile';
+import { Topic } from '../models/Topic';
+import { Lesson } from '../models/Lesson';
+import { Enrollment } from '../models/Enrollment';
+import { Favorite } from '../models/Favorite';
 
 dotenv.config();
 
@@ -54,10 +58,14 @@ class Database {
 		this.sequelize.addModels([
 			Category,
 			Course,
+			Enrollment,
+			Favorite,
 			Language,
 			Level,
 			User,
-			Profile
+			Profile,
+			Topic,
+			Lesson,
 		]);
 
 		await this.sequelize

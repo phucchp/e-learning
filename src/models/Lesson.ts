@@ -1,6 +1,6 @@
 // models/Level.ts
 
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { Topic } from './Topic';
 
 @Table({
@@ -30,6 +30,7 @@ export class Lesson extends Model<Lesson> {
   })
   duration!: number;
 
+  @ForeignKey(() => Topic)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER

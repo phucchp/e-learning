@@ -148,11 +148,11 @@ export class Course extends Model<Course> {
   @HasMany(() => Topic)
   topics!: Topic[];
 
-  @BelongsToMany(() => User, () => Favorite)
-  usersFavorite!: User[];
+  @BelongsToMany(() => User, () => Favorite, 'favoriteUsers')
+  favoriteUsers!: User[];
 
-  @BelongsToMany(() => User, () => Enrollment)
-  usersEnrollment!: User[];
+  @BelongsToMany(() => User, () => Enrollment, 'enrolledUsers')
+  enrolledUsers!: User[];
   
   @DeletedAt
   deletedAt?: Date;

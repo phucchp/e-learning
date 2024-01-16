@@ -35,6 +35,7 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                     },
                     {
                         model: User,
+                        as: 'instructor', // Alias của BelongsTo
                         attributes: ['userName'],
                         include: [
                             {
