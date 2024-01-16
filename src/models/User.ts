@@ -1,5 +1,8 @@
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, IsEmail, IsInt, NotEmpty, AllowNull, HasOne } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, IsEmail, IsInt, NotEmpty, AllowNull, HasOne, HasMany, BelongsToMany } from 'sequelize-typescript';
 import { Profile } from './Profile';
+import { Favorite } from './Favorite';
+import { Course } from './Course';
+import { Enrollment } from './Enrollment';
 
 @Table({
   tableName: 'users',
@@ -57,6 +60,12 @@ export class User extends Model<User> {
 
     @HasOne(() => Profile)
     profile!: Profile;
+
+    @BelongsToMany(() => Course, () => Favorite)
+    coursesFavorites!: Course[];
+
+    @BelongsToMany(() => Course, () => Enrollment)
+    coursesEnrollments!: Course[];
 
     @DeletedAt
     deletedAt?: Date;
