@@ -15,8 +15,13 @@ export class CourseService implements ICourseService {
     @Inject(() => CourseRepository)
 	private courseRepository!: ICourseRepository;
 
-    getCourses(): Promise<Course[]> {
-        throw new Error('Method not implemented.');
+    async getCourses(): Promise<Course[]> {
+       try{
+            const courses = await this.courseRepository.getCourses();
+            return courses;
+       }catch(error){
+            throw(error);
+       }
     }
 
 }

@@ -11,7 +11,7 @@ module.exports = {
         description: 'This course covers fundamental programming concepts and helps beginners get started.',
         price: 49.99,
         discount: 10.00,
-        category_id: 27, // Replace with an existing category ID
+        category_id: 1, // Replace with an existing category ID
         instructor_id: 1, // Replace with an existing instructor ID
         average_rating: 4.5,
         trailer_url: 'https://www.youtube.com/watch?v=ABC123',
@@ -19,7 +19,7 @@ module.exports = {
         sub_url:'https://www.youtube.com/watch?v=ABC123',
         total_students: 1000,
         total_lessons: 20,
-        language_id: 21, // Replace with an existing language ID
+        language_id: 5, // Replace with an existing language ID
         level_id: 1, // Replace with an existing level ID
         is_active: true,
         created_at: new Date(),
@@ -32,7 +32,7 @@ module.exports = {
         description: 'Master web development skills with hands-on projects and real-world applications.',
         price: 99.99,
         discount: 20.00,
-        category_id: 26, // Replace with an existing category ID
+        category_id: 10, // Replace with an existing category ID
         instructor_id: 2, // Replace with an existing instructor ID
         average_rating: 4.8,
         trailer_url: 'https://www.youtube.com/watch?v=XYZ456',
@@ -40,7 +40,7 @@ module.exports = {
         sub_url:'https://www.youtube.com/watch?v=ABC123',
         total_students: 1500,
         total_lessons: 30,
-        language_id: 21, // Replace with an existing language ID
+        language_id: 1, // Replace with an existing language ID
         level_id: 2, // Replace with an existing level ID
         is_active: true,
         created_at: new Date(),

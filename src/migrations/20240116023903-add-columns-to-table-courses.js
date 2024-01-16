@@ -21,7 +21,7 @@ module.exports = {
      await queryInterface.sequelize.transaction(t => {
       return Promise.all([
         queryInterface.removeColumn('courses', 'course_id', { transaction: t }),
-        queryInterface.removeColumn('courses', 'course_id', { transaction: t })
+        queryInterface.removeColumn('courses', 'sub_url', { transaction: t })
       ]);
     });
   }

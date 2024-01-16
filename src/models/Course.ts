@@ -84,7 +84,6 @@ export class Course extends Model<Course> {
   @AllowNull(false)
   @Column({
     type: DataType.FLOAT,
-    defaultValue: 0,
   })
   averageRating!: number;
 
@@ -95,6 +94,10 @@ export class Course extends Model<Course> {
 
   @Column({
     type: DataType.STRING,
+    get() {
+        const rawValue = this.getDataValue('posterUrl');
+        return rawValue ? rawValue.toUpperCase() : null;
+    }
   })
   posterUrl!: string | null;
 
@@ -102,7 +105,6 @@ export class Course extends Model<Course> {
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
-    defaultValue: 0,
   })
   totalStudents!: number;
 
@@ -110,7 +112,6 @@ export class Course extends Model<Course> {
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
-    defaultValue: 0,
   })
   totalLessons!: number;
 
@@ -138,7 +139,6 @@ export class Course extends Model<Course> {
   @AllowNull(false)
   @Column({
     type: DataType.BOOLEAN,
-    defaultValue: true,
   })
   isActive!: boolean;
 
