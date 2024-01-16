@@ -1,6 +1,11 @@
 import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
 import { Category } from '../models/Category';
+import { Language } from '../models/Language';
+import { Course } from '../models/Course';
+import { Level } from '../models/Level';
+import { User } from '../models/User';
+import { Profile } from '../models/Profile';
 
 dotenv.config();
 
@@ -47,7 +52,12 @@ class Database {
 			},
 		});
 		this.sequelize.addModels([
-			Category
+			Category,
+			Course,
+			Language,
+			Level,
+			User,
+			Profile
 		]);
 
 		await this.sequelize

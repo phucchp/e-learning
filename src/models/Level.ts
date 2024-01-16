@@ -1,6 +1,7 @@
 // models/Level.ts
 
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany } from 'sequelize-typescript';
+import { Course } from './Course';
 
 @Table({
   tableName: 'levels',
@@ -24,6 +25,9 @@ export class Level extends Model<Level> {
   })
   levelName!: string;
 
+  @HasMany(() => Course)
+  courses!: Course[];
+  
   @DeletedAt
   deletedAt?: Date;
 

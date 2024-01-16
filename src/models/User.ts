@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, IsEmail, IsInt, NotEmpty, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, IsEmail, IsInt, NotEmpty, AllowNull, HasOne } from 'sequelize-typescript';
+import { Profile } from './Profile';
 
 @Table({
   tableName: 'users',
@@ -53,6 +54,9 @@ export class User extends Model<User> {
     type: DataType.INTEGER,
     })
     roleId!: number;
+
+    @HasOne(() => Profile)
+    profile!: Profile;
 
     @DeletedAt
     deletedAt?: Date;

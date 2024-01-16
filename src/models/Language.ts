@@ -1,6 +1,7 @@
 // models/Language.ts
 
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany } from 'sequelize-typescript';
+import { Course } from './Course';
 
 @Table({
   tableName: 'languages',
@@ -23,6 +24,9 @@ export class Language extends Model<Language> {
     type: DataType.STRING(50),
   })
   languageName!: string;
+
+  @HasMany(() => Course)
+  courses!: Course[];
 
   @DeletedAt
   deletedAt?: Date;
