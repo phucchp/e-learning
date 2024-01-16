@@ -1,10 +1,13 @@
 // models/Course.ts
 
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, ForeignKey, BelongsTo, AllowNull, NotEmpty } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, ForeignKey, BelongsTo, AllowNull, NotEmpty, HasMany, BelongsToMany } from 'sequelize-typescript';
 import { Category } from './Category';
 import { User } from './User';
 import { Language } from './Language';
 import { Level } from './Level';
+import { Topic } from './Topic';
+import { Favorite } from './Favorite';
+import { Enrollment } from './Enrollment';
 
 @Table({
   tableName: 'courses',
@@ -142,6 +145,15 @@ export class Course extends Model<Course> {
   })
   isActive!: boolean;
 
+  @HasMany(() => Topic)
+  topics!: Topic[];
+
+  @BelongsToMany(() => User, () => Favorite)
+  usersFavorite!: User[];
+
+  @BelongsToMany(() => User, () => Enrollment)
+  usersEnrollment!: User[];
+  
   @DeletedAt
   deletedAt?: Date;
 
