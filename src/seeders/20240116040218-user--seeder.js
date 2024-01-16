@@ -7,7 +7,7 @@ module.exports = {
 
     await queryInterface.bulkInsert('users', [
       {
-        username: 'user1',
+        user_name: 'user1',
         email: 'user1@gmail.com',
         password: hashedPassword,
         is_active: true,
@@ -16,7 +16,7 @@ module.exports = {
         updated_at: new Date(),
       },
       {
-        username: 'user2',
+        user_name: 'user2',
         email: 'user2@gmail.com',
         password: hashedPassword,
         is_active: true,
@@ -25,7 +25,7 @@ module.exports = {
         updated_at: new Date(),
       },
       {
-        username: 'user3',
+        user_name: 'user3',
         email: 'user3@gmail.com',
         password: hashedPassword,
         is_active: true,
@@ -34,7 +34,7 @@ module.exports = {
         updated_at: new Date(),
       },
       {
-        username: 'user4',
+        user_name: 'user4',
         email: 'user4@gmail.com',
         password: hashedPassword,
         is_active: true,
@@ -43,7 +43,7 @@ module.exports = {
         updated_at: new Date(),
       },
       {
-        username: 'user5',
+        user_name: 'user5',
         email: 'user5@gmail.com',
         password: hashedPassword,
         is_active: true,
