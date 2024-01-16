@@ -41,6 +41,17 @@ export class Profile extends Model<Profile> {
   lastName!: string | null;
 
   @Column({
+    type: DataType.VIRTUAL,
+    get() {
+        const firstName = this.getDataValue('firstName');
+        const lastName = this.getDataValue('lastName');
+        const fullName = [firstName, lastName].filter(Boolean).join(' ');
+        return fullName.trim();
+    },
+  })
+  fullName!: string | null;
+
+  @Column({
     type: DataType.TEXT,
   })
   avatar!: string | null;
