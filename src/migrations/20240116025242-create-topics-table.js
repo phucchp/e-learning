@@ -3,34 +3,26 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('topics', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_name:{
-        type: Sequelize.STRING(30),
+      name:{
+        type: Sequelize.STRING(150),
         allowNull: false,
-        unique: true
       },
-      email:{
+      course_id: {
         type: Sequelize.STRING(100),
         allowNull: false,
-        unique: true
-      },
-      password:{
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      is_active:{
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-      },
-      role_id:{
-        type: Sequelize.INTEGER,
-        allowNull: false,
+        references: {
+          model: {
+            tableName: 'courses',
+          },
+          key: 'course_id'
+        },
       },
       created_at: {
         allowNull: false,
@@ -48,6 +40,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('topics');
   }
 };

@@ -3,6 +3,7 @@ import express, { Application, Request, Response } from 'express';
 import Database from './config/database';
 import CategoryRoutes from './routes/CategoryRoutes';
 import cors from 'cors';
+import CourseRoutes from './routes/CourseRoutes';
 
 class App {
 	public app: Application;
@@ -31,6 +32,7 @@ class App {
 			res.send('<h1> Hello world!!! </h1>');
 		});
 		this.app.use('/api/categories', CategoryRoutes);
+		this.app.use('/api/courses', CourseRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {
