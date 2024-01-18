@@ -11,18 +11,11 @@ import { User } from './User';
   underscored: true, // Use naming convention snake_case
 })
 export class Enrollment extends Model<Enrollment> {
-  @PrimaryKey
-  @AllowNull(false)
-  @AutoIncrement
-  @Column({
-    type: DataType.INTEGER,
-  })
-  id!: number;
-
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
+    unique: 'compositeIndex'
   })
   userId!: number;
 
@@ -30,6 +23,7 @@ export class Enrollment extends Model<Enrollment> {
   @AllowNull(false)
   @Column({
     type: DataType.STRING(100),
+    unique: 'compositeIndex'
   })
   courseId!: string;
 

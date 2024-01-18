@@ -59,7 +59,7 @@ export class Course extends Model<Course> {
   @Default(0)
   @AllowNull(false)
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.INTEGER,
   })
   discount!: number;
 

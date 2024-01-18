@@ -12,18 +12,12 @@ import { User } from './User';
   underscored: true, // Use naming convention snake_case
 })
 export class Favorite extends Model<Favorite> {
-  @PrimaryKey
-  @AllowNull(false)
-  @AutoIncrement
-  @Column({
-    type: DataType.INTEGER,
-  })
-  id!: number;
 
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
+    unique: 'compositeIndex'
   })
   userId!: number;
 
@@ -31,6 +25,7 @@ export class Favorite extends Model<Favorite> {
   @AllowNull(false)
   @Column({
     type: DataType.STRING(100),
+    unique: 'compositeIndex'
   })
   courseId!: string;
 
