@@ -3,22 +3,12 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('comments', {
+    await queryInterface.createTable('payments', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
-      },
-      lesson_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: {
-            tableName: 'lessons',
-          },
-          key: 'id'
-        },
       },
       user_id: {
         type: Sequelize.INTEGER,
@@ -30,19 +20,30 @@ module.exports = {
           key: 'id'
         },
       },
-      parent_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: {
-            tableName: 'comments',
-          },
-          key: 'id'
-        },
+      price:{
+        type: Sequelize.FLOAT,
+        allowNull: false,
       },
-      content:{
-        type: Sequelize.TEXT,
-        allowNull: true,
+      payment_method:{
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      transaction_id:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        unique: true
+      },
+      status:{
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      order_info:{
+        type: Sequelize.STRING,
+      },
+      is_payment:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -60,6 +61,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('comments');
+     await queryInterface.dropTable('payments');
   }
 };

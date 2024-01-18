@@ -26,7 +26,7 @@ module.exports = {
         allowNull: false,
       },
       discount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       category_id: {
