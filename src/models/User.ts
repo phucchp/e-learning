@@ -3,6 +3,8 @@ import { Profile } from './Profile';
 import { Favorite } from './Favorite';
 import { Course } from './Course';
 import { Enrollment } from './Enrollment';
+import { Comment } from './Comment';
+
 
 @Table({
   tableName: 'users',
@@ -18,7 +20,7 @@ export class User extends Model<User> {
         type: DataType.INTEGER,
       })
       id!: number;
-    
+
     @NotEmpty
     @AllowNull(false)
     @Unique(true)
@@ -66,6 +68,9 @@ export class User extends Model<User> {
 
     @BelongsToMany(() => Course, () => Enrollment)
     coursesEnrollments!: Course[];
+
+    @HasMany(() => Comment)
+    comments!: Comment;
 
     @DeletedAt
     deletedAt?: Date;
