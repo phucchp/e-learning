@@ -3,26 +3,11 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('comments', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
-      lesson_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: {
-            tableName: 'lessons',
-          },
-          key: 'id'
-        },
-      },
+    await queryInterface.createTable('reviews', {
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        primaryKey: true,
         references: {
           model: {
             tableName: 'users',
@@ -30,19 +15,23 @@ module.exports = {
           key: 'id'
         },
       },
-      parent_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
+      course_id: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+        primaryKey: true,
         references: {
           model: {
-            tableName: 'comments',
+            tableName: 'courses',
           },
-          key: 'id'
+          key: 'course_id'
         },
       },
-      content:{
-        type: Sequelize.TEXT,
-        allowNull: true,
+      rating:{
+        type: Sequelize.DECIMAL(2,1),
+        allowNull: false,
+      },
+      review:{
+        type: Sequelize.STRING,
       },
       created_at: {
         allowNull: false,
@@ -60,6 +49,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('comments');
+     await queryInterface.dropTable('reviews');
   }
 };

@@ -9,6 +9,7 @@ class CourseRoutes extends BaseRoutes {
 	}
 	public routes(): void {
 		this.router.get('/', this.controller.getCourses);
+		this.router.get('/:courseId', this.controller.getCourse);
 	}
 }
 

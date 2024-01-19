@@ -23,7 +23,7 @@ class App {
 				// console.log('✅ Cơ sở dữ liệu đã được đồng bộ hóa.');
 			})
 			.catch((error) => {
-				console.error('❌ Lỗi đồng bộ hóa cơ sở dữ liệu:', error);
+				console.error('❌ Database synchronization error:', error);
 			});
 	}
 

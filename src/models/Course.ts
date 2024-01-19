@@ -8,6 +8,8 @@ import { Level } from './Level';
 import { Topic } from './Topic';
 import { Favorite } from './Favorite';
 import { Enrollment } from './Enrollment';
+import { Cart } from './Cart';
+import { Review } from './Review';
 
 @Table({
   tableName: 'courses',
@@ -50,6 +52,16 @@ export class Course extends Model<Course> {
   })
   description!: string | null;
 
+  @Column({
+    type: DataType.TEXT,
+  })
+  learnsDescription!: string | null;
+
+  @Column({
+    type: DataType.TEXT,
+  })
+  requirementsDescription!: string | null;
+
   @AllowNull(false)
   @Column({
     type: DataType.FLOAT,
@@ -59,9 +71,16 @@ export class Course extends Model<Course> {
   @Default(0)
   @AllowNull(false)
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.INTEGER,
   })
   discount!: number;
+
+  @Default(0)
+  @AllowNull(false)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  duration!: number;
 
   @ForeignKey(() => Category)
   @AllowNull(false)
@@ -94,6 +113,11 @@ export class Course extends Model<Course> {
     type: DataType.STRING,
   })
   trailerUrl!: string | null;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  subUrl!: string | null;
 
   @Column({
     type: DataType.STRING,
@@ -148,12 +172,24 @@ export class Course extends Model<Course> {
   @HasMany(() => Topic)
   topics!: Topic[];
 
-  @BelongsToMany(() => User, () => Favorite)
-  usersFavorite!: User[];
+  @BelongsToMany(() => User, {
+    through:() => Favorite, 
+    as:'favorites'
+  })
+  favorites!: User[];
 
-  @BelongsToMany(() => User, () => Enrollment)
-  usersEnrollment!: User[];
+  @BelongsToMany(() => User, () => Enrollment, 'enrolledUsers')
+  enrolledUsers!: User[];
+
+  @BelongsToMany(() => User, () => Cart, 'cartUsers')
+  carts!: User[];
   
+  @BelongsToMany(() => User, {
+    through: () => Review, 
+    as: 'reviews'
+  })
+  reviews!: User[];
+
   @DeletedAt
   deletedAt?: Date;
 

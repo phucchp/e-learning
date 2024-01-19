@@ -3,6 +3,14 @@ import { Profile } from './Profile';
 import { Favorite } from './Favorite';
 import { Course } from './Course';
 import { Enrollment } from './Enrollment';
+import { Comment } from './Comment';
+import { Cart } from './Cart';
+import { Review } from './Review';
+import { Note } from './Note';
+import { Payment } from './Payment';
+import { Processing } from './Processing';
+import { Lesson } from './Lesson';
+
 
 @Table({
   tableName: 'users',
@@ -18,7 +26,7 @@ export class User extends Model<User> {
         type: DataType.INTEGER,
       })
       id!: number;
-    
+
     @NotEmpty
     @AllowNull(false)
     @Unique(true)
@@ -61,11 +69,38 @@ export class User extends Model<User> {
     @HasOne(() => Profile)
     profile!: Profile;
 
-    @BelongsToMany(() => Course, () => Favorite)
-    coursesFavorites!: Course[];
+    @BelongsToMany(() => Course, {
+      through:() => Favorite,
+      as: 'favorites'
+    })
+    favorites!: Course[];
 
-    @BelongsToMany(() => Course, () => Enrollment)
+    @BelongsToMany(() => Course,{
+      through: () => Enrollment, 
+      as:'coursesEnrollments'
+    })
     coursesEnrollments!: Course[];
+
+    @BelongsToMany(() => Course, () => Cart , 'carts')
+    carts!: Course[];
+
+    @BelongsToMany(() => Course, {
+      through:() => Review , 
+      as:'reviews'
+    })
+    reviews!: Course[];
+
+    @BelongsToMany(() => Lesson, () => Processing , 'processing')
+    processing!: Lesson[];
+
+    @HasMany(() => Comment)
+    comments!: Comment[];
+
+    @HasMany(() => Note)
+    notes!: Note[];
+
+    @HasMany(() => Payment)
+    payments!: Payment[];
 
     @DeletedAt
     deletedAt?: Date;

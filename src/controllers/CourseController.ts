@@ -13,13 +13,23 @@ export class CourseController{
 
     getCourses = async (req: Request, res: Response) => {
         try{
-            const courses = await this.courseService.getCourses();
+            const courses = await this.courseService.getCourses(req);
             return res.status(200).json(courses);
         }catch(error: any){
-            console.log(error);
-            return res.status(500).json({
-                message: "Server error!"
-            })
+            handleErrorController(error, res);
+        }
+    }
+
+    getCourse = async (req: Request, res: Response) => {
+        try{
+            const courseId = req.params.courseId;
+            const course = await this.courseService.getCourse(courseId);
+            return res.status(200).json({
+                message: "successfully",
+                data: course
+            });
+        }catch(error: any){
+            handleErrorController(error, res);
         }
     }
 }

@@ -6,6 +6,18 @@ import { Course } from '../models/Course';
 import { Level } from '../models/Level';
 import { User } from '../models/User';
 import { Profile } from '../models/Profile';
+import { Topic } from '../models/Topic';
+import { Lesson } from '../models/Lesson';
+import { Enrollment } from '../models/Enrollment';
+import { Favorite } from '../models/Favorite';
+import { Cart } from '../models/Cart';
+import { Note } from '../models/Note';
+import { Review } from '../models/Review';
+import { Comment } from '../models/Comment';
+import { Processing } from '../models/Processing';
+import { Payment } from '../models/Payment';
+import { PaymentDetail } from '../models/PaymentDetail';
+
 
 dotenv.config();
 
@@ -54,10 +66,21 @@ class Database {
 		this.sequelize.addModels([
 			Category,
 			Course,
+			Enrollment,
+			Favorite,
 			Language,
 			Level,
 			User,
-			Profile
+			Profile,
+			Topic,
+			Lesson,
+			Cart,
+			Note,
+			Review,
+			Comment,
+			Processing,
+			Payment,
+			PaymentDetail
 		]);
 
 		await this.sequelize
