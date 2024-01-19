@@ -1,4 +1,4 @@
-import { Comment, Sequelize } from 'sequelize-typescript';
+import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
 import { Category } from '../models/Category';
 import { Language } from '../models/Language';
@@ -10,6 +10,14 @@ import { Topic } from '../models/Topic';
 import { Lesson } from '../models/Lesson';
 import { Enrollment } from '../models/Enrollment';
 import { Favorite } from '../models/Favorite';
+import { Cart } from '../models/Cart';
+import { Note } from '../models/Note';
+import { Review } from '../models/Review';
+import { Comment } from '../models/Comment';
+import { Processing } from '../models/Processing';
+import { Payment } from '../models/Payment';
+import { PaymentDetail } from '../models/PaymentDetail';
+
 
 dotenv.config();
 
@@ -66,6 +74,13 @@ class Database {
 			Profile,
 			Topic,
 			Lesson,
+			Cart,
+			Note,
+			Review,
+			Comment,
+			Processing,
+			Payment,
+			PaymentDetail
 		]);
 
 		await this.sequelize
