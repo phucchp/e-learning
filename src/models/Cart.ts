@@ -1,42 +1,31 @@
 // models/Level.ts
 
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, ForeignKey } from 'sequelize-typescript';
+import { User } from './User';
 import { Course } from './Course';
-import { Lesson } from './Lesson';
 
 @Table({
-  tableName: 'topics',
+  tableName: 'carts',
   timestamps: true,
   paranoid: true,
   underscored: true, // Use naming convention snake_case
 })
-export class Topic extends Model<Topic> {
-  @PrimaryKey
+export class Cart extends Model<Cart> {
+  @ForeignKey(() => User)
   @AllowNull(false)
-  @AutoIncrement
   @Column({
     type: DataType.INTEGER,
+    unique: 'compositeIndex'
   })
-  id!: number;
-
-  @AllowNull(false)
-  @Column({
-    type: DataType.STRING(150),
-  })
-  name!: string;
+  userId!: number;
 
   @ForeignKey(() => Course)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
+    unique: 'compositeIndex'
   })
   courseId!: number;
-
-  @BelongsTo(() => Course)
-  course!: Course;
-  
-  @HasMany(() => Lesson)
-  lessons!: Lesson[];
 
   @DeletedAt
   deletedAt?: Date;

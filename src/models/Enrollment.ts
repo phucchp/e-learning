@@ -22,10 +22,10 @@ export class Enrollment extends Model<Enrollment> {
   @ForeignKey(() => Course)
   @AllowNull(false)
   @Column({
-    type: DataType.STRING(100),
+    type: DataType.INTEGER,
     unique: 'compositeIndex'
   })
-  courseId!: string;
+  courseId!: number;
 
   @DeletedAt
   deletedAt?: Date;

@@ -1,18 +1,17 @@
 // models/Level.ts
 
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import { Topic } from './Topic';
-import { Course } from './Course';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, ForeignKey } from 'sequelize-typescript';
 import { User } from './User';
+import { Lesson } from './Lesson';
 
 @Table({
-  tableName: 'favorites',
+  tableName: 'processing',
   timestamps: true,
   paranoid: true,
   underscored: true, // Use naming convention snake_case
 })
-export class Favorite extends Model<Favorite> {
-
+export class Processing extends Model<Processing> {
+  
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column({
@@ -21,14 +20,14 @@ export class Favorite extends Model<Favorite> {
   })
   userId!: number;
 
-  @ForeignKey(() => Course)
+  @ForeignKey(() => Lesson)
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
     unique: 'compositeIndex'
   })
-  courseId!: number;
-
+  lessonId!: number;
+  
   @DeletedAt
   deletedAt?: Date;
 
