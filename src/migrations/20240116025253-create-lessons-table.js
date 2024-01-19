@@ -18,6 +18,11 @@ module.exports = {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      is_preview:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValues: false
+      },
       topic_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

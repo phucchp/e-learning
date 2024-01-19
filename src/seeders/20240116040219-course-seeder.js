@@ -11,9 +11,12 @@ module.exports = {
         description: 'This course covers fundamental programming concepts and helps beginners get started.',
         price: 49.99,
         discount: 10.00,
+        duration:5,
         category_id: 1, // Replace with an existing category ID
         instructor_id: 1, // Replace with an existing instructor ID
         average_rating: 4.5,
+        learns_description: 'Build 16 web development projects for your portfolio, ready to apply for junior developer jobs.',
+        requirements_description: 'No programming experience needed - I will teach you everything you need to know',
         trailer_url: 'https://www.youtube.com/watch?v=ABC123',
         poster_url: 'https://example.com/poster1.jpg',
         sub_url:'https://www.youtube.com/watch?v=ABC123',
@@ -30,8 +33,11 @@ module.exports = {
         title: 'Web Development Bootcamp',
         introduction: 'Become a full-stack web developer with this comprehensive bootcamp.',
         description: 'Master web development skills with hands-on projects and real-world applications.',
+        learns_description: 'Build 16 web development projects for your portfolio, ready to apply for junior developer jobs.',
+        requirements_description: 'No programming experience needed - I will teach you everything you need to know',
         price: 99.99,
         discount: 20.00,
+        duration:40,
         category_id: 10, // Replace with an existing category ID
         instructor_id: 2, // Replace with an existing instructor ID
         average_rating: 4.8,

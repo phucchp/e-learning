@@ -21,6 +21,16 @@ module.exports = {
       description: {
         type: Sequelize.TEXT,
       },
+      duration: {
+        allowNull: false,
+        type: Sequelize.TEXT,
+      },
+      learns_description: {
+        type: Sequelize.TEXT,
+      },
+      requirements_description: {
+        type: Sequelize.TEXT,
+      },
       price: {
         type: Sequelize.FLOAT,
         allowNull: false,
