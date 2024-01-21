@@ -13,9 +13,10 @@ tags:
     description: API for Authentication
   - name: course
     description: API for Courses
-    externalDocs:
-      description: Find out more
-      url: 'http://swagger.io'
+  - name: category
+    description: API for Categories
+  - name: language
+    description: API for Languages
 paths:
   /courses:
     get:
@@ -145,3 +146,235 @@ paths:
                 type: array
         '400':
           description: Can not get courses
+  /course/{courseId}:
+    get:
+      tags:
+        - course
+      summary: Get course details by courseId
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category
+  /categories:
+    get:
+      tags:
+        - category
+      summary: Get all category
+      description: Get all category
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - category
+      summary: Add new category
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: "New Category"
+      security:
+        - bearerAuth: []
+  /categories/{categoryId}:
+    get:
+      tags:
+        - category
+      summary: Get category by id
+      parameters:
+        - name: categoryId
+          in: path
+          description: Enter categoryId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category
+    put:
+      tags:
+        - category
+      summary: Updates a category
+      operationId: updateMovieWithForm
+      parameters:
+        - name: categoryId
+          in: path
+          description: categoryId of category that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: New Category
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update category
+    delete:
+      tags:
+        - category
+      summary: Deletes a category by categoryId
+      parameters:
+        - name: categoryId
+          in: path
+          description: categoryId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /languages:
+    get:
+      tags:
+        - language
+      summary: Get all languages
+      description: Get all languages
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - language
+      summary: Add new language
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageName:
+                  type: string
+                  default: "New language"
+      security:
+        - bearerAuth: []
+  /languages/{languageId}:
+    get:
+      tags:
+        - language
+      summary: Get language by id
+      parameters:
+        - name: categoryId
+          in: path
+          description: Enter categoryId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get language
+    put:
+      tags:
+        - language
+      summary: Updates a language
+      operationId: updateMovieWithForm
+      parameters:
+        - name: languageId
+          in: path
+          description: languageId of language that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageName:
+                  type: string
+                  default: New language
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+    delete:
+      tags:
+        - language
+      summary: Deletes a language by languageId
+      parameters:
+        - name: languageId
+          in: path
+          description: languageId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []

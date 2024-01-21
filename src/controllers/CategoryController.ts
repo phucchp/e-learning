@@ -62,10 +62,10 @@ export class CategoryController{
     deleteCategory = async (req: Request, res: Response) => {
         try{
             const categoryId = req.params.categoryId;
-            const newCategory = await this.categoryService.deleteCategory(categoryId);
+            const category = await this.categoryService.deleteCategory(categoryId);
             return res.status(200).json({
                 message: "success",
-                data: newCategory
+                data: category
             });
         }catch(error: any){
             handleErrorController(error,res);
