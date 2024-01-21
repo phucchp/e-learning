@@ -11,6 +11,8 @@ import { ICourseRepository } from '../repositories/interfaces/ICourseRepository'
 import { Op } from 'sequelize';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
+import { ReviewRepository } from '../repositories/ReviewRepository';
+import { IReviewRepository } from '../repositories/interfaces/IReviewRepository';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -20,6 +22,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
+
+    @Inject(() => ReviewRepository)
+	private reviewRepository!: IReviewRepository;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
