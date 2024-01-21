@@ -4,6 +4,7 @@ import Database from './config/database';
 import CategoryRoutes from './routes/CategoryRoutes';
 import cors from 'cors';
 import CourseRoutes from './routes/CourseRoutes';
+import LanguageRoutes from './routes/LanguageRoutes';
 
 class App {
 	public app: Application;
@@ -33,6 +34,8 @@ class App {
 		});
 		this.app.use('/api/categories', CategoryRoutes);
 		this.app.use('/api/courses', CourseRoutes);
+		this.app.use('/api/languages', LanguageRoutes);
+
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {

@@ -70,7 +70,6 @@ export class CategoryService implements ICategoryService {
             });
             return newCategory; 
         }catch(error){
-            console.log(error);
             handleErrorFunction(error);
         }
     }
@@ -99,7 +98,6 @@ export class CategoryService implements ICategoryService {
             }
             throw new ContentNotFound('Category not found!');
         }catch(error){
-            console.log(error);
             handleErrorFunction(error);
         }
     }
@@ -115,7 +113,6 @@ export class CategoryService implements ICategoryService {
             }
             throw new ContentNotFound('Category not found!');
         }catch(error){
-            console.log(error);
             handleErrorFunction(error);
         }
     }
