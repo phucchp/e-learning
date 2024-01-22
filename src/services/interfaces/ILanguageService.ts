@@ -3,8 +3,8 @@ import { Request} from 'express';
 
 export interface ILanguageService {
     getLanguages(): Promise<Language[]>;
-    getLanguage(languageId: string): Promise<Language>;
+    getLanguage(languageId: number): Promise<Language>;
     createLanguage(req: Request): Promise<Language>;
     updateLanguage(req: Request): Promise<Language>;
-    deleteLanguage(languageId: string): Promise<void>;
+    deleteLanguage(languageId: number): Promise<void>;
 }
