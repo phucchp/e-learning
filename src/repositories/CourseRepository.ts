@@ -7,7 +7,6 @@ import { Level } from "../models/Level";
 import { Category } from "../models/Category";
 import { User } from "../models/User";
 import { Profile } from "../models/Profile";
-import { Review } from "../models/Review";
 import { Topic } from "../models/Topic";
 import { Lesson } from "../models/Lesson";
 

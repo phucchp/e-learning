@@ -16,34 +16,84 @@ export class LanguageService implements ILanguageService {
 	private languageRepository!: ILanguageRepository;
 
     async getLanguages(): Promise<Language[]> {
-       try{
+        try{
             const languages = await this.languageRepository.getAll();
             return languages;
-       }catch(error){
-            console.log(error);
+        }catch(error){
             handleErrorFunction(error);
-       }
+        }
     }
 
     async getLanguage(languageId: number): Promise<Language> {
         try{
             const language = await this.languageRepository.findById(languageId);
-            if(!language){
-                throw new NotFound('Language not found');
+            if(language){
+                return language;
             }
-            return language;
-       }catch(error){
-            console.log(error);
+            throw new NotFound('Language not found or deleted!');
+        }catch(error){
             handleErrorFunction(error);
-       }
+        }
     }
-    createLanguage(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Language> {
-        throw new Error('Method not implemented.');
+
+    async createLanguage(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Language> {
+        try{
+            const {name} =req.body;
+            const language = await this.languageRepository.findOneByCondition({
+                languageName : name
+            },[], true);
+            if(language){
+                throw new RecordExistsError('Language already exists');
+            }
+            const newLanguage = await this.languageRepository.create({
+                languageName: name
+            });
+            return newLanguage; 
+        }catch(error){
+            handleErrorFunction(error);
+        }
     }
-    updateLanguage(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Language> {
-        throw new Error('Method not implemented.');
+
+    async updateLanguage(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Language> {
+        try{
+            const {languageName} =req.body;
+            const languageId = req.params.languageId;
+            const language = await this.languageRepository.findOneByCondition({
+                id: languageId
+            });
+            if(language) {
+                const checkName  = await this.languageRepository.findOneByCondition({
+                    languageName : languageName
+                },[], true);
+                if(checkName){
+                    throw new RecordExistsError('Language name already exists');
+                }
+                const newLanguage = await this.languageRepository.update(language.getDataValue('id'),{
+                    languageName: languageName
+                });
+                if(newLanguage){
+                    return newLanguage;
+                }
+                throw new NotFound('Faild');
+            }
+            throw new NotFound('Language not found!');
+        }catch(error){
+            handleErrorFunction(error);
+        }
     }
-    deleteLanguage(languageId: number): Promise<void> {
-        throw new Error('Method not implemented.');
+
+    async deleteLanguage(languageId: number): Promise<void> {
+        try{
+            const language = await this.languageRepository.findOneByCondition({
+                id: languageId
+            });
+            if(language){
+                await this.languageRepository.delete(language.getDataValue('id'));
+                return;
+            }
+            throw new NotFound('Language not found!');
+        }catch(error){
+            handleErrorFunction(error);
+        }
     }
 }
