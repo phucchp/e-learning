@@ -32,7 +32,7 @@ paths:
           explode: true
           schema:
             type: string
-        - name: duration
+        - name: duration[]
           in: query
           description: Filter by total durations of courses 
           required: false

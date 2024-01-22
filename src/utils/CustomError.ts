@@ -11,7 +11,7 @@ export class CustomError extends Error {
 	}
 }
 
-export class UsernameValidDuplicate extends CustomError {
+export class DuplicateError extends CustomError {
 	constructor(message: string) {
 		super(message, 409, 'Conflict');
 	}
@@ -29,7 +29,7 @@ export class OldPasswordError extends CustomError {
 	}
 }
 
-export class NotActiveAccountError extends CustomError {
+export class UnauthorizedError extends CustomError {
 	constructor(message: string) {
 		super(message, 401, 'Unauthorized');
 	}

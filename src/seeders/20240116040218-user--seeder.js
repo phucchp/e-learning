@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const hashedPassword = '$2b$10$D69VoJEoIijwminkjAo.recens0qA/NXN1.PiVy.S8j6ou29G4WlW'; // Replace 'password123' with the desired password
+    const hashedPassword = '$2b$10$VuzRJNXJS6u87eZK6S7JQO9y0qoyOHfp6IKo.eCwcnBXtLuTJltOy'; // Replace 'password123' with the desired password
 
     await queryInterface.bulkInsert('users', [
       {

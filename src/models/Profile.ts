@@ -51,6 +51,7 @@ export class Profile extends Model<Profile> {
   })
   fullName!: string | null;
 
+  @Default('default/avatar.jpg')
   @Column({
     type: DataType.TEXT,
   })
