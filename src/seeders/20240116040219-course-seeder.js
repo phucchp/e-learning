@@ -6,7 +6,7 @@ const generateRandomCourse = () => ({
   title: faker.lorem.sentence(),
   introduction: faker.lorem.paragraph(),
   description: faker.lorem.paragraphs(4),
-  price: faker.number.float({ min: 10, max: 200 }),
+  price: faker.number.float({ min: 0, max: 200 }),
   discount: faker.number.int({ min: 5, max: 50 }),
   duration: faker.number.int({ min: 1, max: 40 }),
   category_id: faker.number.int({ min: 1, max: 10 }), // Replace with an existing category ID
@@ -22,8 +22,8 @@ const generateRandomCourse = () => ({
   language_id: faker.number.int({ min: 1, max: 20 }), // Replace with an existing language ID
   level_id: faker.number.int({ min: 1, max: 4 }),
   is_active: faker.datatype.boolean(),
-  created_at: new Date(),
-  updated_at: new Date(),
+  created_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2024-01-01T00:00:00.000Z' }),
+  updated_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2030-01-01T00:00:00.000Z' }),
 });
 const courses = [...Array(100)].map(() => generateRandomCourse());
 /** @type {import('sequelize-cli').Migration} */

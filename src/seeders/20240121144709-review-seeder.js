@@ -8,8 +8,8 @@ const generateRandomReview = (userId, courseId) => {
     course_id: courseId,
     rating:  faker.number.float({ min: 1, max: 5 }),
     review: faker.lorem.lines(2),
-    created_at: new Date(),
-    updated_at: new Date(),
+    created_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2030-01-01T00:00:00.000Z' }),
+    updated_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2030-01-01T00:00:00.000Z' }),
   };
 };
 
