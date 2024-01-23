@@ -6,6 +6,7 @@ services:
     container_name: E-learning-nodejs-app
     ports:
       - 8000:8000
+      - 9229:9229
     volumes:
       - .:/usr/src/app
     depends_on:

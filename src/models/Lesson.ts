@@ -56,6 +56,12 @@ export class Lesson extends Model<Lesson> {
   })
   lessonUrl!: string;
 
+  @AllowNull(true)
+  @Column({
+    type: DataType.STRING
+  })
+  resourceUrl!: string;
+
   @HasMany(() => Note)
   notes!: Note;
 

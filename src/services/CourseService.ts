@@ -79,7 +79,7 @@ export class CourseService implements ICourseService {
         return where;
     }
 
-    async getCourses(req: Request): Promise<Course[]> {
+    async getCourses(req: Request): Promise<{ rows: Course[]; count: number}> {
        try{
             let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
             const whereCondition: any = {};

@@ -184,11 +184,13 @@ export class Course extends Model<Course> {
   @BelongsToMany(() => User, () => Cart, 'cartUsers')
   carts!: User[];
   
-  @BelongsToMany(() => User, {
-    through: () => Review, 
-    as: 'reviews'
-  })
-  reviews!: User[];
+  // @BelongsToMany(() => User, {
+  //   through: () => Review, 
+  //   as: 'reviews'
+  // })
+  // reviews!: User[];
+  @HasMany(() => Review)
+  reviews!: Review[];
 
   @DeletedAt
   deletedAt?: Date;

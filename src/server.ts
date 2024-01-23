@@ -5,6 +5,8 @@ import CategoryRoutes from './routes/CategoryRoutes';
 import cors from 'cors';
 import CourseRoutes from './routes/CourseRoutes';
 import LanguageRoutes from './routes/LanguageRoutes';
+import AuthenticationRoutes from './routes/AuthenticationRoutes';
+import ReviewRoutes from './routes/ReviewRoutes';
 
 class App {
 	public app: Application;
@@ -35,6 +37,8 @@ class App {
 		this.app.use('/api/categories', CategoryRoutes);
 		this.app.use('/api/courses', CourseRoutes);
 		this.app.use('/api/languages', LanguageRoutes);
+		this.app.use('/api/auth', AuthenticationRoutes);
+		this.app.use('/api/reviews', ReviewRoutes);
 
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp

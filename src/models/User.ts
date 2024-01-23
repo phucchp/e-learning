@@ -84,11 +84,13 @@ export class User extends Model<User> {
     @BelongsToMany(() => Course, () => Cart , 'carts')
     carts!: Course[];
 
-    @BelongsToMany(() => Course, {
-      through:() => Review , 
-      as:'reviews'
-    })
-    reviews!: Course[];
+    // @BelongsToMany(() => Course, {
+    //   through:() => Review , 
+    //   as:'reviews'
+    // })
+    // reviews!: Course[];
+    @HasMany(() => Review)
+    reviews!: Review[];
 
     @BelongsToMany(() => Lesson, () => Processing , 'processing')
     processing!: Lesson[];

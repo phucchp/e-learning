@@ -1,1 +1,24 @@
-GET
+GET http://localhost:8000/api/courses
+
+### Request 2: POST request
+POST http://localhost:8000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "phucchp",
+  "email": "phucchp77@gmail.com",
+  "password": "123456Aa#"
+}
+
+### Request 2: POST request
+POST http://localhost:8000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "phucchp77@gmail.com",
+  "password": "123456Aa#"
+}
+
+### Request 2: POST request
+GET http://localhost:8000/api/categories
+Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsInJvbGUiOjEsInVzZXJuYW1lIjoicGh1Y2NocDc3NiIsImVtYWlsIjoicGh1Y2NocDc3QGdtYWlsLmNvbSIsImlhdCI6MTcwNTkxMTYyNSwiZXhwIjoxNzA1OTEyNTI1fQ.USCsSuFeW_lYNUHP7pXPpEvwNACA7lCNqWS8sWc_RRY"

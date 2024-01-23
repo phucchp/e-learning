@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 interface Payload {
 	userId?: number;
 	role?: number;
-	username: string;
-	gmail?: string;
+	username?: string;
+	email: string;
 }
 
 class Authentication {
@@ -45,23 +45,23 @@ class Authentication {
 		id: number,
 		role: number,
 		username: string,
-		gmail: string
+		email: string
 	) {
 		const secretKey: string = process.env.JWT_SECRET_KEY || 'my-secret-key';
 		const payload: Payload = {
 			userId: id,
 			role: role,
 			username: username,
-			gmail: gmail,
+			email: email,
 		};
 		const optionAccess = { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN };
 		return jwt.sign(payload, secretKey, optionAccess);
 	}
 
-	public static generateRefreshToken(username: string) {
+	public static generateRefreshToken(email: string) {
 		const secretKey: string = process.env.JWT_SECRET_KEY || 'my-secret-key';
 		const payload: Payload = {
-			username: username,
+			email: email,
 		};
 		const optionRefresh = { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN };
 		return jwt.sign(payload, secretKey, optionRefresh);
