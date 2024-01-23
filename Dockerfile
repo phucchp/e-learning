@@ -16,6 +16,6 @@ RUN npm i -g rimraf
 # Bundle app source
 COPY . .
 EXPOSE 8000
-# CMD [ "npm","run", "start:dev" ]
-CMD [ "npm", "start" ]
+CMD [ "npm","run", "start:dev" ]
+# CMD [ "npm", "start" ]
 

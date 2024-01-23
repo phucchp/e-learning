@@ -9,6 +9,7 @@ import { User } from "../models/User";
 import { Profile } from "../models/Profile";
 import { Topic } from "../models/Topic";
 import { Lesson } from "../models/Lesson";
+import { Review } from "../models/Review";
 
 @Service()
 export class CourseRepository extends BaseRepository<Course> implements ICourseRepository{
@@ -17,11 +18,11 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
 		super(Course);
 	}
 
-    async getCourses(options: any): Promise<Course[]> {
+    async getCourses(options: any): Promise<{ rows: Course[]; count: number}> {
         try {
             const {page, pageSize, whereCondition, sort, sortType} = options;
             const offset = (page - 1) * pageSize;
-            const courses = await this.model.findAll({
+            const courses = await this.model.findAndCountAll({
                 attributes: { exclude: ['id', 'updatedAt', 'deletedAt'] },
                 where: whereCondition,
                 include: [
@@ -107,16 +108,20 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                         ],
                     },
                     {
-                        model: User, 
+                        model: Review, 
                         include: [
                             {
-                                model: Profile,
-                                attributes: ['fullName', 'avatar'],
-                            },
+                                model: User,
+                                include: [
+                                    {
+                                        model: Profile,
+                                        attributes: ['fullName', 'avatar'],
+                                    },
+                                ],
+                                attributes: ['userName'], 
+                            }
                         ],
-                        as: 'reviews',
-                        through: { attributes: ['review', 'rating','createdAt', 'updatedAt'] }, // Đặt attributes là một mảng rỗng để bỏ qua các cột không cần thiết
-                        attributes: ['userName'], // Thêm các cột cần lấy từ bảng 'users',
+                        limit : 10
                     },
                     {
                         model: Topic,
@@ -138,5 +143,6 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
             throw error;
         }
     }
+
     
 }
