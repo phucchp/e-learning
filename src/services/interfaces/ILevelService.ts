@@ -6,5 +6,5 @@ export interface ILevelService {
     getLevel(levelId: string): Promise<Level>;
     createLevel(req: Request): Promise<Level>;
     updateLevel(req: Request): Promise<Level>;
-    deleteLevel(LlvelId: string): Promise<void>;
+    deleteLevel(levelId: string): Promise<void>;
 }

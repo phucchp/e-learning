@@ -35,12 +35,6 @@ export class UnauthorizedError extends CustomError {
 	}
 }
 
-export class TokenError extends CustomError {
-	constructor(message: string) {
-		super(message, 401, 'Unauthorized');
-	}
-}
-
 export class InvalidUserNameOrPassword extends CustomError {
 	constructor(message: string) {
 		super(message, 401, 'Unauthorized');

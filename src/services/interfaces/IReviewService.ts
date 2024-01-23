@@ -1,0 +1,10 @@
+import { Review } from "../../models/Review";
+import { Request} from 'express';
+
+export interface IReviewService {
+    getReviews(req: Request): Promise<{ rows: Review[]; count: number }>;
+    getReview(reviewId: string): Promise<Review>;
+    createReview(userId: number, courseId: string, rating: number, review: string): Promise<Review>;
+    updateReview(userId: number, courseId: string, rating: number, review: string): Promise<Review>;
+    deleteReview(courseId: string, userId: number): Promise<void>;
+}
