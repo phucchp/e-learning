@@ -72,7 +72,7 @@ export class ReviewController{
      */
     createReview  = async (req: Request, res: Response) => {
         try {
-            const userId = Number(req.params.userId);
+            const userId = Number(req.payload.userId);
             if(!userId) {
                 throw new UnauthorizedError('Login is required');
             }

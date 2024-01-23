@@ -58,16 +58,16 @@ export class ReviewService implements IReviewService {
     
     async createReview(userId: number, courseId: string, rating: number, review: string): Promise<Review> {
         try {
-            const reviewInstance = await this.reviewRepository.findOneByCondition({
-                courseId: courseId,
-                userId: userId
-            });
             const course = await this.courseRepository.findOneByCondition({ courseId: courseId });
             if(!course){
                 throw new NotFound('Course not found');
             }
+            const reviewInstance = await this.reviewRepository.findOneByCondition({
+                courseId: course.id,
+                userId: userId
+            });
             if(reviewInstance){
-                throw new RecordExistsError('Review already exists!');
+                throw new RecordExistsError('User already review this course before!');
             }
             return await this.reviewRepository.create({
                 userId: userId,

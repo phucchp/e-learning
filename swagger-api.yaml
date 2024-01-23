@@ -17,6 +17,8 @@ tags:
     description: API for Categories
   - name: language
     description: API for Languages
+  - name: review
+    description: API for reviews
 paths:
   /courses:
     get:
@@ -168,6 +170,75 @@ paths:
                 type: array
         '400':
           description: Can not get category
+  /course/{courseId}/reviews:
+    get:
+      tags:
+        - course
+      summary: Get reviews of course
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+        - name: rating
+          in: query
+          description: Filter by rating review
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - rating
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category   
   /categories:
     get:
       tags:
@@ -378,3 +449,125 @@ paths:
                 message: successfully
       security:
         - bearerAuth: []
+  /reviews:
+    get:
+      tags:
+        - review
+      summary: Get all reviews
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title and discription of courses
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: rating
+          in: query
+          description: Filter by rating of review 
+          required: false
+          style: form
+          explode: true  # Do not explode the array
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+        - name: userId
+          in: query
+          description: userId fo filtering
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: courseId
+          in: query
+          description: courseId fo filtering
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - rating
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - review
+      summary: Add new review for user
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseId:
+                  type: string
+                  default: "enter-couse-id-string"
+                rating:
+                  type: number
+                  default: 5.0
+                review:
+                  type: string
+                  default: "Good Course!"
+      security:
+        - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
