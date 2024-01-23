@@ -7,4 +7,6 @@ export interface IReviewService {
     createReview(userId: number, courseId: string, rating: number, review: string): Promise<Review>;
     updateReview(userId: number, courseId: string, rating: number, review: string): Promise<Review>;
     deleteReview(courseId: string, userId: number): Promise<void>;
+    getReviewsOfCourse(req: Request): Promise<{ rows: Review[]; count: number }>;
+    getStatiscalReviews(courseId: string): Promise<{ rows: Review[]; count: any[]}>;
 }

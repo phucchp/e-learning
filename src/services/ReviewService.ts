@@ -116,4 +116,52 @@ export class ReviewService implements IReviewService {
             handleErrorFunction(error);
         }
     }
+
+    async getReviewsOfCourse(req: Request): Promise<{ rows: Review[]; count: number }> {
+        try{
+            const courseId = req.params.courseId;
+            const {page , pageSize, sort, sortType, rating} = req.query;
+            const whereCondition: any = {};
+
+            const course = await this.courseRepository.findOneByCondition({
+                courseId: courseId
+            });
+            if(!course){
+                throw new NotFound('Course not found');
+            }
+        
+            whereCondition['courseId'] = course.id;
+            if(rating){
+                whereCondition[Op.and] = [
+					{ rating: { [Op.gte]: rating } },
+					{ rating: { [Op.lt]: Number(rating)+1 } },
+				];
+            }
+            const options = {
+                page: page || 1,
+                pageSize: pageSize || 10,
+                whereCondition: whereCondition,
+                sortType: sortType || 'ASC',
+                sort : sort || 'createdAt'
+            }
+            const reviews = await this.reviewRepository.getReviewsOfCourse(options);
+            return reviews;
+        }catch(error){
+            handleErrorFunction(error);
+        }
+    }
+    async getStatiscalReviews(courseId: string): Promise<{ rows: Review[]; count: any[]}>{
+        try {
+            const course = await this.courseRepository.findOneByCondition({
+                courseId: courseId
+            });
+            if(!course){
+                throw new NotFound('Course not found');
+            }
+            const results = await this.reviewRepository.getStatiscalReviews(course.id);
+            return results;
+        } catch (error) {
+            handleErrorFunction(error);
+        }
+    }
 }
