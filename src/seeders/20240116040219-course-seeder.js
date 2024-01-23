@@ -22,8 +22,8 @@ const generateRandomCourse = () => ({
   language_id: faker.number.int({ min: 1, max: 20 }), // Replace with an existing language ID
   level_id: faker.number.int({ min: 1, max: 4 }),
   is_active: faker.datatype.boolean(),
-  created_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2024-01-01T00:00:00.000Z' }),
-  updated_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2030-01-01T00:00:00.000Z' }),
+  created_at: new Date(),
+  updated_at: new Date(),
 });
 const courses = [...Array(100)].map(() => generateRandomCourse());
 /** @type {import('sequelize-cli').Migration} */

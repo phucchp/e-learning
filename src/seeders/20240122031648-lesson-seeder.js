@@ -18,8 +18,8 @@ module.exports = {
           resource_url:faker.internet.url(),
           topic_id: topicId,
           lesson_url: faker.internet.url(),
-          created_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2030-01-01T00:00:00.000Z' }),
-          updated_at: faker.date.betweens({ from: '2020-01-01T00:00:00.000Z', to: '2030-01-01T00:00:00.000Z' }),
+          created_at: new Date(),
+          updated_at: new Date(),
         };
 
         lessonsData.push(lesson);
