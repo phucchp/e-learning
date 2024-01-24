@@ -40,10 +40,10 @@ export class NoteService implements INoteService {
             };
             if(sort==='oldest'){
                 options.sort = 'createdAt';
-                options.sortType = 'DESC';
+                options.sortType = 'ASC';
             }else if(sort==='newest'){
                 options.sort = 'createdAt';
-                options.sortType = 'ASC';
+                options.sortType = 'DESC';
             }
             const notes = await this.noteRepository.getNotes(options);
             return notes;
