@@ -9,4 +9,22 @@ export class NoteRepository extends BaseRepository<Note> implements INoteReposit
     constructor(){
 		super(Note);
 	}
+
+	async getNotes(options: any): Promise<{ rows: Note[]; count: number}> {
+		try{
+			const {whereCondition, page, pageSize, sort, sortType} = options;
+			const offset = (page - 1) * pageSize;
+			return await this.model.findAndCountAll({
+				attributes: { exclude: ['userId', 'deletedAt'] },
+				where: whereCondition,
+				limit: pageSize,
+                offset: offset,
+                order: [
+                    [sort, sortType],
+                ]
+			});
+		}catch(error){
+			throw(error);
+		}
+	}
 }
