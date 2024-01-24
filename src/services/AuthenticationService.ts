@@ -7,7 +7,8 @@ import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 import { ProfileRepository } from '../repositories/ProfileRepository';
 import { IProfileRepository } from '../repositories/interfaces/IProfileRepository';
 import { IAuthenticationService } from './interfaces/IAuthenticationService';
-import { DuplicateError, InvalidUserNameOrPassword, UnauthorizedError, handleErrorFunction } from '../utils/CustomError';
+import { DuplicateError, BadRequestError, UnauthorizedError, handleErrorFunction } from '../utils/CustomError';
+import Mail from '../utils/Mail';
 
 @Service()
 export class AuthenticationService implements IAuthenticationService {
@@ -18,13 +19,16 @@ export class AuthenticationService implements IAuthenticationService {
 	@Inject(() => ProfileRepository)
 	private profileRepository!: IProfileRepository;
 
+    @Inject(() => Mail)
+	private mail!: Mail;
+    
     async login(email: string, password: string): Promise<any> {
         try {
             const user = await this.userRepository.findOneByCondition({
                 email: email,
             });
             if(!user){
-                throw new InvalidUserNameOrPassword('Invalid email or password');
+                throw new BadRequestError('Invalid email or password');
             }
             // check password
 			let compare = await Authentication.passwordCompare(
@@ -48,7 +52,7 @@ export class AuthenticationService implements IAuthenticationService {
 					),
 				};
             }else {
-				throw new InvalidUserNameOrPassword('Invalid email or password');
+				throw new BadRequestError('Invalid email or password');
 			}
         } catch (error) {
             handleErrorFunction(error);
@@ -68,7 +72,6 @@ export class AuthenticationService implements IAuthenticationService {
             const hashedPassword: string = await Authentication.passwordHash(
 				password
 			);
-            console.log(hashedPassword);
             const user = await this.userRepository.create({
                 email:email,
                 userName:username,
@@ -80,7 +83,11 @@ export class AuthenticationService implements IAuthenticationService {
                 firstName: firstName,
                 lastName: lastName,
             });
-           
+            await this.mail.activeUser(
+                username,
+                email,
+                'token'
+            );
             return true;
         } catch (error) {
             handleErrorFunction(error);

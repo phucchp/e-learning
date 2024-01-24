@@ -17,17 +17,6 @@ export class DuplicateError extends CustomError {
 	}
 }
 
-export class EmailValidDuplicate extends CustomError {
-	constructor(message: string) {
-		super(message, 409, 'Conflict');
-	}
-}
-
-export class OldPasswordError extends CustomError {
-	constructor(message: string) {
-		super(message, 400, 'Bad Request');
-	}
-}
 
 export class UnauthorizedError extends CustomError {
 	constructor(message: string) {
@@ -35,13 +24,7 @@ export class UnauthorizedError extends CustomError {
 	}
 }
 
-export class InvalidUserNameOrPassword extends CustomError {
-	constructor(message: string) {
-		super(message, 401, 'Unauthorized');
-	}
-}
-
-export class PasswordNotMatch extends CustomError {
+export class BadRequestError extends CustomError {
 	constructor(message: string) {
 		super(message, 400, 'Bad Request');
 	}
@@ -65,11 +48,6 @@ export class ServerError extends CustomError {
 	}
 }
 
-export class EmptyDataError extends CustomError {
-	constructor(message: string = 'Empty data') {
-		super(message, 400, 'Bad Request');
-	}
-}
 
 export class NotFound extends CustomError {
 	constructor(message: string = 'Record not found') {
