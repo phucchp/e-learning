@@ -7,6 +7,7 @@ import CourseRoutes from './routes/CourseRoutes';
 import LanguageRoutes from './routes/LanguageRoutes';
 import AuthenticationRoutes from './routes/AuthenticationRoutes';
 import ReviewRoutes from './routes/ReviewRoutes';
+import NoteRoutes from './routes/NoteRoutes';
 
 class App {
 	public app: Application;
@@ -39,7 +40,7 @@ class App {
 		this.app.use('/api/languages', LanguageRoutes);
 		this.app.use('/api/auth', AuthenticationRoutes);
 		this.app.use('/api/reviews', ReviewRoutes);
-
+		this.app.use('/api/notes', NoteRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {

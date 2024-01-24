@@ -63,7 +63,7 @@ export class Lesson extends Model<Lesson> {
   resourceUrl!: string;
 
   @HasMany(() => Note)
-  notes!: Note;
+  notes!: Note[];
 
   @BelongsToMany(() => User, () => Processing , 'processing')
   processing!: User[];

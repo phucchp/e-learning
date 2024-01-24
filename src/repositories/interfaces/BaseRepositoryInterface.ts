@@ -5,7 +5,7 @@ interface BaseRepositoryInterface<T extends Model<T>> {
   findById(id: number, options?: any): Promise<T | null>;
   create(entity: Partial<T>): Promise<T>;
   update(id: number, entity: Partial<T>): Promise<T | null>;
-  delete(id: number): Promise<number>;
+  delete(id: number, force?: boolean): Promise<number>;
   findOneByCondition(condition: any, options?: any, paranoid?:boolean): Promise<T | null>;
   deleteInstace(model: T, force?: boolean): Promise<void>;
   updateInstace(instance: T): Promise<T | null>;

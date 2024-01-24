@@ -59,12 +59,6 @@ export class NotEnoughAuthority extends CustomError {
 	}
 }
 
-export class NotEnoughSubscription extends CustomError {
-	constructor(message: string) {
-		super(message, 403, 'Forbidden');
-	}
-}
-
 export class ServerError extends CustomError {
 	constructor(message: string) {
 		super(message, 500, 'Internal Server Error');
