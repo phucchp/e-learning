@@ -4,13 +4,15 @@ import { Review } from '../models/Review';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { NotFound, RecordExistsError, ServerError, UnauthorizedError, handleErrorFunction } from '../utils/CustomError';
+import { NotEnoughAuthority, NotFound, RecordExistsError, ServerError, UnauthorizedError, handleErrorFunction } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { ReviewRepository } from '../repositories/ReviewRepository';
 import { IReviewRepository } from '../repositories/interfaces/IReviewRepository';
 import { Op } from 'sequelize';
 import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
+import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
+import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
 
 @Service()
 export class ReviewService implements IReviewService {
@@ -20,6 +22,9 @@ export class ReviewService implements IReviewService {
 
     @Inject(() => CourseRepository)
 	private courseRepository!: ICourseRepository;
+
+    @Inject(() => EnrollmentRepository)
+	private enrollmentRepository!: IEnrollmentRepository;
     
     async getReviews(req: Request): Promise<{ rows: Review[]; count: number }> {
         try {
@@ -62,6 +67,15 @@ export class ReviewService implements IReviewService {
             if(!course){
                 throw new NotFound('Course not found');
             }
+            const enrollmentCourse = await this.enrollmentRepository.findOneByCondition({
+                courseId: course.id,
+                userIdent: userId
+            });
+
+            if(!enrollmentCourse){
+                throw new NotEnoughAuthority('User must enrollment course to be rating');
+            }
+
             const reviewInstance = await this.reviewRepository.findOneByCondition({
                 courseId: course.id,
                 userId: userId
