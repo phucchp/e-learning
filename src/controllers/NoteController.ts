@@ -12,55 +12,39 @@ export class NoteController{
 	}
 
     getNotes = async (req: Request, res: Response) => {
-        try{
-            const notes = await this.noteService.getNotes(req);
-            return res.status(200).json({
-                message: "Successful",
-                page: req.query.page || 1,
-                pageSize: req.query.pageSize || 10,
-                totalCount: notes.count,
-                totalPage: Math.ceil(notes.count/Number(req.query.pageSize || 10)),
-                data: notes.rows
-            });
-        }catch(error){
-            handleErrorController(error, res);
-        }
+        const notes = await this.noteService.getNotes(req);
+        return res.status(200).json({
+            message: "Successful",
+            page: req.query.page || 1,
+            pageSize: req.query.pageSize || 10,
+            totalCount: notes.count,
+            totalPage: Math.ceil(notes.count/Number(req.query.pageSize || 10)),
+            data: notes.rows
+        });
     }
 
     createNote = async (req: Request, res: Response) => {
-        try{
-            const newNote = await this.noteService.createNote(req);
-            return res.status(200).json({
-                message: "Successful",
-                data: newNote
-            });
-        }catch(error){
-            handleErrorController(error, res);
-        }
+        const newNote = await this.noteService.createNote(req);
+        return res.status(200).json({
+            message: "Successful",
+            data: newNote
+        });
     }
 
     updateNote = async (req: Request, res: Response) => {
-        try{
-            const newNote = await this.noteService.updateNote(req);
-            return res.status(200).json({
-                message: "Successful",
-                data: newNote
-            });
-        }catch(error){
-            handleErrorController(error, res);
-        }
+        const newNote = await this.noteService.updateNote(req);
+        return res.status(200).json({
+            message: "Successful",
+            data: newNote
+        });
     }
 
     deleteNote = async (req: Request, res: Response) => {
-        try{
-            const userId = req.payload.userId;
-            const noteId = Number(req.params.noteId);
-            const newNote = await this.noteService.deleteNote(noteId, userId);
-            return res.status(200).json({
-                message: "Successful",
-            });
-        }catch(error){
-            handleErrorController(error, res);
-        }
+        const userId = req.payload.userId;
+        const noteId = Number(req.params.noteId);
+        const newNote = await this.noteService.deleteNote(noteId, userId);
+        return res.status(200).json({
+            message: "Successful",
+        });
     }
 }

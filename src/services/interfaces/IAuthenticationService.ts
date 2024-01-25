@@ -18,8 +18,6 @@ export interface IAuthenticationService {
 	// 	oldPassword: string,
 	// 	newPassword: string
 	// ) => Promise<any>;
-	// activeUser: (email: string, token?: string | null) => Promise<string>;
+	activeUser: (token: string) => Promise<boolean>;
 	// getAccessTokenByRefreshToken: (refreshToken: string) => Promise<any>;
-	// checkUsername: (username: string) => Promise<Boolean>;
-	// checkEmail: (email: string) => Promise<boolean>;
 }

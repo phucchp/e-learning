@@ -75,6 +75,20 @@ class Authentication {
 			return null;
 		}
 	}
+
+	public static createActivationToken(email: string){
+		try{
+		const secretKey: string = process.env.JWT_SECRET_KEY || 'my-secret-key';
+		const payload: Payload = {
+			email: email,
+		};
+		const optionAccess = { expiresIn: '24h' };
+		return jwt.sign(payload, secretKey, optionAccess);
+		}catch (error){
+			console.log(error);
+			throw(error);
+		}
+	}
 }
 
 export default Authentication;

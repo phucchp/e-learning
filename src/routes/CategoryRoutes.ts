@@ -3,6 +3,7 @@ import { auth, authAdmin } from "../middlewares/AuthMiddleware";
 import { validateDeleteCategory, validateGetCategory, validateUpdateCategory } from "../validators/CategoryValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
+import express, { Application, Request, Response, NextFunction } from 'express';
 
 
 class CategoryRoutes extends BaseRoutes {

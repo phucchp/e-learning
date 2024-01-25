@@ -22,32 +22,24 @@ export class UserService implements IUserService {
     }
 
     async isAdmin(userId: number): Promise<boolean>{
-        try {
-            const user = await this.UserRepository.findById(userId);
-            if(!user) {
-                throw new NotFound('User not found or is not actived');
-            }
-            if(user.roleId===3){
-                return true;
-            }
-            return false;
-        } catch (error) {
-            handleErrorFunction(error);
+        const user = await this.UserRepository.findById(userId);
+        if(!user) {
+            throw new NotFound('User not found or is not actived');
         }
+        if(user.roleId===3){
+            return true;
+        }
+        return false;
     }
 
     async isInstructor(userId: number): Promise<boolean>{
-        try {
-            const user = await this.UserRepository.findById(userId);
-            if(!user) {
-                throw new NotFound('User not found or is not actived');
-            }
-            if(user.roleId===2){
-                return true;
-            }
-            return false;
-        } catch (error) {
-            handleErrorFunction(error);
+        const user = await this.UserRepository.findById(userId);
+        if(!user) {
+            throw new NotFound('User not found or is not actived');
         }
+        if(user.roleId===2){
+            return true;
+        }
+        return false;
     }
 }

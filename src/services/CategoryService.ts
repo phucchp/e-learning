@@ -6,7 +6,7 @@ import { ICategoryRepository } from '../repositories/interfaces/ICategoryReposit
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
+import { ContentNotFound, NotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
 import * as crypto from 'crypto';
 
 @Service()
@@ -29,91 +29,70 @@ export class CategoryService implements ICategoryService {
       }
 
     async getAll(): Promise<Category[]> {
-        try{
-            const categories = await this.categoryRepository.getAll();
-            return categories;
-        }catch(error){
-            throw(error);
-        }
+        const categories = await this.categoryRepository.getAll();
+        return categories;
     }
 
     async getCategory(categoryId: string): Promise<Category> {
-        try{
-            const category = await this.categoryRepository.findOneByCondition({
-                categoryId: categoryId
-            },
-            ['id','deletedAt']
-            );
-            if(category){
-                return category;
-            }
-            throw new ContentNotFound('Category not found!');
-        }catch(error){
-            console.log(error);
-            throw new ServerError('Server Error!');
+        const category = await this.categoryRepository.findOneByCondition({
+            categoryId: categoryId
+        },
+        ['id','deletedAt']
+        );
+        if(category){
+            return category;
         }
+        throw new NotFound('Category not found!');
     }
 
     async createCategory(req: Request): Promise<Category> {
-        try{
-            const {name} =req.body;
-            const category = await this.categoryRepository.findOneByCondition({
-                name : name
-            },[], true);
-            if(category){
-                throw new RecordExistsError('Category already exists');
-            }
-            const categoryId = this.generateCategoryId(name);
-            const newCategory = await this.categoryRepository.create({
-                categoryId: categoryId,
-                name: name
-            });
-            return newCategory; 
-        }catch(error){
-            handleErrorFunction(error);
+        const {name} =req.body;
+        const category = await this.categoryRepository.findOneByCondition({
+            name : name
+        },[], true);
+        if(category){
+            throw new RecordExistsError('Category already exists');
         }
+        const categoryId = this.generateCategoryId(name);
+        const newCategory = await this.categoryRepository.create({
+            categoryId: categoryId,
+            name: name
+        });
+        return newCategory; 
     }
 
     async updateCategory(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Category> {
-        try{
-            const {name} =req.body;
-            const categoryId = req.params.categoryId;
-            const category = await this.categoryRepository.findOneByCondition({
-                categoryId: categoryId
-            });
-            if(category) {
-                const checkName  = await this.categoryRepository.findOneByCondition({
-                    name : name
-                },[], true);
-                if(checkName){
-                    throw new RecordExistsError('Category name already exists');
-                }
-                const newCategory = await this.categoryRepository.update(category.getDataValue('id'),{
-                    name: name
-                });
-                if(newCategory){
-                    return newCategory;
-                }
-                throw new ContentNotFound('Faild');
+        const {name} =req.body;
+        const categoryId = req.params.categoryId;
+        const category = await this.categoryRepository.findOneByCondition({
+            categoryId: categoryId
+        });
+        if(category) {
+            const checkName  = await this.categoryRepository.findOneByCondition({
+                name : name
+            },[], true);
+            if(checkName){
+                throw new RecordExistsError('Category name already exists');
             }
-            throw new ContentNotFound('Category not found!');
-        }catch(error){
-            handleErrorFunction(error);
+            const newCategory = await this.categoryRepository.update(category.getDataValue('id'),{
+                name: name
+            });
+            if(newCategory){
+                return newCategory;
+            }
+            throw new ContentNotFound('Faild');
         }
+        throw new ContentNotFound('Category not found!');
     }
 
     async deleteCategory(categoryId: string): Promise<void> {
-        try{
-            const category = await this.categoryRepository.findOneByCondition({
-                categoryId: categoryId
-            });
-            if(category){
-                await this.categoryRepository.delete(category.getDataValue('id'));
-                return;
-            }
-            throw new ContentNotFound('Category not found!');
-        }catch(error){
-            handleErrorFunction(error);
+        const category = await this.categoryRepository.findOneByCondition({
+            categoryId: categoryId
+        });
+        if(category){
+            await this.categoryRepository.delete(category.getDataValue('id'));
+            return;
         }
+        throw new ContentNotFound('Category not found!');
     }
 }

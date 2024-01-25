@@ -17,17 +17,6 @@ export class DuplicateError extends CustomError {
 	}
 }
 
-export class EmailValidDuplicate extends CustomError {
-	constructor(message: string) {
-		super(message, 409, 'Conflict');
-	}
-}
-
-export class OldPasswordError extends CustomError {
-	constructor(message: string) {
-		super(message, 400, 'Bad Request');
-	}
-}
 
 export class UnauthorizedError extends CustomError {
 	constructor(message: string) {
@@ -35,13 +24,7 @@ export class UnauthorizedError extends CustomError {
 	}
 }
 
-export class InvalidUserNameOrPassword extends CustomError {
-	constructor(message: string) {
-		super(message, 401, 'Unauthorized');
-	}
-}
-
-export class PasswordNotMatch extends CustomError {
+export class BadRequestError extends CustomError {
 	constructor(message: string) {
 		super(message, 400, 'Bad Request');
 	}
@@ -65,11 +48,6 @@ export class ServerError extends CustomError {
 	}
 }
 
-export class EmptyDataError extends CustomError {
-	constructor(message: string = 'Empty data') {
-		super(message, 400, 'Bad Request');
-	}
-}
 
 export class NotFound extends CustomError {
 	constructor(message: string = 'Record not found') {
@@ -83,7 +61,16 @@ export class RecordExistsError extends CustomError {
 	}
 }
 
-export function handleErrorController(error: any, res: Response) {
+export function handleErrorController(error: any,req: Request, res: Response) {
+	console.log('ERROR LOG ', new Date().toLocaleString());
+    console.log('Request:', req.method, req.originalUrl);
+    console.log('Params:', req.params);
+    console.log('Body:', req.body);
+    console.log('Query:', req.query);
+    console.log('Error: ', error);
+    console.log('Error stack: ', error.stack);
+    console.log("--------------------------------------------------------------------------------------");
+
 	const status = error.statusCode || 500;
 	const statusText = error.statusText || 'Internal Server Error';
 	const message = error.message || 'Something went wrong';
@@ -94,7 +81,6 @@ export function handleErrorController(error: any, res: Response) {
 }
 
 export function handleErrorFunction(error: any): never {
-	console.log(error);
 	if (error instanceof CustomError) {
 		throw error;
 	} else {
