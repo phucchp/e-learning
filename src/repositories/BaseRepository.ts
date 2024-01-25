@@ -38,26 +38,16 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
     }
 
     async create(data: any): Promise<T> {
-        try{
-            return await this.model.create(data);
-        }catch(error){
-            console.log(error);
-            throw(error);
-        }
+        return await this.model.create(data);
     }
 
     async update(id: number, updateFields: Partial<T>): Promise<T | null> {
-        try{
-            const instance = await this.model.findByPk(id);
-            if (!instance) {
-              return null;
-            }
-            await instance.update(updateFields);
-            return instance;
-        }catch(error){
-            console.log(error);
-            throw(error);
+        const instance = await this.model.findByPk(id);
+        if (!instance) {
+            return null;
         }
+        await instance.update(updateFields);
+        return instance;
       }
 
     /**
@@ -67,31 +57,17 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
      * @returns 
      */
     async delete(id: number, force: boolean = false): Promise<number> {
-        try {
-            const result = await this.model.destroy({ where: { id } as any, force });
-            return result;
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
+        const result = await this.model.destroy({ where: { id } as any, force });
+        return result;
     }
     
     async deleteInstace(model: T, force: boolean = false): Promise<void> {
-		try {
-			await model.destroy({ force: force });
-		} catch (error) {
-			throw(error);
-		}
+		await model.destroy({ force: force });
 	}
 
     async updateInstace(instance: T): Promise<T | null> {
-        try{
-            await instance.save();
-            return instance;
-        }catch(error){
-            console.log(error);
-            throw(error);
-        }
+        await instance.save();
+        return instance;
       }
 }
 

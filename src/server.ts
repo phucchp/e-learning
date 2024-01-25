@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import express, { Application, Request, Response } from 'express';
+import "express-async-errors";
+import express, { Application, Request, Response, NextFunction } from 'express';
 import Database from './config/database';
 import CategoryRoutes from './routes/CategoryRoutes';
 import cors from 'cors';
@@ -8,6 +9,7 @@ import LanguageRoutes from './routes/LanguageRoutes';
 import AuthenticationRoutes from './routes/AuthenticationRoutes';
 import ReviewRoutes from './routes/ReviewRoutes';
 import NoteRoutes from './routes/NoteRoutes';
+import { handleErrorController } from './utils/CustomError';
 
 class App {
 	public app: Application;
@@ -48,6 +50,9 @@ class App {
 			res.status(404).json({
                 message: `API ${url} not found!`
             });
+		});
+		this.app.use((err: Error, req: Request, res: Response, next: NextFunction):void => {
+			handleErrorController(err, req, res);
 		});
 	}
 

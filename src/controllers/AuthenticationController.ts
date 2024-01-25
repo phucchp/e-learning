@@ -15,36 +15,28 @@ export class AuthenticationController {
 	}
 
 	login = async (req: Request, res: Response) => {
-		try {
-			const { email, password } = req.body;
-			const token = await this.authenticationService.login(email, password);
-			const res_token = { type: 'Bearer', token: token };
-			return res.status(200).json({
-				status: 'Ok!',
-				message: 'Successfully login!',
-				result: res_token,
-			});
-		} catch (error) {
-			handleErrorController(error, res);
-		}
+		const { email, password } = req.body;
+		const token = await this.authenticationService.login(email, password);
+		const res_token = { type: 'Bearer', token: token };
+		return res.status(200).json({
+			status: 'Ok!',
+			message: 'Successfully login!',
+			result: res_token,
+		});
 	};
 
     register = async (req: Request, res: Response) => {
-		try {
-			const { email, username, password } = req.body;
+		const { email, username, password } = req.body;
 
-			await this.authenticationService.register(
-				email,
-				username,
-				password
-			);
+		await this.authenticationService.register(
+			email,
+			username,
+			password
+		);
 
-			return res.status(200).json({
-				status: 'Ok',
-				message: 'Successfully registerd users!',
-			});
-		} catch (error: any) {
-			handleErrorController(error, res);
-		}
+		return res.status(200).json({
+			status: 'Ok',
+			message: 'Successfully registerd users!',
+		});
 	};
 }

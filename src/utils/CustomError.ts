@@ -61,7 +61,16 @@ export class RecordExistsError extends CustomError {
 	}
 }
 
-export function handleErrorController(error: any, res: Response) {
+export function handleErrorController(error: any,req: Request, res: Response) {
+	console.log('ERROR LOG ', new Date().toLocaleString());
+    console.log('Request:', req.method, req.originalUrl);
+    console.log('Params:', req.params);
+    console.log('Body:', req.body);
+    console.log('Query:', req.query);
+    console.log('Error: ', error);
+    console.log('Error stack: ', error.stack);
+    console.log("--------------------------------------------------------------------------------------");
+
 	const status = error.statusCode || 500;
 	const statusText = error.statusText || 'Internal Server Error';
 	const message = error.message || 'Something went wrong';
@@ -72,7 +81,6 @@ export function handleErrorController(error: any, res: Response) {
 }
 
 export function handleErrorFunction(error: any): never {
-	console.log(error);
 	if (error instanceof CustomError) {
 		throw error;
 	} else {
