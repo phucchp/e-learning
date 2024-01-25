@@ -9,7 +9,7 @@ import LanguageRoutes from './routes/LanguageRoutes';
 import AuthenticationRoutes from './routes/AuthenticationRoutes';
 import ReviewRoutes from './routes/ReviewRoutes';
 import NoteRoutes from './routes/NoteRoutes';
-import { handleErrorController } from './utils/CustomError';
+import { handleError } from './utils/CustomError';
 
 class App {
 	public app: Application;
@@ -51,8 +51,10 @@ class App {
                 message: `API ${url} not found!`
             });
 		});
+
+		// Xử lí error khi gặp ngoại lệ
 		this.app.use((err: Error, req: Request, res: Response, next: NextFunction):void => {
-			handleErrorController(err, req, res);
+			handleError(err, req, res);
 		});
 	}
 

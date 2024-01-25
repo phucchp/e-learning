@@ -4,7 +4,7 @@ import { Language } from '../models/Language';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
+import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { LanguageRepository } from '../repositories/LanguageRepository';
 import { ILanguageRepository } from '../repositories/interfaces/ILanguageRepository';

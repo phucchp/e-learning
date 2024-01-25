@@ -4,7 +4,7 @@ import { User } from '../models/User';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
+import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { UserRepository } from '../repositories/UserRepository';
 import { IUserRepository } from '../repositories/interfaces/IUserRepository';

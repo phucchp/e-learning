@@ -2,7 +2,7 @@ import { ReviewService } from "../services/ReviewService";
 import { IReviewService } from "../services/interfaces/IReviewService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { UnauthorizedError, handleErrorController, handleErrorFunction } from "../utils/CustomError";
+import { UnauthorizedError } from "../utils/CustomError";
 
 export class ReviewController{
 	private reviewService: IReviewService;

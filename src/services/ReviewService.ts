@@ -4,7 +4,7 @@ import { Review } from '../models/Review';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { NotEnoughAuthority, NotFound, RecordExistsError, ServerError, UnauthorizedError, handleErrorFunction } from '../utils/CustomError';
+import { NotEnoughAuthority, NotFound, RecordExistsError, ServerError, UnauthorizedError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { ReviewRepository } from '../repositories/ReviewRepository';
 import { IReviewRepository } from '../repositories/interfaces/IReviewRepository';

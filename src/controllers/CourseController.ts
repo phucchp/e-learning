@@ -2,7 +2,6 @@ import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { handleErrorController } from "../utils/CustomError";
 import { IReviewService } from "../services/interfaces/IReviewService";
 import { ReviewService } from "../services/ReviewService";
 
