@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
   description: |
-    API Document for Movie Website
+    API Document for E-learning Website
   version: '1.0.0'
-  title: PBL6-Movie Website API
+  title: E-learning Website API
   contact:
     email: phucchp@gmail.com
 servers:
@@ -618,6 +618,61 @@ paths:
                 review:
                   type: string
                   default: "Good Course!"
+      security:
+        - bearerAuth: []
+  /reviews/{reviewId}: 
+    put:
+      tags:
+        - review
+      summary: Updates a review
+      parameters:
+        - name: reviewId
+          in: path
+          description: reviewId of note that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review:
+                  type: string
+                  default: "New review"
+                rating:
+                  type: number
+                  default: 5
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - review
+      summary: Deletes a review by reviewId
+      parameters:
+        - name: reviewId
+          in: path
+          description: reviewId to delete
+          required: true
+          schema:
+            type: number
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
       security:
         - bearerAuth: []
   /notes:
