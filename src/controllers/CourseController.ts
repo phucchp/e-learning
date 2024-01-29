@@ -56,4 +56,20 @@ export class CourseController{
             data: course.rows,
         });
     }
+
+    updateCourse = async (req: Request, res: Response) => {
+        const course = await this.courseService.updateCourse(req);
+        return res.status(200).json({
+            message: "successfully",
+            data: course,
+        });
+    }
+
+    createCourse = async (req: Request, res: Response) => {
+        const course = await this.courseService.createCourse(req);
+        return res.status(201).json({
+            message: "successfully",
+            data: course,
+        });
+    }
 }

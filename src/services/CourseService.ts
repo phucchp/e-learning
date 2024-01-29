@@ -4,7 +4,7 @@ import { Course } from '../models/Course';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
+import { ContentNotFound, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
@@ -13,6 +13,8 @@ import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
 import { ReviewRepository } from '../repositories/ReviewRepository';
 import { IReviewRepository } from '../repositories/interfaces/IReviewRepository';
+import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';
+import { LevelRepository } from '../repositories/LevelRepository';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -25,6 +27,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => ReviewRepository)
 	private reviewRepository!: IReviewRepository;
+
+    @Inject(() => LevelRepository)
+	private levelRepository!: ILevelRepository;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
@@ -141,4 +146,129 @@ export class CourseService implements ICourseService {
         return course;
     }
 
+    /**
+     * Update course for instructor
+     * @param req 
+     */
+    async updateCourse(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Course> {
+        const { courseId } = req.params;
+        const userId = Number(req.payload.userId);
+        const course = await this.getCourse(courseId);
+        if(userId!==course.instructorId){
+            throw new NotEnoughAuthority('Only instructors who own the course have the right to update');
+        }
+
+       // Lọc ra các trường có giá trị từ body
+        const updateFields: Record<string, any> = {};
+        const fieldsToUpdate = [
+            'title', 'introduction', 'description', 'learnsDescription', 'requirementsDescription',
+            'price', 'discount', 'categoryId', 'languageId', 'levelId'
+        ];
+
+        fieldsToUpdate.forEach(field => {
+            if (req.body[field] !== undefined) {
+                updateFields[field] = req.body[field];
+            }
+        });
+
+        // Nếu không có trường nào cần cập nhật, trả về khóa học hiện tại mà không thay đổi
+        if (Object.keys(updateFields).length === 0) {
+            return course;
+        }
+
+        if(req.body.categoryId){ // check category is exist
+            const category = await this.categoryRepository.findOneByCondition({
+                categoryId: req.body.categoryId
+            });
+            if(!category){
+                throw new NotFound('Category not found or deleted!');
+            }
+            updateFields['categoryId'] = category.id;
+        }
+
+        if(req.body.levelId){ // check level is exist
+            const level = await this.levelRepository.findOneByCondition({
+                id: req.body.levelId
+            });
+            if(!level){
+                throw new NotFound('Level not found or deleted!');
+            }
+            updateFields['levelId'] = level.id;
+        }
+
+        if(req.body.languageId){ // check language is exist
+            const language = await this.levelRepository.findOneByCondition({
+                id: req.body.languageId
+            });
+            if(!language){
+                throw new NotFound('Language not found or deleted!');
+            }
+            updateFields['languageId'] = language.id;
+        }
+
+        const courseUpdate = await this.courseRepository.update(course.id,updateFields);
+
+        if(!courseUpdate){
+            throw new NotFound('Course not found');
+        }
+        return courseUpdate;
+    }
+
+    private generateCourseId(name: string): string {
+        // Chuyển tên thành viết thường và thêm dấu gạch ngang
+        const lowerCaseName = name.toLowerCase();
+        const dashedName = lowerCaseName.replace(/\s+/g, '-');
+      
+        // Tạo mã hash SHA-256 từ tên đã được xử lý
+        const hash = crypto.createHash('sha256');
+        const hashedCategoryId = hash.update(dashedName).digest('hex').slice(0,8);
+      
+        // Kết hợp tên đã xử lý và mã hash để tạo categoryId
+        return `${dashedName}-${hashedCategoryId}`;
+      }
+
+    async createCourse(req: Request): Promise<Course> {
+        const {title, introduction, description, learnsDescription, requirementsDescription, price, discount
+            ,categoryId, languageId, levelId
+        } = req.body;
+
+        const category = await this.categoryRepository.findOneByCondition({
+            categoryId: req.body.categoryId
+        });
+        if(!category){
+            throw new NotFound('Category not found or deleted!');
+        }
+
+        const level = await this.levelRepository.findOneByCondition({
+            id: req.body.levelId
+        });
+        if(!level){
+            throw new NotFound('Level not found or deleted!');
+        }
+
+        const language = await this.levelRepository.findOneByCondition({
+            id: req.body.languageId
+        });
+        if(!language){
+            throw new NotFound('Language not found or deleted!');
+        }
+
+        const userId = Number(req.payload.userId);
+        const newCourse = this.courseRepository.create({
+            title: title,
+            introduction: introduction,
+            description: description,
+            learnsDescription: learnsDescription,
+            requirementsDescription: requirementsDescription,
+            price: price,
+            discount: discount,
+            categoryId: category.id,
+            languageId: languageId,
+            levelId: levelId,
+            instructorId: userId,
+            courseId : this.generateCourseId(title),
+        });
+
+        return newCourse;
+    }
 }
