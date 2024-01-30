@@ -11,6 +11,7 @@ import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 
 @Service()
 export class UserService implements IUserService {
+    
     @Inject(() => UserRepository)
 	private UserRepository!: IUserRepository;
     
@@ -41,5 +42,9 @@ export class UserService implements IUserService {
             return true;
         }
         return false;
+    }
+
+    async getCarts(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
+        return await this.UserRepository.getCarts(userId, search);
     }
 }

@@ -203,6 +203,56 @@ paths:
                 type: array
         '400':
           description: Can not get courses
+    post:
+      tags:
+        - course
+      summary: Add new course
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: "Title of Course"
+                introduction:
+                  type: string
+                  default: "Introduction of Course" 
+                description:
+                  type: string
+                  default: "Introduction of Course" 
+                learnsDescription:
+                  type: string
+                  default: "learnsDescription of Course"
+                requirementsDescription:
+                  type: string
+                  default: "requirementsDescription of Course"
+                price:
+                  type: number
+                  format: float
+                  default: 50
+                discount:
+                  type: number
+                  format: int
+                  default: 10
+                categoryId:
+                  type: string
+                  default: "categoryId of Course"
+                languageId:
+                  type: number
+                  format: int
+                  default: 1
+                levelId:
+                  type: number
+                  format: int
+                  default: 1
+      security:
+        - bearerAuth: []
+
   /course/{courseId}:
     get:
       tags:
@@ -225,6 +275,66 @@ paths:
                 type: array
         '400':
           description: Can not get category
+    put:
+      tags:
+        - course
+      summary: Updates a Course
+      parameters:
+        - name: courseId
+          in: path
+          description: courseId of course that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: "Title of Course"
+                introduction:
+                  type: string
+                  default: "Introduction of Course" 
+                description:
+                  type: string
+                  default: "Introduction of Course" 
+                learnsDescription:
+                  type: string
+                  default: "learnsDescription of Course"
+                requirementsDescription:
+                  type: string
+                  default: "requirementsDescription of Course"
+                price:
+                  type: number
+                  format: float
+                  default: 50
+                discount:
+                  type: number
+                  format: int
+                  default: 10
+                categoryId:
+                  type: string
+                  default: "categoryId of Course"
+                languageId:
+                  type: number
+                  format: int
+                  default: 1
+                levelId:
+                  type: number
+                  format: int
+                  default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update category
   /course/{courseId}/reviews:
     get:
       tags:

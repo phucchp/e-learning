@@ -10,7 +10,7 @@ import AuthenticationRoutes from './routes/AuthenticationRoutes';
 import ReviewRoutes from './routes/ReviewRoutes';
 import NoteRoutes from './routes/NoteRoutes';
 import { handleError } from './utils/CustomError';
-
+import UserRoutes from './routes/UserRoutes'
 class App {
 	public app: Application;
 
@@ -43,6 +43,7 @@ class App {
 		this.app.use('/api/auth', AuthenticationRoutes);
 		this.app.use('/api/reviews', ReviewRoutes);
 		this.app.use('/api/notes', NoteRoutes);
+		this.app.use('/api/users', UserRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {

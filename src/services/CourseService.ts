@@ -225,7 +225,7 @@ export class CourseService implements ICourseService {
       
         // Kết hợp tên đã xử lý và mã hash để tạo categoryId
         return `${dashedName}-${hashedCategoryId}`;
-      }
+    }
 
     async createCourse(req: Request): Promise<Course> {
         const {title, introduction, description, learnsDescription, requirementsDescription, price, discount
