@@ -81,7 +81,10 @@ export class User extends Model<User> {
     })
     coursesEnrollments!: Course[];
 
-    @BelongsToMany(() => Course, () => Cart , 'carts')
+    @BelongsToMany(() => Course, {
+      through: () => Cart, 
+      as:'carts'
+    })
     carts!: Course[];
 
     // @BelongsToMany(() => Course, {
@@ -92,7 +95,10 @@ export class User extends Model<User> {
     @HasMany(() => Review)
     reviews!: Review[];
 
-    @BelongsToMany(() => Lesson, () => Processing , 'processing')
+    @BelongsToMany(() => Lesson, {
+      through:() => Processing,
+      as:'processing'
+    })
     processing!: Lesson[];
 
     @HasMany(() => Comment)
