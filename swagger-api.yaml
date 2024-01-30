@@ -21,6 +21,8 @@ tags:
     description: API for reviews
   - name: note
     description: API for notes
+  - name: user
+    description: API for users
 paths:
   /auth/login:
     post:
@@ -926,6 +928,70 @@ paths:
             application/json:
               example:
                 message: successfully
+      security:
+        - bearerAuth: []
+  /users/carts:
+    get:
+      tags:
+        - user
+      summary: Get all courses in cart of user
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title course
+          required: false
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - user
+      summary: Deletes courses from cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseIds:
+                  type: array
+                  default: ['cc8196b3-9ff8-4f6a-8387-a6aa998acedb', 'd2b734f2-eee1-4a34-ae77-919cb7af46fc']
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - user
+      summary: Add course to cart
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseId:
+                  type: string
+                  default: "d2b734f2-eee1-4a34-ae77-919cb7af46fc"
       security:
         - bearerAuth: []
 components:
