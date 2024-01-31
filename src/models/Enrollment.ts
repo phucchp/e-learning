@@ -11,6 +11,15 @@ import { User } from './User';
   underscored: true, // Use naming convention snake_case
 })
 export class Enrollment extends Model<Enrollment> {
+
+  @PrimaryKey
+  @AllowNull(false)
+  @AutoIncrement
+  @Column({
+      type: DataType.INTEGER,
+    })
+  id!: number;
+
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column({
@@ -27,6 +36,11 @@ export class Enrollment extends Model<Enrollment> {
   })
   courseId!: number;
 
+  @BelongsTo(() => User)
+  user!: User;
+  @BelongsTo(() => Course)
+  course!: Course;
+  
   @DeletedAt
   deletedAt?: Date;
 

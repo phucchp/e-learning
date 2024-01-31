@@ -957,7 +957,7 @@ paths:
     delete:
       tags:
         - user
-      summary: Deletes courses from cart
+      summary: Delete courses from cart
       requestBody:
         content:
           application/json:

@@ -178,8 +178,8 @@ export class Course extends Model<Course> {
   })
   favorites!: User[];
 
-  @BelongsToMany(() => User, () => Enrollment, 'enrolledUsers')
-  enrolledUsers!: User[];
+  // @BelongsToMany(() => User, () => Enrollment, 'enrolledUsers')
+  // enrolledUsers!: User[];
 
   @BelongsToMany(() => User, () => Cart, 'cartUsers')
   carts!: User[];
@@ -191,6 +191,9 @@ export class Course extends Model<Course> {
   // reviews!: User[];
   @HasMany(() => Review)
   reviews!: Review[];
+
+  @HasMany(() => Enrollment)
+  enrollments!: Enrollment[];
 
   @DeletedAt
   deletedAt?: Date;

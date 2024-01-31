@@ -25,7 +25,7 @@ export class User extends Model<User> {
     @Column({
         type: DataType.INTEGER,
       })
-      id!: number;
+    id!: number;
 
     @NotEmpty
     @AllowNull(false)
@@ -75,11 +75,14 @@ export class User extends Model<User> {
     })
     favorites!: Course[];
 
-    @BelongsToMany(() => Course,{
-      through: () => Enrollment, 
-      as:'coursesEnrollments'
-    })
-    coursesEnrollments!: Course[];
+    // @BelongsToMany(() => Course,{
+    //   through: () => Enrollment, 
+    //   as:'coursesEnrollments'
+    // })
+    // coursesEnrollments!: Course[];
+    @HasMany(() => Enrollment)
+    enrollments!: Enrollment[];
+
 
     @BelongsToMany(() => Course, {
       through: () => Cart, 
