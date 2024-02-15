@@ -2,7 +2,7 @@ import { CategoryService } from "../services/CategoryService";
 import { ICategoryService } from "../services/interfaces/ICategoryService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { NotFound, handleErrorController } from "../utils/CustomError";
+import { NotFound } from "../utils/CustomError";
 
 export class CategoryController{
 	private categoryService: ICategoryService;

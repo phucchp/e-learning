@@ -2,7 +2,7 @@ import { ReviewService } from "../services/ReviewService";
 import { IReviewService } from "../services/interfaces/IReviewService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { UnauthorizedError, handleErrorController, handleErrorFunction } from "../utils/CustomError";
+import { UnauthorizedError } from "../utils/CustomError";
 
 export class ReviewController{
 	private reviewService: IReviewService;
@@ -31,13 +31,8 @@ export class ReviewController{
      */
     deleteReview  = async (req: Request, res: Response) => {
         const userId = Number(req.payload.userId);
-        if(!userId) {
-            return res.status(403).json({
-                message: "Please login"
-            });
-        }
-        const courseId = req.body.courseId;
-        await this.reviewService.deleteReview(courseId,userId);
+        const reviewId = Number(req.params.reviewId);
+        await this.reviewService.deleteReview(reviewId,userId);
         return res.status(200).json({
             message: "Review deleted successfully"
         });
@@ -75,12 +70,10 @@ export class ReviewController{
      * Update review for User
      */
     updateReview  = async (req: Request, res: Response) => {
-        const userId = Number(req.params.userId);
-        if(!userId) {
-            throw new UnauthorizedError('Login is required');
-        }
-        const {courseId, rating, review} = req.body;
-        const newReview = await this.reviewService.updateReview(userId, courseId, rating, review);
+        const userId = Number(req.payload.userId);
+        const { rating, review} = req.body;
+        const reviewId = Number(req.params.reviewId);
+        const newReview = await this.reviewService.updateReview(userId, reviewId, rating, review);
         return res.status(200).json({
             message: "successfully",
             data: newReview

@@ -2,7 +2,6 @@ import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { handleErrorController } from "../utils/CustomError";
 import { IReviewService } from "../services/interfaces/IReviewService";
 import { ReviewService } from "../services/ReviewService";
 
@@ -55,6 +54,22 @@ export class CourseController{
             pageSize: pageSize,
             totalPage: pageSize < course.count?Math.ceil(course.count/pageSize):course.count,
             data: course.rows,
+        });
+    }
+
+    updateCourse = async (req: Request, res: Response) => {
+        const course = await this.courseService.updateCourse(req);
+        return res.status(200).json({
+            message: "successfully",
+            data: course,
+        });
+    }
+
+    createCourse = async (req: Request, res: Response) => {
+        const course = await this.courseService.createCourse(req);
+        return res.status(201).json({
+            message: "successfully",
+            data: course,
         });
     }
 }

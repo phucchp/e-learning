@@ -4,7 +4,6 @@ import Container, { Inject, Service } from 'typedi';
 import { AuthenticationService } from '../services/AuthenticationService';
 import Authentication from '../utils/Authentication';
 import { IAuthenticationService } from '../services/interfaces/IAuthenticationService';
-import { handleErrorController } from '../utils/CustomError';
 
 
 export class AuthenticationController {

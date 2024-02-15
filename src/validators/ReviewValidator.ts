@@ -14,3 +14,16 @@ export const validateCreateReview = [
     .isString().withMessage('review is a string')
     .isLength({max: 100}).withMessage('max length of review is 255 characters'),
 ]
+
+export const validateDeleteReview = [
+    param('reviewId').notEmpty().isInt({min:1}).withMessage('reviewId is required and must be int')
+]
+
+export const validateUpdateReview = [
+    param('reviewId').notEmpty().isInt({min:1}).withMessage('reviewId is required and must be int'),
+    body('rating').notEmpty().withMessage('rating is required!')
+    .isFloat({min:0, max: 5}).withMessage('rating is min 0 and max 5.0'),
+    body('review').notEmpty().withMessage('review is required')
+    .isString().withMessage('review is a string')
+    .isLength({max: 100}).withMessage('max length of review is 255 characters'),
+]

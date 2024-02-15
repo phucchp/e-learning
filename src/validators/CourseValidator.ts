@@ -23,7 +23,35 @@ export const validateGetCourses = [
     query('price').optional().isIn(['free', 'paid']).withMessage('Invalid price parameter, price is free or paid'),
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
     query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
-  ];
+];
+
 export const validateGetCourse = [
     param('courseId').notEmpty().isString().withMessage('courseId must be a string').trim(),
+]
+
+export const validateUpdateCourse = [
+  param('courseId').notEmpty().isString().withMessage('courseId must be a string').trim(),
+  body('title').optional().isString().withMessage('title must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of title must be min:1 and max:255'),
+  body('introduction').optional().isString().withMessage('introduction must be a string').trim(),
+  body('description').optional().isString().withMessage('description must be a string').trim(),
+  body('learnsDescription').optional().isString().withMessage('learnsDescription must be a string').trim(),
+  body('requirementsDescription').optional().isString().withMessage('learnsDescription must be a string').trim(),
+  body('price').optional().isFloat({min: 0, max: 9999}).withMessage('price must be a float and must be greater than 0'),
+  body('discount').optional().isInt({min: 0,max: 100}).withMessage('discount must be a integer and must be greater than 0 and must be less than 100'),
+  body('categoryId').optional().isString().withMessage('categoryId must be a string').trim(),
+  body('languageId').optional().isInt({min: 1}).withMessage('languageId must be a integer'),
+  body('levelId').optional().isInt({min: 1}).withMessage('levelId must be a integer'),
+]
+
+export const validateCreateCourse = [
+  body('title').optional().isString().withMessage('title must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of title must be min:1 and max:255'),
+  body('introduction').optional().isString().withMessage('introduction must be a string').trim(),
+  body('description').optional().isString().withMessage('description must be a string').trim(),
+  body('learnsDescription').optional().isString().withMessage('learnsDescription must be a string').trim(),
+  body('requirementsDescription').optional().isString().withMessage('learnsDescription must be a string').trim(),
+  body('price').optional().isFloat({min: 0, max: 9999}).withMessage('price must be a float and must be greater than 0'),
+  body('discount').optional().isInt({min: 0,max: 100}).withMessage('discount must be a integer and must be greater than 0 and must be less than 100'),
+  body('categoryId').optional().isString().withMessage('categoryId must be a string').trim(),
+  body('languageId').optional().isInt({min: 1}).withMessage('languageId must be a integer'),
+  body('levelId').optional().isInt({min: 1}).withMessage('levelId must be a integer'),
 ]

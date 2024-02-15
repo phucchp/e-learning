@@ -9,6 +9,7 @@ interface BaseRepositoryInterface<T extends Model<T>> {
   findOneByCondition(condition: any, options?: any, paranoid?:boolean): Promise<T | null>;
   deleteInstace(model: T, force?: boolean): Promise<void>;
   updateInstace(instance: T): Promise<T | null>;
+  restore(instance: T): Promise<void>;
 }
 
 export { BaseRepositoryInterface };

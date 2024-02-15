@@ -4,13 +4,14 @@ import { User } from '../models/User';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
+import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { UserRepository } from '../repositories/UserRepository';
 import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 
 @Service()
 export class UserService implements IUserService {
+    
     @Inject(() => UserRepository)
 	private UserRepository!: IUserRepository;
     
@@ -41,5 +42,9 @@ export class UserService implements IUserService {
             return true;
         }
         return false;
+    }
+
+    async getCarts(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
+        return await this.UserRepository.getCarts(userId, search);
     }
 }

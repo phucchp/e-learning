@@ -4,7 +4,7 @@ import { Review } from '../models/Review';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { NotEnoughAuthority, NotFound, RecordExistsError, ServerError, UnauthorizedError, handleErrorFunction } from '../utils/CustomError';
+import { NotEnoughAuthority, NotFound, RecordExistsError, ServerError, UnauthorizedError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { ReviewRepository } from '../repositories/ReviewRepository';
 import { IReviewRepository } from '../repositories/interfaces/IReviewRepository';
@@ -60,7 +60,7 @@ export class ReviewService implements IReviewService {
         }
         const enrollmentCourse = await this.enrollmentRepository.findOneByCondition({
             courseId: course.id,
-            userIdent: userId
+            userId: userId
         });
 
         if(!enrollmentCourse){
@@ -82,13 +82,13 @@ export class ReviewService implements IReviewService {
         });
     }
     
-    async updateReview(userId: number, courseId: string, rating: number, review: string): Promise<Review> {
-        const reviewInstance = await this.reviewRepository.findOneByCondition({
-            courseId: courseId,
-            userId: userId
-        });
+    async updateReview(userId: number, reviewId: number, rating: number, review: string): Promise<Review> {
+        const reviewInstance = await this.reviewRepository.findById(reviewId);
         if(!reviewInstance){
             throw new NotFound('Review not found!');
+        }
+        if(reviewInstance.userId !== userId) {
+            throw new NotEnoughAuthority('Not Enough Authority');
         }
         reviewInstance.rating = rating;
         reviewInstance.review = review;
@@ -100,13 +100,13 @@ export class ReviewService implements IReviewService {
         return newReview;
     }
 
-    async deleteReview(courseId: string, userId: number): Promise<void> {
-        const review = await this.reviewRepository.findOneByCondition({
-            courseId: courseId,
-            userId: userId
-        });
+    async deleteReview(reviewId: number, userId: number): Promise<void> {
+        const review = await this.reviewRepository.findById(reviewId);
         if(!review) {
             throw new NotFound('Review not found or deleted');
+        }
+        if(review.userId !== userId) {
+            throw new NotEnoughAuthority('Not Enough Authority');
         }
         await this.reviewRepository.deleteInstace(review, true);
     }

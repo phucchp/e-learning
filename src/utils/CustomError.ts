@@ -61,7 +61,7 @@ export class RecordExistsError extends CustomError {
 	}
 }
 
-export function handleErrorController(error: any,req: Request, res: Response) {
+export function handleError(error: any,req: Request, res: Response) {
 	console.log('ERROR LOG ', new Date().toLocaleString());
     console.log('Request:', req.method, req.originalUrl);
     console.log('Params:', req.params);
@@ -78,12 +78,4 @@ export function handleErrorController(error: any,req: Request, res: Response) {
 		status: statusText,
 		message: message,
 	});
-}
-
-export function handleErrorFunction(error: any): never {
-	if (error instanceof CustomError) {
-		throw error;
-	} else {
-		throw new ServerError(error.message);
-	}
 }

@@ -1,11 +1,14 @@
 {
   "development": {
-    "username": "root",
-    "password": "root",
+    "username": "phucchp",
+    "password": "Chp123456789",
     "database": "elearning_database",
-    "host": "db",
+    "host": "elearning-database.postgres.database.azure.com",
 		"port": 5432,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": true
+  }
   },
   "test": {
     "username": "root",

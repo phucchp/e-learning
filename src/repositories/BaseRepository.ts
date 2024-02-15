@@ -27,13 +27,14 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
         /**
      * 
      * @param id 
-     * @param paranoid : Default false, if paranoid = true will return soft delete record
+     * @param paranoid : Default true, if paranoid = false will return soft delete record
      * @returns model
      */
-    async findOneByCondition(condition: any, options: any = [], paranoid:boolean = false): Promise<T | null> {
+    async findOneByCondition(condition: any, options: any = [], paranoid:boolean = true): Promise<T | null> {
         return this.model.findOne({
             where: condition,
-            attributes: { exclude: options }
+            attributes: { exclude: options },
+            paranoid: paranoid
         });
     }
 
@@ -68,7 +69,11 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
     async updateInstace(instance: T): Promise<T | null> {
         await instance.save();
         return instance;
-      }
+    }
+
+    async restore(model: T): Promise<void> {
+		return await model.restore();
+	}
 }
 
 

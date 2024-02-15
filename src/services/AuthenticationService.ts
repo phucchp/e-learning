@@ -7,7 +7,7 @@ import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 import { ProfileRepository } from '../repositories/ProfileRepository';
 import { IProfileRepository } from '../repositories/interfaces/IProfileRepository';
 import { IAuthenticationService } from './interfaces/IAuthenticationService';
-import { DuplicateError, BadRequestError, UnauthorizedError, handleErrorFunction, NotFound } from '../utils/CustomError';
+import { DuplicateError, BadRequestError, UnauthorizedError, NotFound } from '../utils/CustomError';
 import Mail from '../utils/Mail';
 
 @Service()

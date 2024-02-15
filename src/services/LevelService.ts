@@ -4,7 +4,7 @@ import { Level } from '../models/Level';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
+import { ContentNotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { LevelRepository } from '../repositories/LevelRepository';
 import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';

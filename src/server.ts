@@ -9,8 +9,8 @@ import LanguageRoutes from './routes/LanguageRoutes';
 import AuthenticationRoutes from './routes/AuthenticationRoutes';
 import ReviewRoutes from './routes/ReviewRoutes';
 import NoteRoutes from './routes/NoteRoutes';
-import { handleErrorController } from './utils/CustomError';
-
+import { handleError } from './utils/CustomError';
+import UserRoutes from './routes/UserRoutes'
 class App {
 	public app: Application;
 
@@ -43,6 +43,7 @@ class App {
 		this.app.use('/api/auth', AuthenticationRoutes);
 		this.app.use('/api/reviews', ReviewRoutes);
 		this.app.use('/api/notes', NoteRoutes);
+		this.app.use('/api/users', UserRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {
@@ -51,8 +52,10 @@ class App {
                 message: `API ${url} not found!`
             });
 		});
+
+		// Xử lí error khi gặp ngoại lệ
 		this.app.use((err: Error, req: Request, res: Response, next: NextFunction):void => {
-			handleErrorController(err, req, res);
+			handleError(err, req, res);
 		});
 	}
 

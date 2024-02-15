@@ -4,7 +4,7 @@ import { Note } from '../models/Note';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, DuplicateError, NotEnoughAuthority, NotFound, RecordExistsError, ServerError, handleErrorFunction } from '../utils/CustomError';
+import { ContentNotFound, DuplicateError, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { NoteRepository } from '../repositories/NoteRepository';
 import { INoteRepository } from '../repositories/interfaces/INoteRepository';
