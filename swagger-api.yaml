@@ -153,6 +153,7 @@ paths:
                 - 1
                 - 2
                 - 3
+                - 4
         - name: sort
           in: query
           description: Choose addition to sort
@@ -255,7 +256,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /course/{courseId}:
+  /courses/{courseId}:
     get:
       tags:
         - course
@@ -337,7 +338,7 @@ paths:
                 type: array
         '400':
           description: Can not update category
-  /course/{courseId}/reviews:
+  /courses/{courseId}/reviews:
     get:
       tags:
         - course
@@ -992,6 +993,125 @@ paths:
                 courseId:
                   type: string
                   default: "d2b734f2-eee1-4a34-ae77-919cb7af46fc"
+      security:
+        - bearerAuth: []
+  /users/enrollment-courses:
+    get:
+      tags:
+        - user
+      summary: Get all courses enrollment of user
+      description: Get and search courses enrollment API
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title and discription of courses
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: duration[]
+          in: query
+          description: Filter by total durations of courses 
+          required: false
+          style: form
+          explode: true  # Do not explode the array
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - extraShort
+                - short
+                - medium
+                - long
+                - extraLong
+        - name: category
+          in: query
+          description: Filter by category courses, enter categoryId of Category
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: averageRating
+          in: query
+          description: Filter by average rating course, enter average rating of course to filter
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: languageId
+          in: query
+          description: Filter by language of course
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: level
+          in: query
+          description: Choose level to filter
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: number
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - price
+                - discount
+                - duration
+                - averageRating
+                - totalStudents
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
       security:
         - bearerAuth: []
 components:
