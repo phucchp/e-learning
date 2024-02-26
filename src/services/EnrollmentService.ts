@@ -4,7 +4,7 @@ import { Enrollment } from '../models/Enrollment';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
+import { BadRequestError, ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
 import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
 import { Op } from 'sequelize';
@@ -14,7 +14,7 @@ import { ICategoryRepository } from '../repositories/interfaces/ICategoryReposit
 
 @Service()
 export class EnrollmentService implements IEnrollmentService {
-
+    
     @Inject(() => EnrollmentRepository)
 	private enrollmentRepository!: IEnrollmentRepository;
 
@@ -70,4 +70,27 @@ export class EnrollmentService implements IEnrollmentService {
         return await this.enrollmentRepository.getEnrollmentCourses(userId, options);
     }
 
+    /**
+     * Check user is enrollment course
+     */
+    protected async isUserEnrollmentCourse(userId: number, courseId: number): Promise<boolean>{
+        const enrollment = await this.enrollmentRepository.findOneByCondition({
+            userId: userId,
+            courseId: courseId
+        },[], false);
+        if(enrollment) return true;
+        return false;
+    }
+
+    async addEnrollmentCourse(userId: number, courseId: number): Promise<Enrollment> {
+        if(await this.isUserEnrollmentCourse(userId, courseId)){
+            // Return error if user already enrollment course
+            throw new BadRequestError('User already enrollment course!');
+        }
+
+        return await this.enrollmentRepository.create({
+            userId:userId,
+            courseId:courseId
+        });
+    }
 }

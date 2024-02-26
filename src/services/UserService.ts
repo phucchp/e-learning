@@ -38,7 +38,7 @@ export class UserService implements IUserService {
         if(!user) {
             throw new NotFound('User not found or is not actived');
         }
-        if(user.roleId===2){
+        if(user.roleId===2 || user.roleId===3){
             return true;
         }
         return false;
