@@ -15,9 +15,9 @@ module.exports = {
           title: faker.lorem.words(3),
           duration: faker.number.int({ min: 1, max: 60 }), // Random duration between 30 and 180 minutes
           is_preview: faker.datatype.boolean(),
-          resource_url:faker.internet.url(),
+          resource_url:'lessons/defaults/resource.zip',
           topic_id: topicId,
-          lesson_url: faker.internet.url(),
+          lesson_url: 'courses/defaults/trailer.mp4',
           created_at: new Date(),
           updated_at: new Date(),
         };

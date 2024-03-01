@@ -3,5 +3,4 @@ import { BaseRepositoryInterface } from "./BaseRepositoryInterface";
 import { Model, ModelCtor } from 'sequelize-typescript';
 
 export interface IPaymentRepository extends BaseRepositoryInterface<Payment> {
-
 }
