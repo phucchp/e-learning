@@ -89,7 +89,6 @@ export class CourseService implements ICourseService {
     }
 
     async getCourses(req: Request): Promise<{ rows: Course[]; count: number}> {
-        console.log(await this.s3Service.getObjectUrl('lessons/me-removebg-preview.png'));
         let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
         const whereCondition: any = {};
         if(search){
