@@ -67,3 +67,10 @@ fix:
 migration-refresh:
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate:undo" && \
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:migrate"
+#Undo all seed
+seeder-undo:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:seed:undo:all"
+#Refresh seeder
+seeder-refresh:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:seed:undo:all" && \
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:seed:all"

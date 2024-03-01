@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, HasMany } from 'sequelize-typescript';
+import { Course } from './Course';
 
 @Table({
   tableName: 'categories',
@@ -20,6 +21,9 @@ export class Category extends Model<Category> {
   @Unique
   @Column(DataType.STRING)
   name!: string;
+
+  @HasMany(() => Course)
+  courses!: Course[];
 
   @DeletedAt
   deletedAt?: Date;
