@@ -3,6 +3,7 @@
 import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, BelongsTo, ForeignKey, BelongsToMany } from 'sequelize-typescript';
 import { Topic } from './Topic';
 import { Note } from './Note';
+import { Resource } from './Resource';
 import { Processing } from './Processing';
 import { User } from './User';
 
@@ -67,7 +68,10 @@ export class Lesson extends Model<Lesson> {
 
   @BelongsToMany(() => User, () => Processing , 'processing')
   processing!: User[];
-  
+
+  @HasMany(() => Resource)
+  resources!: Resource[];
+
   @DeletedAt
   deletedAt?: Date;
 

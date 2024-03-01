@@ -2,6 +2,7 @@
 
 import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany } from 'sequelize-typescript';
 import { Course } from './Course';
+import { Subtitle } from './Subtitle';
 
 @Table({
   tableName: 'languages',
@@ -25,8 +26,18 @@ export class Language extends Model<Language> {
   })
   languageName!: string;
 
+  @Unique(true)
+  @AllowNull(false)
+  @Column({
+    type: DataType.STRING(10),
+  })
+  code!: string;
+
   @HasMany(() => Course)
   courses!: Course[];
+
+  @HasMany(() => Subtitle)
+  subtitles!: Subtitle[];
 
   @DeletedAt
   deletedAt?: Date;

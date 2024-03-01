@@ -10,6 +10,7 @@ import { Note } from './Note';
 import { Payment } from './Payment';
 import { Processing } from './Processing';
 import { Lesson } from './Lesson';
+import { EWallet } from './EWallet';
 
 
 @Table({
@@ -97,6 +98,9 @@ export class User extends Model<User> {
     // reviews!: Course[];
     @HasMany(() => Review)
     reviews!: Review[];
+
+    @HasMany(() => EWallet)
+    eWallets!: EWallet[];
 
     @BelongsToMany(() => Lesson, {
       through:() => Processing,
