@@ -24,7 +24,7 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
         });
     }
 
-        /**
+    /**
      * 
      * @param id 
      * @param paranoid : Default true, if paranoid = false will return soft delete record

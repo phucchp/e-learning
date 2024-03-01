@@ -15,6 +15,7 @@ import { ReviewRepository } from '../repositories/ReviewRepository';
 import { IReviewRepository } from '../repositories/interfaces/IReviewRepository';
 import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';
 import { LevelRepository } from '../repositories/LevelRepository';
+import { S3Service } from './S3Service';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -30,6 +31,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => LevelRepository)
 	private levelRepository!: ILevelRepository;
+
+    @Inject(() => S3Service)
+	private s3Service!: S3Service;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
@@ -85,6 +89,7 @@ export class CourseService implements ICourseService {
     }
 
     async getCourses(req: Request): Promise<{ rows: Course[]; count: number}> {
+        console.log(await this.s3Service.getObjectUrl('lessons/me-removebg-preview.png'));
         let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
         const whereCondition: any = {};
         if(search){

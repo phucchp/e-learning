@@ -11,7 +11,7 @@ class UserRoutes extends BaseRoutes {
 		this.router.get('/carts', auth, this.controller.getCarts);
 		this.router.delete('/carts',auth, this.controller.deleteCourseFromCart);
 		this.router.post('/carts',auth, this.controller.addCourseToCart);
-		this.router.get('/enrollment-courses', this.controller.getEnrollmentCourses);
+		this.router.get('/enrollment-courses',auth, this.controller.getEnrollmentCourses);
 	}
 }
 

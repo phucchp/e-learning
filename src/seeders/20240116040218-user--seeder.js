@@ -11,7 +11,7 @@ module.exports = {
         email: 'user1@gmail.com',
         password: hashedPassword,
         is_active: true,
-        role_id: 1, // Replace with an existing role ID
+        role_id: 1,  
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -20,7 +20,7 @@ module.exports = {
         email: 'user2@gmail.com',
         password: hashedPassword,
         is_active: true,
-        role_id: 1, // Replace with an existing role ID
+        role_id: 1,  
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -29,7 +29,7 @@ module.exports = {
         email: 'user3@gmail.com',
         password: hashedPassword,
         is_active: true,
-        role_id: 2, // Replace with an existing role ID
+        role_id: 2,  
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -38,7 +38,7 @@ module.exports = {
         email: 'user4@gmail.com',
         password: hashedPassword,
         is_active: true,
-        role_id: 2, // Replace with an existing role ID
+        role_id: 2,  
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -47,7 +47,25 @@ module.exports = {
         email: 'user5@gmail.com',
         password: hashedPassword,
         is_active: true,
-        role_id: 3, // Replace with an existing role ID
+        role_id: 3,  
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        user_name: 'user6',
+        email: 'admin@gmail.com',
+        password: hashedPassword,
+        is_active: true,
+        role_id: 3,  
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        user_name: 'user6',
+        email: 'instructor@gmail.com',
+        password: hashedPassword,
+        is_active: true,
+        role_id: 2,  
         created_at: new Date(),
         updated_at: new Date(),
       },
