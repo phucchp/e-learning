@@ -18,6 +18,7 @@ import { Review } from './Review';
   underscored: true, // Use naming convention snake_case
 })
 export class Course extends Model<Course> {
+  
   @PrimaryKey
   @AllowNull(false)
   @AutoIncrement
@@ -123,6 +124,9 @@ export class Course extends Model<Course> {
     type: DataType.STRING,
     get() {
         const rawValue = this.getDataValue('posterUrl');
+        if(rawValue) {
+          return 
+        }
         return rawValue ? rawValue.toUpperCase() : null;
     }
   })

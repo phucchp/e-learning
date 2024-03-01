@@ -49,6 +49,24 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+      {
+        user_id: 6, // replace with an existing user ID
+        first_name: 'Admin',
+        last_name: 'Admin',
+        avatar: 'users/6/avatar.jpg',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        user_id: 7, // replace with an existing user ID
+        first_name: 'Instructor',
+        last_name: 'Instructor',
+        avatar: 'users/6/avatar.jpg',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
       // Add more profiles as needed
     ]);
   },
