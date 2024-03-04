@@ -73,7 +73,7 @@ export class EnrollmentService implements IEnrollmentService {
     /**
      * Check user is enrollment course
      */
-    protected async isUserEnrollmentCourse(userId: number, courseId: number): Promise<boolean>{
+    async isUserEnrollmentCourse(userId: number, courseId: number): Promise<boolean>{
         const enrollment = await this.enrollmentRepository.findOneByCondition({
             userId: userId,
             courseId: courseId

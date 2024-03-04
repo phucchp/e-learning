@@ -1114,6 +1114,47 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
+  /users/favorite-courses:
+    post:
+          tags:
+            - user
+          summary: Add new favorite course for user
+          responses:
+            '200':
+              description: Successful
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                      default: 'cc8196b3-9ff8-4f6a-8387-a6aa998acedb'
+          security:
+            - bearerAuth: []
+    delete:
+          tags:
+            - user
+          summary: Delete courses favorite
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                      default: 'cc8196b3-9ff8-4f6a-8387-a6aa998acedb'
+          responses:
+            '204':
+              description: successfully
+              content:
+                application/json:
+                  example:
+                    message: successfully
+          security:
+            - bearerAuth: []
 components:
   securitySchemes:
     bearerAuth:

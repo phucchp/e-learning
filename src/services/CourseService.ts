@@ -4,7 +4,7 @@ import { Course } from '../models/Course';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
+import { ContentNotFound, DuplicateError, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
@@ -16,6 +16,14 @@ import { IReviewRepository } from '../repositories/interfaces/IReviewRepository'
 import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';
 import { LevelRepository } from '../repositories/LevelRepository';
 import { S3Service } from './S3Service';
+import { LessonRepository } from '../repositories/LessonRepository';
+import { TopicRepository } from '../repositories/TopicRepository';
+import { ILessonRepository } from '../repositories/interfaces/ILessonRepository';
+import { ITopicRepository } from '../repositories/interfaces/ITopicRepository';
+import { FavoriteRepository } from '../repositories/FavoriteRepository';
+import { IFavoriteRepository } from '../repositories/interfaces/IFavoriteRepository';
+import { Favorite } from '../models/Favorite';
+import { IoTRoboRunner } from 'aws-sdk';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -31,6 +39,15 @@ export class CourseService implements ICourseService {
 
     @Inject(() => LevelRepository)
 	private levelRepository!: ILevelRepository;
+
+    @Inject(() => LessonRepository)
+	private lessonRepository!: ILessonRepository;
+
+    @Inject(() => TopicRepository)
+	private topicRepository!: ITopicRepository;
+
+    @Inject(() => FavoriteRepository)
+	private favoriteRepository!: IFavoriteRepository;
 
     @Inject(() => S3Service)
 	private s3Service!: S3Service;
@@ -275,5 +292,87 @@ export class CourseService implements ICourseService {
         });
 
         return newCourse;
+    }
+
+    async getCourseIdByLessonId(lessonId: number): Promise<number> {
+        const lesson = await this.lessonRepository.findById(lessonId);
+        if(!lesson) {
+            throw new NotFound('lesson not found');
+        }
+
+        const topic = await this.topicRepository.findById(lesson.topicId);
+        if(!topic) {
+            throw new ServerError('Server error: Can not find topic of lesson');
+        }
+
+        return topic.courseId;
+    }
+
+    /**
+     * Check the user's favorite course.
+     * 
+     * @param courseId 
+     * @param userId 
+     * @returns 
+     */
+    async isCourseFavorite(courseId: number, userId: number): Promise<boolean> {
+        const favorite = await this.favoriteRepository.findOneByCondition({
+            courseId: courseId,
+            userId: userId
+        }, true);
+        if(!favorite){
+            return false;
+        }
+        return true;
+    }
+
+    async addCourseFavorite(courseId: string, userId: number): Promise<boolean> {
+        const course  = await this.courseRepository.findOneByCondition({
+            courseId: courseId,
+            active: true
+        });
+        // Check course is exist
+        if(!course){
+            throw new NotFound('Course not found or is not actived');
+        }
+
+        if(await this.isCourseFavorite(course.id, userId)){
+            // Return error if user already favorited course
+            throw new DuplicateError('The user already favorited the course before.');
+        }
+
+        await this.favoriteRepository.create({
+            courseId: course.id,
+            userId: userId
+        });
+
+        return true;
+    }
+
+    async deleteCourseFavorite(courseId: string, userId: number): Promise<boolean> {
+        const course  = await this.courseRepository.findOneByCondition({
+            courseId: courseId,
+            active: true
+        });
+        // Check course is exist
+        if(!course){
+            throw new NotFound('Course not found or is not actived');
+        }
+        const favorite = await this.favoriteRepository.findOneByCondition({
+            courseId: course.id,
+            userId: userId
+        }, true);
+
+        if(!favorite){
+            // Return error if user is not favorited course
+            throw new NotFound('The user is not favorited the course before.');
+        }
+        
+        await this.favoriteRepository.deleteInstace(favorite);
+        return true;
+    }
+
+    async getCoursesFavorite(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: Favorite[]; count: number; }> {
+        throw Error("Method not implemented");
     }
 }
