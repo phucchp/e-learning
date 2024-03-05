@@ -17,6 +17,9 @@ import { Comment } from '../models/Comment';
 import { Processing } from '../models/Processing';
 import { Payment } from '../models/Payment';
 import { PaymentDetail } from '../models/PaymentDetail';
+import { EWallet } from '../models/EWallet';
+import { Resource } from '../models/Resource';
+import { Subtitle } from '../models/Subtitle';
 
 
 dotenv.config();
@@ -80,7 +83,10 @@ class Database {
 			Comment,
 			Processing,
 			Payment,
-			PaymentDetail
+			PaymentDetail,
+			Subtitle,
+			Resource,
+			EWallet,
 		]);
 
 		await this.sequelize
