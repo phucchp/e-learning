@@ -6,6 +6,7 @@ import { Note } from './Note';
 import { Resource } from './Resource';
 import { Processing } from './Processing';
 import { User } from './User';
+import { Remind } from './Remind';
 
 @Table({
   tableName: 'lessons',
@@ -57,12 +58,6 @@ export class Lesson extends Model<Lesson> {
   })
   lessonUrl!: string;
 
-  @AllowNull(true)
-  @Column({
-    type: DataType.STRING
-  })
-  resourceUrl!: string;
-
   @HasMany(() => Note)
   notes!: Note[];
 
@@ -71,6 +66,9 @@ export class Lesson extends Model<Lesson> {
 
   @HasMany(() => Resource)
   resources!: Resource[];
+
+  @HasMany(() => Remind)
+  reminds!: Remind[];
 
   @DeletedAt
   deletedAt?: Date;

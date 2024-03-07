@@ -20,7 +20,7 @@ import { PaymentDetail } from '../models/PaymentDetail';
 import { EWallet } from '../models/EWallet';
 import { Resource } from '../models/Resource';
 import { Subtitle } from '../models/Subtitle';
-
+import { Remind } from '../models/Remind';
 
 dotenv.config();
 
@@ -87,6 +87,7 @@ class Database {
 			Subtitle,
 			Resource,
 			EWallet,
+			Remind,
 		]);
 
 		await this.sequelize
