@@ -12,8 +12,46 @@ export const validateRegister = [
         minUppercase:1,
         minSymbols:1
     }).withMessage('password must be more than 5 characters and at least a number,a Symbols characters, a lowercase and a uppercase')
-    .isLength({min:5, max:100}).withMessage('username must be at least 5 characters and maximum length 100'),
+    .isLength({min:5, max:100}).withMessage('password must be at least 5 characters and maximum length 100'),
     body('email').notEmpty().withMessage('email must be required')
     .isEmail().withMessage('email must be an valid email address'),
 ];
 
+export const validateLogin = [
+    body('email').notEmpty().withMessage('email is required').isEmail().withMessage('email must be an valid email address'),
+    body('password').notEmpty().withMessage('password is required')
+]
+
+export const validateActiveUser = [
+    query('token').notEmpty().withMessage('token is required'),
+]
+
+export const validatChangePassword = [
+    body('oldPassword').notEmpty().withMessage('oldPassword is required'),
+    body('newPassword').notEmpty().withMessage('newPassword is required')
+    .isStrongPassword({
+        minLength:5,
+        minNumbers:1,
+        minLowercase:1,
+        minUppercase:1,
+        minSymbols:1
+    }).withMessage('newPassword must be more than 5 characters and at least a number,a Symbols characters, a lowercase and a uppercase')
+    .isLength({min:5, max:100}).withMessage('newPassword must be at least 5 characters and maximum length 100'),
+]
+
+export const validatChangePasswordUsingToken = [
+    body('token').notEmpty().withMessage('token is required'),
+    body('newPassword').notEmpty().withMessage('newPassword is required')
+    .isStrongPassword({
+        minLength:5,
+        minNumbers:1,
+        minLowercase:1,
+        minUppercase:1,
+        minSymbols:1
+    }).withMessage('newPassword must be more than 5 characters and at least a number,a Symbols characters, a lowercase and a uppercase')
+    .isLength({min:5, max:100}).withMessage('newPassword must be at least 5 characters and maximum length 100'),
+]
+
+export const validateForgotPassword = [
+    body('email').notEmpty().withMessage('email is required'),
+]

@@ -77,6 +77,74 @@ paths:
           description: Successful response
         '500':
           description: Internal server error
+  /auth/users/change-password:
+    post:
+      summary: Change password for user (Already login)
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  default: '123456Aa#'
+                newPassword:
+                  type: string
+                  default: "123456789Aa#"
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+      security:
+        - bearerAuth: []
+  /auth/users/change-password-token:
+    post:
+      summary: Change password for user
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  default: 'Add token here'
+                newPassword:
+                  type: string
+                  default: "123456789Aa#"
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+  /auth/users/forgot-password:
+    post:
+      summary: Forgot password for user
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: 'user1@gmail.com'
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
   /courses:
     get:
       tags:

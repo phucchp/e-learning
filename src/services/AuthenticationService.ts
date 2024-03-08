@@ -78,7 +78,7 @@ export class AuthenticationService implements IAuthenticationService {
             firstName: firstName,
             lastName: lastName,
         });
-        const token: string = await Authentication.createActivationToken(email);
+        const token: string = Authentication.createActivationToken(email);
         await this.mail.activeUser(
             username,
             email,
@@ -87,13 +87,18 @@ export class AuthenticationService implements IAuthenticationService {
         return true;
     }
     
+    /**
+     * Active user using token from mail
+     */
     async activeUser(token: string): Promise<boolean>{
         const data = await Authentication.validateToken(token);
         if(!data) {
+            // Check token is valid
             throw new UnauthorizedError('Token has expired!');
         }
 
         if(!data.email){
+            // Check email 
             throw new NotFound('Email not found!');
         }
 
@@ -104,6 +109,12 @@ export class AuthenticationService implements IAuthenticationService {
         if(!user){
             throw new NotFound('Account not found!');
         }
+
+        if(user.isActive){
+            throw new DuplicateError('Account is already actived!');
+        }
+
+        // Active account
         user.isActive = true;
         await this.userRepository.updateInstace(user);
         return true;
@@ -128,4 +139,100 @@ export class AuthenticationService implements IAuthenticationService {
         }
         return false;
     }
+
+    /**
+     * Change password for user from UI
+     * @param userId 
+     * @param oldPassword 
+     * @param newPassword 
+     * @returns 
+     */
+    changePassword = async (
+		userId: number,
+		oldPassword: string,
+		newPassword: string
+	) => {
+        const user = await this.userRepository.findOneByCondition({
+            id: userId,
+        });
+
+        if(!user){
+            throw new NotFound('Account not found!');
+        }
+
+        // check password
+        const compare = await Authentication.passwordCompare(
+            oldPassword,
+            user.password
+        );
+        if (compare) {
+            const hashedPassword: string = await Authentication.passwordHash(
+                newPassword
+            );
+            user.password = hashedPassword;
+            return await this.userRepository.updateInstace(user);
+        } else {
+            throw new BadRequestError('Old password is not correct!');
+        }
+	};
+
+    /**
+     * Send mail forgot password
+     * @param email
+     */
+    forgotPassword = async (
+		email: string | null,
+	) => {
+        const searchConditions = {
+            email,
+        };
+        const user = await this.userRepository.findOneByCondition(searchConditions);
+        if(!user) {
+            throw new NotFound('Email not found!');
+        }
+
+        // Send mail to user
+        await this.mail.forgotPassword(
+            user.userName,
+            user.email,
+            Authentication.generateAccessTokenForgotPassWord(
+                user.id,
+                user.roleId,
+                user.userName,
+                user.email
+            )
+        );
+	};
+
+    /**
+     * Change password using token from mail
+     * @param token 
+     * @param newPassword 
+     */
+    changePasswordUsingToken = async (
+		token: string,
+		newPassword: string
+	) => {
+        // Validate token is valid
+        const data = Authentication.validateToken(token);
+        if(!data) {
+            throw new UnauthorizedError('Token has expired or invalid!');
+        }
+
+        // Check user is exists
+        const user = await this.userRepository.findOneByCondition({
+            email: data.email
+        });
+        if(!user) {
+            throw new NotFound('Email not found!');
+        }
+
+        // Change password
+        const hashedPassword: string = await Authentication.passwordHash(
+            newPassword
+        );
+        user.password = hashedPassword;
+        return await this.userRepository.updateInstace(user);
+    }
+    
 }

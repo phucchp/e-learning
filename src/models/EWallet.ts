@@ -37,14 +37,8 @@ export class EWallet extends Model<EWallet> {
     })
     email!: string;
 
-    @AllowNull(true)
-    @Column({
-        type: DataType.INTEGER,
-    })
-    phone!: string;
-
     @BelongsTo(() => User)
-    lesson!: User;
+    user!: User;
 
     @DeletedAt
     deletedAt?: Date;
