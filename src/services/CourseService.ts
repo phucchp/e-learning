@@ -307,6 +307,24 @@ export class CourseService implements ICourseService {
         return topic.courseId;
     }
 
+    async getCourseByLessonId(lessonId: number): Promise<Course> {
+        const lesson = await this.lessonRepository.findById(lessonId);
+        if(!lesson) {
+            throw new NotFound('lesson not found');
+        }
+
+        const topic = await this.topicRepository.findById(lesson.topicId);
+        if(!topic) {
+            throw new ServerError('Server error: Can not find topic of lesson');
+        }
+
+        const course = await this.courseRepository.findById(topic.courseId);
+        if(!course) {
+            throw new NotFound('Course not found');
+        }
+        return course;
+    }
+
     /**
      * Check the user's favorite course.
      * 
