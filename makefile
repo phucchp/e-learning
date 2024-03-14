@@ -74,3 +74,6 @@ seeder-undo:
 seeder-refresh:
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:seed:undo:all" && \
 	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:seed:all"
+# Run one seed
+run-seeder:
+	$(DOCKER_COMPOSE) exec app sh -c "cd src && npx sequelize-cli db:seed --seed $(NAME)"

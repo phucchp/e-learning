@@ -13,6 +13,8 @@ tags:
     description: API for Authentication
   - name: course
     description: API for Courses
+  - name: lesson
+    description: API for Lessons
   - name: category
     description: API for Categories
   - name: language
@@ -474,7 +476,29 @@ paths:
               schema:
                 type: array
         '400':
-          description: Can not get category   
+          description: Can not get course
+  /lessons/{lessonId}:
+    get:
+      tags:
+        - lesson
+      summary: Get lesson details by lessonId
+      parameters:
+        - name: lessonId
+          in: path
+          description: Enter lessonId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information   
   /categories:
     get:
       tags:

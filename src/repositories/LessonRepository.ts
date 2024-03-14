@@ -18,22 +18,6 @@ export class LessonRepository extends BaseRepository<Lesson> implements ILessonR
                 id: lessonId
             },
             attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] },
-			include: [
-                {
-                    model: Note,
-					where: {
-						userId: userId
-					},
-                    attributes: { exclude: ['deletedAt'] },
-                },
-				{
-                    model: Remind,
-					where: {
-						userId: userId
-					},
-                    attributes: { exclude: ['deletedAt'] },
-                },
-			]
 		});
 	}
 }

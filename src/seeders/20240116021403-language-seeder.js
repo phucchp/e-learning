@@ -21,7 +21,7 @@ module.exports = {
       { language_name: 'Vietnamese', code: 'vi', created_at: new Date(), updated_at: new Date() },
       { language_name: 'Marathi', code: 'mr', created_at: new Date(), updated_at: new Date() },
       { language_name: 'French', code: 'fr', created_at: new Date(), updated_at: new Date() },
-      { language_name: 'Korean', code: 'ko', created_t: new Date(), updated_at: new Date() },
+      { language_name: 'Korean', code: 'ko', created_at: new Date(), updated_at: new Date() },
       { language_name: 'Tamil', code: 'ta', created_at: new Date(), updated_at: new Date() },
       { language_name: 'Urdu', code: 'ur', created_at: new Date(), updated_at: new Date() },
       // Add more language entries here

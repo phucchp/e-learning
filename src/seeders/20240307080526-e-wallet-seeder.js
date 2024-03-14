@@ -6,27 +6,27 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('e_wallets',[
         {
-            userId:1,
+            user_id:1,
             type: 'Paypal',
             email: 'elearning-user-1@gmail.com',
         },
         {
-            userId:2,
+            user_id:2,
             type: 'Paypal',
             email: 'elearning-user-2@gmail.com',
         },
         {
-            userId:3,
+            user_id:3,
             type: 'Paypal',
             email: 'elearning-user-3@gmail.com',
         },
         {
-            userId:4,
+            user_id:4,
             type: 'Paypal',
             email: 'elearning-user-4@gmail.com',
         },
         {
-            userId:5,
+            user_id:5,
             type: 'Paypal',
             email: 'elearning-user-5@gmail.com',
         },
