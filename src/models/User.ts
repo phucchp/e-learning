@@ -11,7 +11,7 @@ import { Payment } from './Payment';
 import { Processing } from './Processing';
 import { Lesson } from './Lesson';
 import { EWallet } from './EWallet';
-
+import { Remind } from './Remind';
 
 @Table({
   tableName: 'users',
@@ -98,6 +98,9 @@ export class User extends Model<User> {
     // reviews!: Course[];
     @HasMany(() => Review)
     reviews!: Review[];
+
+    @HasMany(() => Remind)
+    reminds!: Remind[];
 
     @HasMany(() => EWallet)
     eWallets!: EWallet[];

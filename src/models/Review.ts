@@ -1,5 +1,3 @@
-// models/Level.ts
-
 import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, AllowNull, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { User } from './User';
 import { Course } from './Course';

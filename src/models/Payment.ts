@@ -44,7 +44,7 @@ export class Payment extends Model<Payment> {
   @Column({
     type: DataType.INTEGER,
   })
-  transactionId!:string;
+  transactionId!:number;
   
   @AllowNull(false)
   @Column({

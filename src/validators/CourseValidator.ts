@@ -55,3 +55,11 @@ export const validateCreateCourse = [
   body('languageId').optional().isInt({min: 1}).withMessage('languageId must be a integer'),
   body('levelId').optional().isInt({min: 1}).withMessage('levelId must be a integer'),
 ]
+
+export const validateAddFavoriteCourse = [
+  body('courseId').notEmpty().isString().withMessage('courseId must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of title must be min:1 and max:255'),
+]
+
+export const validateDeleteFavoriteCourse = [
+  body('courseId').notEmpty().isString().withMessage('courseId must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of title must be min:1 and max:255'),
+]

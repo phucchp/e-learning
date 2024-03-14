@@ -2,6 +2,7 @@ import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import { Service } from 'typedi';
 import * as dotenv from 'dotenv';
+import Handlebars from "handlebars";
 dotenv.config();
 
 @Service()
@@ -35,32 +36,29 @@ export class Mail {
 			console.error('Error sending email:', error);
 		}
 	};
+
 	forgotPassword = async (
 		username: string,
 		to: string,
 		token: string
 	): Promise<void> => {
-		try {
-			console.log(token);
-			const replacements = {
-				username: username,
-				replaceLink:
-					this.client_url+'/reset-password?token=' + token + '&email=' + to,
-			};
-			let htmlContent = fs.readFileSync(
-				'src/utils/ForgotPasswordMail.html',
-				'utf8'
-			);
+		console.log(token);
+		const replacements = {
+			username: username,
+			replaceLink:
+				this.client_url+'/reset-password?token=' + token + '&email=' + to,
+		};
+		let htmlContent = fs.readFileSync(
+			'src/utils/ForgotPasswordMail.html',
+			'utf8'
+		);
 
-			Object.entries(replacements).forEach(([key, value]) => {
-				const regex = new RegExp(`{{${key}}}`, 'g');
-				htmlContent = htmlContent.replace(regex, value);
-			});
+		Object.entries(replacements).forEach(([key, value]) => {
+			const regex = new RegExp(`{{${key}}}`, 'g');
+			htmlContent = htmlContent.replace(regex, value);
+		});
 
-			return await this.sendEmail(to, 'Quên mật khẩu', htmlContent);
-		} catch (error) {
-			console.error('Error sending email:', error);
-		}
+		return await this.sendEmail(to, 'Quên mật khẩu', htmlContent);
 	};
 
 	activeUser = async (
@@ -68,24 +66,26 @@ export class Mail {
 		to: string,
 		token: string
 	): Promise<void> => {
-		try {
-			const replacements = {
-				username: username,
-				replaceLink:
-					this.client_url+'/active-user?token=' + token + '&email=' + to,
-			};
+		const replacements = {
+			username: username,
+			replaceLink:
+				this.client_url+'/active-user?token=' + token + '&email=' + to,
+		};
+		// Đọc nội dung HTML từ file mẫu handlebars
+		let htmlTemplate = fs.readFileSync('src/utils/templates/active-account.hbs', 'utf8');
+		// Biên dịch mẫu handlebars
+		const compiledTemplate = Handlebars.compile(htmlTemplate);
+		// Dữ liệu động để chèn vào mẫu
+		const templateData = {
+			subject: 'Subject of the email',
+			greeting: 'Hello!',
+			message: 'This is a sample email with dynamic content.',
+			link: `http://localhost:8000/api/active?token=${token}`
+		};
+		// Chèn dữ liệu vào mẫu
+		const htmlContent = compiledTemplate(templateData);
 
-			let htmlContent = fs.readFileSync('src/utils/templates/active-account.html', 'utf8');
-
-			Object.entries(replacements).forEach(([key, value]) => {
-				const regex = new RegExp(`{{${key}}}`, 'g');
-				htmlContent = htmlContent.replace(regex, value);
-			});
-
-			return await this.sendEmail(to, 'Xác nhận người dùng', htmlContent);
-		} catch (error) {
-			console.error('Error sending email:', error);
-		}
+		return await this.sendEmail(to, 'Active your account', htmlContent);
 	};
 }
 

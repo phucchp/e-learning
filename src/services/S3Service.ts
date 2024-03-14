@@ -24,7 +24,7 @@ export class S3Service {
     private expires = new Date(Date.now() + this.expireTime);
     
     // Get link Object 
-    getObjectUrl = async (objectName: string, bucketName: string = this.BUCKET_NAME, expiration: number = this.EXPIRATION) => {
+    getObjectUrl = async (objectName: string, expiration: number = this.EXPIRATION, bucketName: string = this.BUCKET_NAME) => {
         try {
             const url = await getSignedUrl({
                 url: this.cloudFrontDomain+"/"+objectName,

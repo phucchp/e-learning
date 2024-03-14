@@ -31,11 +31,12 @@ export class Subtitle extends Model<Subtitle> {
     })
     url!: string;
 
+    @ForeignKey(() => Language)
     @AllowNull(false)
     @Column({
-        type: DataType.STRING,
+        type: DataType.INTEGER,
     })
-    languageId!: string;
+    languageId!: number;
 
     @BelongsTo(() => Lesson)
     lesson!: Lesson;

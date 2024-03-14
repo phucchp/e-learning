@@ -7,16 +7,20 @@ import { UnauthorizedError } from "../utils/CustomError";
 import { CartService } from "../services/CartService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
 import { EnrollmentService } from "../services/EnrollmentService";
+import { CourseService } from "../services/CourseService";
+import { ICourseService } from "../services/interfaces/ICourseService";
 
 export class UserController{
 	private userService: IUserService;
     private cartSerivce: ICartService;
     private enrollmentSerivce: IEnrollmentService;
+    private courseSerivce: ICourseService;
 
 	constructor() {
 		this.userService = Container.get(UserService);
 		this.cartSerivce = Container.get(CartService);
 		this.enrollmentSerivce = Container.get(EnrollmentService);
+		this.courseSerivce = Container.get(CourseService);
 	}
     
     //--------------CART------------------//
@@ -60,4 +64,22 @@ export class UserController{
         });
     }
 
+    //--------------FAVORITE COURSE------------------//
+    addCourseFavorite = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const courseId = req.body.courseId;
+        await this.courseSerivce.addCourseFavorite(userId, courseId);
+        return res.status(200).json({
+            message : "Successful",
+        })
+    }
+
+    deleteCourseFavorite = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const courseId = req.body.courseId;
+        await this.courseSerivce.deleteCourseFavorite(userId, courseId);
+        return res.status(200).json({
+            message : "Successful",
+        })
+    }
 }
