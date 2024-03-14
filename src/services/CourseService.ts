@@ -325,6 +325,20 @@ export class CourseService implements ICourseService {
         return course;
     }
 
+    async getCourseByTopicId(topicId: number): Promise<Course> {
+
+        const topic = await this.topicRepository.findById(topicId);
+        if(!topic) {
+            throw new ServerError('Server error: Can not find topic of lesson');
+        }
+
+        const course = await this.courseRepository.findById(topic.courseId);
+        if(!course) {
+            throw new NotFound('Course not found');
+        }
+        return course;
+    }
+
     /**
      * Check the user's favorite course.
      * 
@@ -338,6 +352,24 @@ export class CourseService implements ICourseService {
             userId: userId
         }, true);
         if(!favorite){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check the user's favorite course.
+     * 
+     * @param courseId 
+     * @param userId 
+     * @returns 
+     */
+    async isUserOwnerCourse(courseId: number, userId: number): Promise<boolean> {
+        const course = await this.courseRepository.findOneByCondition({
+            courseId: courseId,
+            instructorId: userId
+        }, true);
+        if(!course){
             return false;
         }
         return true;

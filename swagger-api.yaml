@@ -477,6 +477,7 @@ paths:
                 type: array
         '400':
           description: Can not get course
+
   /lessons/{lessonId}:
     get:
       tags:
@@ -498,7 +499,130 @@ paths:
               schema:
                 type: array
         '400':
-          description: Can not get lesson information   
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - lesson
+      summary: Deletes a lesson by lessonId
+      parameters:
+        - name: lessonId
+          in: path
+          description: lessonId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - lesson
+      summary: Update a lesson
+      parameters:
+        - name: lessonId
+          in: path
+          description: lessonId of lesson that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: New Title
+                isPreview:
+                  type: boolean
+                  default: New Title
+                duration:
+                  type: integer
+                  default: New Title
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update lesson
+      security:
+        - bearerAuth: []
+  /lessons:
+    post:
+      tags:
+        - lesson
+      summary: Add new lessons
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessons:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      isPreview:
+                        type: boolean
+                      duration:
+                        type: integer
+                      topicId:
+                        type: integer
+              example:
+                lessons:
+                  - title: Lesson 1
+                    isPreview: true
+                    duration: 1
+                    topicId: 1
+                  - title: Lesson 2
+                    isPreview: false
+                    duration: 2
+                    topicId: 1
+      security:
+        - bearerAuth: []
+  /lessons/presign-url/upload-video:
+    get:
+      tags:
+        - lesson
+      summary: Get presign URL to upload video of lesson
+      parameters:
+        - name: lessonId
+          in: query
+          description: Enter lessonId
+          required: true
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
   /categories:
     get:
       tags:

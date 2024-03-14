@@ -3,8 +3,8 @@ import { Request} from 'express';
 
 export interface ILessonService {
     getLesson(lessonId: number, userId: number): Promise<Lesson>;
-    createLesson(req: Request): Promise<Lesson>;
-    createMultipleLesson(req: Request): Promise<Lesson>;
+    createLessons(req: Request): Promise<Lesson[]>;
     updateLesson(req: Request): Promise<Lesson>;
-    deleteLesson(lessonId: string): Promise<void>;
+    deleteLesson(lessonId: number): Promise<void>;
+    getLinkUpdateVideoLesson(lessonId: number): Promise<string>;
 }

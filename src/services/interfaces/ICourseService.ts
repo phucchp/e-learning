@@ -14,4 +14,6 @@ export interface ICourseService {
     deleteCourseFavorite(courseId: string, userId: number): Promise<boolean>;
     getCoursesFavorite(req: Request): Promise<{ rows: Favorite[]; count: number; }>;
     getCourseByLessonId(lessonId: number): Promise<Course>;
+    isUserOwnerCourse(courseId: number, userId: number): Promise<boolean>;
+    getCourseByTopicId(topicId: number): Promise<Course>;
 }

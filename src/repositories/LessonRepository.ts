@@ -20,4 +20,8 @@ export class LessonRepository extends BaseRepository<Lesson> implements ILessonR
             attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] },
 		});
 	}
+
+	async createLessons(lessons: any[]): Promise<Lesson[]> {
+		return await this.model.bulkCreate(lessons);
+	}
 }

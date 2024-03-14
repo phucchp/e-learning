@@ -4,7 +4,7 @@ import { Lesson } from '../models/Lesson';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
+import { ContentNotFound, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { LessonRepository } from '../repositories/LessonRepository';
 import { ILessonRepository } from '../repositories/interfaces/ILessonRepository';
@@ -40,25 +40,70 @@ export class LessonService implements ILessonService {
        return lesson;
     }   
 
-    async createLesson(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Lesson> {
+    async createLessons(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Lesson[]> {
         // Check role user is instructor and owner this course
-        throw new Error('Method not implemented.');
+        const lessons = req.body.lessons;
+        const userId = Number(req.payload.userId);
+        const topicIds = new Set(lessons.map((lesson: { topicId: number; }) => lesson.topicId));
+        topicIds.forEach(async topicId => {
+            const course = await this.courseService.getCourseByTopicId(Number(topicId));
+            if(course.instructorId !== userId) {
+                throw new NotEnoughAuthority('Not Enough Authority!');
+            }
+        });
+
+        return await this.lessonRepository.createLessons(lessons);
     }
-
-
-    async createMultipleLesson(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Lesson> {
-        // Check role user is instructor and owner this course
-        throw new Error('Method not implemented.');
-    }
-
 
     async updateLesson(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Lesson> {
         // Check role user is instructor and owner this course
-        throw new Error('Method not implemented.');
+        // title, duration, isPreview, topicId
+        const lessonId = Number(req.params.lessonId);
+        const userId = Number(req.payload.userId);
+        const {title, isPreview, duration} = req.body;
+        const lesson = await this.lessonRepository.findOneByCondition({
+            id: lessonId,
+        });
+        if(!lesson) {
+            throw new NotFound("Lesson not found!");
+        }
+        const course = await this.courseService.getCourseByLessonId(lessonId);
+        if(course.instructorId !== userId) {
+            throw new NotEnoughAuthority('Not Enough Authority!');
+        }
+        if(title) {
+            lesson.title = title;
+        }
+        if(isPreview) {
+            lesson.isPreview = isPreview;
+        }
+        if(duration) {
+            lesson.duration = duration;
+        }
+        const newLesson =  await this.lessonRepository.updateInstace(lesson);
+        if(!newLesson) {
+            throw new ServerError('Server error: Cannot update lesson !');
+        }
+        return newLesson;
     }   
 
-    async deleteLesson(lessonId: string): Promise<void> {
-        // Check role user is instructor and owner this course or user is admin
-        throw new Error('Method not implemented.');
+    async deleteLesson(lessonId: number): Promise<void> {
+        await this.lessonRepository.delete(lessonId, true);
+    }
+
+    async getLinkUpdateVideoLesson(lessonId: number): Promise<string> {
+        const lesson = await this.lessonRepository.findOneByCondition({
+            id: lessonId,
+        });
+
+        if(!lesson) {
+            throw new NotFound("Lesson not found!");
+        }
+
+        if(!lesson.lessonUrl) {
+            lesson.lessonUrl = `lessons/${lesson.id}/video.mp4`;
+        }
+
+        return await this.s3Service.generatePresignedUrlUpdate(lesson.lessonUrl, 'video/mp4');
     }
 }
