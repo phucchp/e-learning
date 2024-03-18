@@ -20,7 +20,7 @@ const generateRandomPayment = () => ({
   created_at: new Date(),
   updated_at: new Date(),
 });
-const payments = [...Array(1000)].map(() => generateRandomPayment());
+const payments = [...Array(500)].map(() => generateRandomPayment());
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

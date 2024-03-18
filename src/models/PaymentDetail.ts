@@ -41,6 +41,9 @@ export class PaymentDetail extends Model<PaymentDetail> {
   @BelongsTo(() => Payment)
   payment!: Payment;
 
+  @BelongsTo(() => Course)
+  course!: Course;
+
   @DeletedAt
   deletedAt?: Date;
 
