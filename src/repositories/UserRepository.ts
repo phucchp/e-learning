@@ -7,6 +7,8 @@ import { Language } from "../models/Language";
 import { Level } from "../models/Level";
 import { Category } from "../models/Category";
 import { Op } from 'sequelize';
+import { NotFound } from "../utils/CustomError";
+import { Profile } from "../models/Profile";
 
 @Service()
 export class UserRepository extends BaseRepository<User> implements IUserRepository{
@@ -90,5 +92,23 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 			],
 		});
 		return result;
+	}
+
+	async getUserInformation(userId: number): Promise<User> {
+		const user = await this.model.findOne({
+			where: {
+				id: userId
+			},
+			include: [
+				{
+					model: Profile,
+				}
+			]
+		});
+
+		if(!user) {
+			throw new NotFound('User not found');
+		}
+		return user;
 	}
 }

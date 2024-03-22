@@ -2,10 +2,18 @@
 const { faker } = require('@faker-js/faker');
 const crypto = require('crypto');
 
+const usedIds = new Set(); // Set để lưu trữ các ID đã sử dụng
+
 function generateUniqueId() {
-  const timestamp = Date.now() % 100000; // Use the last 5 digits of the current timestamp
-  const randomPart = Math.floor(Math.random() * 10000); // Generate a random 4-digit number
-  return parseInt(`${timestamp}${randomPart}`, 10); // Combine and convert to integer
+    let uniqueId;
+    do {
+        const timestamp = Date.now() % 100000; // Sử dụng 5 chữ số cuối của timestamp hiện tại
+        const randomPart = Math.floor(Math.random() * 10000); // Tạo số ngẫu nhiên gồm 4 chữ số
+        uniqueId = parseInt(`${timestamp}${randomPart}`, 10); // Kết hợp và chuyển đổi thành số nguyên
+    } while (usedIds.has(uniqueId)); // Kiểm tra xem ID đã được sử dụng chưa
+
+    usedIds.add(uniqueId); // Thêm ID vào danh sách đã sử dụng
+    return uniqueId;
 }
 
 
