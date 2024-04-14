@@ -3,6 +3,15 @@ import { Profile } from './Profile';
 import { Favorite } from './Favorite';
 import { Course } from './Course';
 import { Enrollment } from './Enrollment';
+import { Comment } from './Comment';
+import { Cart } from './Cart';
+import { Review } from './Review';
+import { Note } from './Note';
+import { Payment } from './Payment';
+import { Processing } from './Processing';
+import { Lesson } from './Lesson';
+import { EWallet } from './EWallet';
+import { Remind } from './Remind';
 
 @Table({
   tableName: 'users',
@@ -17,8 +26,8 @@ export class User extends Model<User> {
     @Column({
         type: DataType.INTEGER,
       })
-      id!: number;
-    
+    id!: number;
+
     @NotEmpty
     @AllowNull(false)
     @Unique(true)
@@ -61,11 +70,55 @@ export class User extends Model<User> {
     @HasOne(() => Profile)
     profile!: Profile;
 
-    @BelongsToMany(() => Course, () => Favorite)
-    coursesFavorites!: Course[];
+    @BelongsToMany(() => Course, {
+      through:() => Favorite,
+      as: 'favorites'
+    })
+    favorites!: Course[];
 
-    @BelongsToMany(() => Course, () => Enrollment)
-    coursesEnrollments!: Course[];
+    // @BelongsToMany(() => Course,{
+    //   through: () => Enrollment, 
+    //   as:'coursesEnrollments'
+    // })
+    // coursesEnrollments!: Course[];
+    @HasMany(() => Enrollment)
+    enrollments!: Enrollment[];
+
+
+    @BelongsToMany(() => Course, {
+      through: () => Cart, 
+      as:'carts'
+    })
+    carts!: Course[];
+
+    // @BelongsToMany(() => Course, {
+    //   through:() => Review , 
+    //   as:'reviews'
+    // })
+    // reviews!: Course[];
+    @HasMany(() => Review)
+    reviews!: Review[];
+
+    @HasMany(() => Remind)
+    reminds!: Remind[];
+
+    @HasMany(() => EWallet)
+    eWallets!: EWallet[];
+
+    @BelongsToMany(() => Lesson, {
+      through:() => Processing,
+      as:'processing'
+    })
+    processing!: Lesson[];
+
+    @HasMany(() => Comment)
+    comments!: Comment[];
+
+    @HasMany(() => Note)
+    notes!: Note[];
+
+    @HasMany(() => Payment)
+    payments!: Payment[];
 
     @DeletedAt
     deletedAt?: Date;

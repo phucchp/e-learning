@@ -1,0 +1,1379 @@
+openapi: 3.0.0
+info:
+  description: |
+    API Document for E-learning Website
+  version: '1.0.0'
+  title: E-learning Website API
+  contact:
+    email: phucchp@gmail.com
+servers:
+  - url: 'http://localhost:8000/api'
+tags:
+  - name: authentication
+    description: API for Authentication
+  - name: course
+    description: API for Courses
+  - name: lesson
+    description: API for Lessons
+  - name: category
+    description: API for Categories
+  - name: language
+    description: API for Languages
+  - name: review
+    description: API for reviews
+  - name: note
+    description: API for notes
+  - name: user
+    description: API for users
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - authentication
+      requestBody:
+        description: User credentials for login
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: "user1@gmail.com"
+                password:
+                  type: string
+                  default: "123456"
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /auth/register:
+    post:
+      summary: User registration
+      tags:
+        - authentication
+      requestBody:
+        description: User data for registration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  default: 'username123456'
+                email:
+                  type: string
+                  default: "user123456@gmail.com"
+                password:
+                  type: string
+                  default: "123456Aa#"
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+  /auth/users/change-password:
+    post:
+      summary: Change password for user (Already login)
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  default: '123456Aa#'
+                newPassword:
+                  type: string
+                  default: "123456789Aa#"
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+      security:
+        - bearerAuth: []
+  /auth/users/change-password-token:
+    post:
+      summary: Change password for user
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  default: 'Add token here'
+                newPassword:
+                  type: string
+                  default: "123456789Aa#"
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+  /auth/users/forgot-password:
+    post:
+      summary: Forgot password for user
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: 'user1@gmail.com'
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+  /courses:
+    get:
+      tags:
+        - course
+      summary: Get all courses or by filter
+      description: Get and search courses API
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title and discription of courses
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: duration[]
+          in: query
+          description: Filter by total durations of courses 
+          required: false
+          style: form
+          explode: true  # Do not explode the array
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - extraShort
+                - short
+                - medium
+                - long
+                - extraLong
+        - name: price
+          in: query
+          description: Filter by price of courses (free or paid)
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - free
+                - paid
+        - name: category
+          in: query
+          description: Filter by category courses, enter categoryId of Category
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: averageRating
+          in: query
+          description: Filter by average rating course, enter average rating of course to filter
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: languageId
+          in: query
+          description: Filter by language of course
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: level
+          in: query
+          description: Choose level to filter
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: number
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - price
+                - discount
+                - duration
+                - averageRating
+                - totalStudents
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - course
+      summary: Add new course
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: "Title of Course"
+                introduction:
+                  type: string
+                  default: "Introduction of Course" 
+                description:
+                  type: string
+                  default: "Introduction of Course" 
+                learnsDescription:
+                  type: string
+                  default: "learnsDescription of Course"
+                requirementsDescription:
+                  type: string
+                  default: "requirementsDescription of Course"
+                price:
+                  type: number
+                  format: float
+                  default: 50
+                discount:
+                  type: number
+                  format: int
+                  default: 10
+                categoryId:
+                  type: string
+                  default: "categoryId of Course"
+                languageId:
+                  type: number
+                  format: int
+                  default: 1
+                levelId:
+                  type: number
+                  format: int
+                  default: 1
+      security:
+        - bearerAuth: []
+
+  /courses/{courseId}:
+    get:
+      tags:
+        - course
+      summary: Get course details by courseId
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category
+    put:
+      tags:
+        - course
+      summary: Updates a Course
+      parameters:
+        - name: courseId
+          in: path
+          description: courseId of course that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: "Title of Course"
+                introduction:
+                  type: string
+                  default: "Introduction of Course" 
+                description:
+                  type: string
+                  default: "Introduction of Course" 
+                learnsDescription:
+                  type: string
+                  default: "learnsDescription of Course"
+                requirementsDescription:
+                  type: string
+                  default: "requirementsDescription of Course"
+                price:
+                  type: number
+                  format: float
+                  default: 50
+                discount:
+                  type: number
+                  format: int
+                  default: 10
+                categoryId:
+                  type: string
+                  default: "categoryId of Course"
+                languageId:
+                  type: number
+                  format: int
+                  default: 1
+                levelId:
+                  type: number
+                  format: int
+                  default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update category
+  /courses/{courseId}/reviews:
+    get:
+      tags:
+        - course
+      summary: Get reviews of course
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+        - name: rating
+          in: query
+          description: Filter by rating review
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - rating
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get course
+
+  /lessons/{lessonId}:
+    get:
+      tags:
+        - lesson
+      summary: Get lesson details by lessonId
+      parameters:
+        - name: lessonId
+          in: path
+          description: Enter lessonId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - lesson
+      summary: Deletes a lesson by lessonId
+      parameters:
+        - name: lessonId
+          in: path
+          description: lessonId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - lesson
+      summary: Update a lesson
+      parameters:
+        - name: lessonId
+          in: path
+          description: lessonId of lesson that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: New Title
+                isPreview:
+                  type: boolean
+                  default: New Title
+                duration:
+                  type: integer
+                  default: New Title
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update lesson
+      security:
+        - bearerAuth: []
+  /lessons:
+    post:
+      tags:
+        - lesson
+      summary: Add new lessons
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessons:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      isPreview:
+                        type: boolean
+                      duration:
+                        type: integer
+                      topicId:
+                        type: integer
+              example:
+                lessons:
+                  - title: Lesson 1
+                    isPreview: true
+                    duration: 1
+                    topicId: 1
+                  - title: Lesson 2
+                    isPreview: false
+                    duration: 2
+                    topicId: 1
+      security:
+        - bearerAuth: []
+  /lessons/presign-url/upload-video:
+    get:
+      tags:
+        - lesson
+      summary: Get presign URL to upload video of lesson
+      parameters:
+        - name: lessonId
+          in: query
+          description: Enter lessonId
+          required: true
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
+  /categories:
+    get:
+      tags:
+        - category
+      summary: Get all category
+      description: Get all category
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - category
+      summary: Add new category
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: "New Category"
+      security:
+        - bearerAuth: []
+  /categories/{categoryId}:
+    get:
+      tags:
+        - category
+      summary: Get category by id
+      parameters:
+        - name: categoryId
+          in: path
+          description: Enter categoryId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category
+    put:
+      tags:
+        - category
+      summary: Updates a category
+      operationId: updateMovieWithForm
+      parameters:
+        - name: categoryId
+          in: path
+          description: categoryId of category that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: New Category
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update category
+    delete:
+      tags:
+        - category
+      summary: Deletes a category by categoryId
+      parameters:
+        - name: categoryId
+          in: path
+          description: categoryId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /languages:
+    get:
+      tags:
+        - language
+      summary: Get all languages
+      description: Get all languages
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - language
+      summary: Add new language
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageName:
+                  type: string
+                  default: "New language"
+      security:
+        - bearerAuth: []
+  /languages/{languageId}:
+    get:
+      tags:
+        - language
+      summary: Get language by id
+      parameters:
+        - name: categoryId
+          in: path
+          description: Enter categoryId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get language
+    put:
+      tags:
+        - language
+      summary: Updates a language
+      operationId: updateMovieWithForm
+      parameters:
+        - name: languageId
+          in: path
+          description: languageId of language that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageName:
+                  type: string
+                  default: New language
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+    delete:
+      tags:
+        - language
+      summary: Deletes a language by languageId
+      parameters:
+        - name: languageId
+          in: path
+          description: languageId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /reviews:
+    get:
+      tags:
+        - review
+      summary: Get all reviews
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title and discription of courses
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: rating
+          in: query
+          description: Filter by rating of review 
+          required: false
+          style: form
+          explode: true  # Do not explode the array
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+        - name: userId
+          in: query
+          description: userId fo filtering
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: courseId
+          in: query
+          description: courseId fo filtering
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - rating
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+    post:
+      tags:
+        - review
+      summary: Add new review for user
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseId:
+                  type: string
+                  default: "enter-couse-id-string"
+                rating:
+                  type: number
+                  default: 5.0
+                review:
+                  type: string
+                  default: "Good Course!"
+      security:
+        - bearerAuth: []
+  /reviews/{reviewId}: 
+    put:
+      tags:
+        - review
+      summary: Updates a review
+      parameters:
+        - name: reviewId
+          in: path
+          description: reviewId of note that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review:
+                  type: string
+                  default: "New review"
+                rating:
+                  type: number
+                  default: 5
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - review
+      summary: Deletes a review by reviewId
+      parameters:
+        - name: reviewId
+          in: path
+          description: reviewId to delete
+          required: true
+          schema:
+            type: number
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /notes:
+    get:
+      tags:
+        - note
+      summary: Get all notes of lesson for user
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search notes
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: lessonId
+          in: query
+          required: true
+          explode: true
+          schema:
+            type: number
+            format: integer
+        - name: time
+          in: query
+          required: false
+          explode: true
+          schema:
+            type: number
+            format: integer
+        - name: sort
+          in: query
+          description: Filter by rating of review 
+          required: false
+          explode: true  # Do not explode the array
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - 'newest'
+                - 'oldest'
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number 
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - note
+      summary: Add new notes to lesson
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                content:
+                  type: string
+                  default: "Add note here"
+                time:
+                  type: number
+                  default: 1
+      security:
+        - bearerAuth: []
+  /notes/{noteId}: 
+    put:
+      tags:
+        - note
+      summary: Updates a note
+      parameters:
+        - name: noteId
+          in: path
+          description: noteId of note that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  default: "New content of note to update"
+                time:
+                  type: number
+                  default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - note
+      summary: Deletes a note by noteId
+      parameters:
+        - name: noteId
+          in: path
+          description: noteId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /users/carts:
+    get:
+      tags:
+        - user
+      summary: Get all courses in cart of user
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title course
+          required: false
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - user
+      summary: Delete courses from cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseIds:
+                  type: array
+                  default: ['cc8196b3-9ff8-4f6a-8387-a6aa998acedb', 'd2b734f2-eee1-4a34-ae77-919cb7af46fc']
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - user
+      summary: Add course to cart
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseId:
+                  type: string
+                  default: "d2b734f2-eee1-4a34-ae77-919cb7af46fc"
+      security:
+        - bearerAuth: []
+  /users/enrollment-courses:
+    get:
+      tags:
+        - user
+      summary: Get all courses enrollment of user
+      description: Get and search courses enrollment API
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title and discription of courses
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: duration[]
+          in: query
+          description: Filter by total durations of courses 
+          required: false
+          style: form
+          explode: true  # Do not explode the array
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - extraShort
+                - short
+                - medium
+                - long
+                - extraLong
+        - name: category
+          in: query
+          description: Filter by category courses, enter categoryId of Category
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: averageRating
+          in: query
+          description: Filter by average rating course, enter average rating of course to filter
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: languageId
+          in: query
+          description: Filter by language of course
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: level
+          in: query
+          description: Choose level to filter
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: number
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - price
+                - discount
+                - duration
+                - averageRating
+                - totalStudents
+                - createdAt
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+  /users/favorite-courses:
+    post:
+          tags:
+            - user
+          summary: Add new favorite course for user
+          responses:
+            '200':
+              description: Successful
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                      default: 'cc8196b3-9ff8-4f6a-8387-a6aa998acedb'
+          security:
+            - bearerAuth: []
+    delete:
+          tags:
+            - user
+          summary: Delete courses favorite
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                      default: 'cc8196b3-9ff8-4f6a-8387-a6aa998acedb'
+          responses:
+            '204':
+              description: successfully
+              content:
+                application/json:
+                  example:
+                    message: successfully
+          security:
+            - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

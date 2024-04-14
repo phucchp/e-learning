@@ -25,7 +25,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: {
-            tableName: 'lessons',
+            tableName: 'users',
           },
           key: 'id'
         },
@@ -41,7 +41,7 @@ module.exports = {
         },
       },
       content:{
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       created_at: {

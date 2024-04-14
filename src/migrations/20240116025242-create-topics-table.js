@@ -15,13 +15,13 @@ module.exports = {
         allowNull: false,
       },
       course_id: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: {
             tableName: 'courses',
           },
-          key: 'course_id'
+          key: 'id'
         },
       },
       created_at: {

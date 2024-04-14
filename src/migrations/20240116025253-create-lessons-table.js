@@ -18,6 +18,11 @@ module.exports = {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      is_preview:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValues: false
+      },
       topic_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -29,6 +34,10 @@ module.exports = {
         },
       },
       lesson_url:{
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      resource_url:{
         type: Sequelize.STRING,
         allowNull: true,
       },

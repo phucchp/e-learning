@@ -2,24 +2,81 @@ import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { handleErrorController } from "../utils/CustomError";
+import { IReviewService } from "../services/interfaces/IReviewService";
+import { ReviewService } from "../services/ReviewService";
 
 export class CourseController{
 	private courseService: ICourseService;
+	private reviewService: IReviewService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
+		this.reviewService = Container.get(ReviewService);
+
 	}
 
     getCourses = async (req: Request, res: Response) => {
-        try{
-            const courses = await this.courseService.getCourses();
-            return res.status(200).json(courses);
-        }catch(error: any){
-            console.log(error);
-            return res.status(500).json({
-                message: "Server error!"
-            })
+        const courses = await this.courseService.getCourses(req);
+        const page = req.query.page || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        
+        return res.status(200).json({
+            message: "successfully",
+            page: page,
+            pageSize: pageSize,
+            totalCount: courses.count,
+            totalPages:  Math.ceil(courses.count/pageSize),
+            data:courses.rows
+        });
+    }
+
+    getCourse = async (req: Request, res: Response) => {
+        const courseId = req.params.courseId;
+        const course = await this.courseService.getCourse(courseId);
+        const groupReview = await this.reviewService.getStatiscalReviews(courseId);
+        const userId = req.payload.userId;
+        let isCourseFavorite = false;
+        if(userId) {
+            isCourseFavorite = await this.courseService.isCourseFavorite(course.id, userId);
         }
+        return res.status(200).json({
+            message: "successfully",
+            data: {
+                course,
+                isCourseFavorite
+            },
+            groupReview: groupReview.rows
+        });
+    }
+
+    getReviewsOfCourse = async (req: Request, res: Response) => {
+        const course = await this.reviewService.getReviewsOfCourse(req);
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+
+        return res.status(200).json({
+            message: "successfully",
+            totalCount: course.count,
+            page: page,
+            pageSize: pageSize,
+            totalPage: pageSize < course.count?Math.ceil(course.count/pageSize):course.count,
+            data: course.rows,
+        });
+    }
+
+    updateCourse = async (req: Request, res: Response) => {
+        const course = await this.courseService.updateCourse(req);
+        return res.status(200).json({
+            message: "successfully",
+            data: course,
+        });
+    }
+
+    createCourse = async (req: Request, res: Response) => {
+        const course = await this.courseService.createCourse(req);
+        return res.status(201).json({
+            message: "successfully",
+            data: course,
+        });
     }
 }

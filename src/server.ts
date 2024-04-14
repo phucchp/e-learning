@@ -1,10 +1,17 @@
 import 'reflect-metadata';
-import express, { Application, Request, Response } from 'express';
+import "express-async-errors";
+import express, { Application, Request, Response, NextFunction } from 'express';
 import Database from './config/database';
 import CategoryRoutes from './routes/CategoryRoutes';
 import cors from 'cors';
 import CourseRoutes from './routes/CourseRoutes';
-
+import LanguageRoutes from './routes/LanguageRoutes';
+import AuthenticationRoutes from './routes/AuthenticationRoutes';
+import ReviewRoutes from './routes/ReviewRoutes';
+import NoteRoutes from './routes/NoteRoutes';
+import { handleError } from './utils/CustomError';
+import UserRoutes from './routes/UserRoutes'
+import LessonRoutes from './routes/LessonRoutes';
 class App {
 	public app: Application;
 
@@ -23,7 +30,7 @@ class App {
 				// console.log('✅ Cơ sở dữ liệu đã được đồng bộ hóa.');
 			})
 			.catch((error) => {
-				console.error('❌ Lỗi đồng bộ hóa cơ sở dữ liệu:', error);
+				console.error('❌ Database synchronization error:', error);
 			});
 	}
 
@@ -33,6 +40,12 @@ class App {
 		});
 		this.app.use('/api/categories', CategoryRoutes);
 		this.app.use('/api/courses', CourseRoutes);
+		this.app.use('/api/languages', LanguageRoutes);
+		this.app.use('/api/auth', AuthenticationRoutes);
+		this.app.use('/api/reviews', ReviewRoutes);
+		this.app.use('/api/notes', NoteRoutes);
+		this.app.use('/api/users', UserRoutes);
+		this.app.use('/api/lessons', LessonRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {
@@ -40,6 +53,11 @@ class App {
 			res.status(404).json({
                 message: `API ${url} not found!`
             });
+		});
+
+		// Xử lí error khi gặp ngoại lệ
+		this.app.use((err: Error, req: Request, res: Response, next: NextFunction):void => {
+			handleError(err, req, res);
 		});
 	}
 

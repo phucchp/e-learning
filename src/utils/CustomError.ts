@@ -11,43 +11,22 @@ export class CustomError extends Error {
 	}
 }
 
-export class UsernameValidDuplicate extends CustomError {
+export class DuplicateError extends CustomError {
 	constructor(message: string) {
 		super(message, 409, 'Conflict');
 	}
 }
 
-export class EmailValidDuplicate extends CustomError {
-	constructor(message: string) {
-		super(message, 409, 'Conflict');
-	}
-}
-
-export class OldPasswordError extends CustomError {
-	constructor(message: string) {
-		super(message, 400, 'Bad Request');
-	}
-}
-
-export class NotActiveAccountError extends CustomError {
+/**
+ * Lỗi chưa được uỷ quyền, client không có quyền truy cập vào tài nguyên vì chưa xác thực
+ */
+export class UnauthorizedError extends CustomError {
 	constructor(message: string) {
 		super(message, 401, 'Unauthorized');
 	}
 }
 
-export class TokenError extends CustomError {
-	constructor(message: string) {
-		super(message, 401, 'Unauthorized');
-	}
-}
-
-export class InvalidUserNameOrPassword extends CustomError {
-	constructor(message: string) {
-		super(message, 401, 'Unauthorized');
-	}
-}
-
-export class PasswordNotMatch extends CustomError {
+export class BadRequestError extends CustomError {
 	constructor(message: string) {
 		super(message, 400, 'Bad Request');
 	}
@@ -59,13 +38,10 @@ export class ContentNotFound extends CustomError {
 	}
 }
 
+/**
+ *  Client đã được xác thực nhưng không có quyền truy cập vào tài nguyên được yêu cầu
+ */
 export class NotEnoughAuthority extends CustomError {
-	constructor(message: string) {
-		super(message, 403, 'Forbidden');
-	}
-}
-
-export class NotEnoughSubscription extends CustomError {
 	constructor(message: string) {
 		super(message, 403, 'Forbidden');
 	}
@@ -77,9 +53,10 @@ export class ServerError extends CustomError {
 	}
 }
 
-export class EmptyDataError extends CustomError {
-	constructor(message: string = 'Empty data') {
-		super(message, 400, 'Bad Request');
+
+export class NotFound extends CustomError {
+	constructor(message: string = 'Record not found') {
+		super(message, 404, 'Not Found');
 	}
 }
 
@@ -89,21 +66,21 @@ export class RecordExistsError extends CustomError {
 	}
 }
 
-export function handleErrorController(error: any, res: Response) {
+export function handleError(error: any,req: Request, res: Response) {
+	console.log('ERROR LOG ', new Date().toLocaleString());
+    console.log('Request:', req.method, req.originalUrl);
+    console.log('Params:', req.params);
+    console.log('Body:', req.body);
+    console.log('Query:', req.query);
+    console.log('Error: ', error);
+    console.log('Error stack: ', error.stack);
+    console.log("--------------------------------------------------------------------------------------");
+
 	const status = error.statusCode || 500;
 	const statusText = error.statusText || 'Internal Server Error';
 	const message = error.message || 'Something went wrong';
-
 	res.status(status).json({
 		status: statusText,
 		message: message,
 	});
-}
-
-export function handleErrorFunction(error: any): never {
-	if (error instanceof CustomError) {
-		throw error;
-	} else {
-		throw new ServerError(error.message);
-	}
 }
