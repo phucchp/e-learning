@@ -25,6 +25,8 @@ tags:
     description: API for notes
   - name: user
     description: API for users
+  - name: statistical
+    description: API for statisticals
 paths:
   /auth/login:
     post:
@@ -1371,6 +1373,546 @@ paths:
                     message: successfully
           security:
             - bearerAuth: []
+  /statisticals/statistical-revenue:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue by week, month, year, and day for instructors
+      description: Thống kê doanh thu theo tuần, tháng, năm, ngày cho instructor
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string    
+        - name: statisBy
+          in: query
+          description: Choose statisBy
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - year
+                - month
+                - day
+                - week
+        - name: courseId
+          in: query
+          description: Enter value courseId
+          required: false
+          explode: true
+          schema:
+            type: string  
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []
+  /statisticals/admin/statistical-revenue:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue by week, month, year, and day for admin
+      description: Thống kê doanh thu theo tuần tháng năm ngày cho admin
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string    
+        - name: statisBy
+          in: query
+          description: Choose statisBy
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - year
+                - month
+                - day
+                - week
+        - name: courseId
+          in: query
+          description: Enter value courseId
+          required: false
+          explode: true
+          schema:
+            type: string   
+        - name: instructorId
+          in: query
+          description: Enter value instructorId
+          required: false
+          explode: true
+          schema:
+            type: string       
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-by-course:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each course for instructors
+      description: Thống kê doanh thu theo từng khoá học cho instructor
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: orderPrice
+          in: query
+          description: Choose orderPrice, default DESC
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC                  
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []  
+  /statisticals/admin/statistical-revenue-by-course:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each course for admin
+      description: Thống kê doanh thu theo khoá học cho admin
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: orderPrice
+          in: query
+          description: Choose orderPrice, default DESC
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC  
+        - name: instructorId
+          in: query
+          description: Enter value instructorId
+          required: false
+          explode: true
+          schema:
+            type: string       
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []  
+  /statisticals/admin/statistical-revenue-by-instructor:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each instructor
+      description: Thống kê doanh thu theo từng instructor
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default instructorId
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - instructorId
+                - total_price     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []   
+  /statisticals/statistical-courses-by-category:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on the number of courses by each category
+      description: Thống kê số lượng khoá học theo từng category
+      parameters:
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default id
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - totalCourses     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-by-category:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each category
+      description: Thống kê doanh thu theo từng chủ đề (category)
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default categoryId
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - categoryId
+                - total_price     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-courses-by-category:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue of courses in a category
+      description: Thống kê doanh thu các khoá học trong một chủ đề
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          description: Enter value categoryId
+          required: true
+          explode: true
+          schema:
+            type: number
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC (Sort by total_price)
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-courses-by-level:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on the number of courses by each level
+      description: Thống kê số lượng khoá học theo từng level
+      parameters:
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default id
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - totalCourses     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-by-level:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each level
+      description: Thống kê doanh thu theo từng level
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default id
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - total_price     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-courses-by-level:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue of courses in a level
+      description: Thống kê doanh thu các khoá học trong một level
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: levelId
+          in: query
+          description: Enter value levelId
+          required: true
+          explode: true
+          schema:
+            type: number
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC (Sort by total_price)
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
 components:
   securitySchemes:
     bearerAuth:

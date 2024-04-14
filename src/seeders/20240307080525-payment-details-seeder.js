@@ -4,7 +4,7 @@ const { faker } = require('@faker-js/faker');
 const generateRandomPaymentDetail = (existingPairs) => {
   let paymentId, courseId;
   do {
-    paymentId = faker.number.int({ min: 1, max: 1000 });
+    paymentId = faker.number.int({ min: 1, max: 500 });
     courseId = faker.number.int({ min: 1, max: 100 });
   } while (existingPairs.has(`${paymentId}-${courseId}`));
 

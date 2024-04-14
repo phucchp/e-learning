@@ -93,4 +93,9 @@ export class EnrollmentService implements IEnrollmentService {
             courseId:courseId
         });
     }
+
+    async addEnrollmentCourseInBulk(userId: number, courseIds: number[]): Promise<Enrollment[]> {
+        const userCourses = courseIds.map(courseId => ({ userId, courseId }));
+        return await this.enrollmentRepository.createMultiple(userCourses);
+    }
 }

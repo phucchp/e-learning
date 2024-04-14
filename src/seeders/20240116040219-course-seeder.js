@@ -6,7 +6,7 @@ const generateRandomCourse = () => ({
   title: faker.lorem.sentence(),
   introduction: faker.lorem.paragraph(),
   description: faker.lorem.paragraphs(4),
-  price: faker.number.float({ min: 0, max: 200 }),
+  price: faker.number.int({ min: 0, max: 200 }),
   discount: faker.number.int({ min: 5, max: 50 }),
   duration: faker.number.int({ min: 1, max: 40 }),
   category_id: faker.number.int({ min: 1, max: 10 }), // Replace with an existing category ID

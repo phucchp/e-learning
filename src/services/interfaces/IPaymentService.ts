@@ -12,10 +12,13 @@ export interface IPaymentService {
         transactionId: string,
         orderInfor: string,
         status: string,
-        courseIds: number[]
+        courseIds: string[]
     ): Promise<Payment>;
-    updatePayment(req: Request): Promise<Payment>;
+    updatePayment(payment: Payment): Promise<Payment>
     deletePayment(paymentId: number): Promise<void>;
     createPaymentDetails(paymentId: number, courseIds: number[]): Promise<PaymentDetail[]>;
     getPaymentNotCheckout(userId: number): Promise<Payment | null>;
+    cancelOrder(userId: number): Promise<void>;
+    getPaymentNotCheckoutInformation(userId: number): Promise<Payment | null>;
+    getPaymentByTransactionId(transactionId: string): Promise<Payment| null>;
 }

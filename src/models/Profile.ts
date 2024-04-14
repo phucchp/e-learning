@@ -1,5 +1,3 @@
-// models/Profile.ts
-
 import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Default, DeletedAt, ForeignKey, BelongsTo, AllowNull, IsInt } from 'sequelize-typescript';
 import { User } from './User'; // Assuming your User model is in the same directory
 

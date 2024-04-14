@@ -424,4 +424,49 @@ export class CourseService implements ICourseService {
     async getCoursesFavorite(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: Favorite[]; count: number; }> {
         throw Error("Method not implemented");
     }
+
+    /**
+     * Using create data for payment with paypal
+     * @param courseIds 
+     * @returns 
+     */
+    async createDataCourseForPayment(courseIds: string[]): Promise<{totalPrice: number; items: any[]}> {
+        const items = [];
+        let totalPrice = 0;
+        const courses = await this.courseRepository.getAll({
+            where: {
+                courseId: {
+					[Op.in]:courseIds
+				}
+            }
+        });
+
+        for(const course of courses) {
+            const price = course.price - course.price * course.discount/100;
+            totalPrice += parseFloat(price.toFixed(2));
+            items.push({
+                name : course.id.toString(),
+                quantity: '1',
+                unit_amount: {
+                    currency_code: "USD",
+                    value: price.toFixed(2),
+                }
+            });
+        }
+
+        return {
+            totalPrice: totalPrice,
+            items: items
+        };
+    }
+
+    async getCoursesByCourseIds(courseIds: number[]): Promise<Course[]> {
+        return await this.courseRepository.getAll({
+            where: {
+                courseId: {
+					[Op.in]:courseIds
+				}
+            }
+        });
+    }
 }

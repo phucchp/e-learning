@@ -63,4 +63,8 @@ export class EnrollmentRepository extends BaseRepository<Enrollment> implements 
             ]
 		});
 	}
+
+	async createMultiple(data: any): Promise<Enrollment[]> {
+		return await this.model.bulkCreate(data);
+	}
 }

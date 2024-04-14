@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import { Service } from 'typedi';
 import * as dotenv from 'dotenv';
 import Handlebars from "handlebars";
+import { Course } from '../models/Course';
+import { User } from '../models/User';
 dotenv.config();
 
 @Service()
@@ -87,6 +89,40 @@ export class Mail {
 
 		return await this.sendEmail(to, 'Active your account', htmlContent);
 	};
+
+
+	getCurrentDateAsString() {
+		const currentDate = new Date();
+		const day = String(currentDate.getDate()).padStart(2, '0');
+		const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+		const year = currentDate.getFullYear();
+		
+		return `${year}-${month}-${day}`;
+	}
+	  	  
+	sendBill = async(user: User, courses: Course[], paymentDetail: any) : Promise<void> =>{
+			// Đọc nội dung HTML từ file mẫu handlebars
+		let htmlTemplate = fs.readFileSync('src/utils/templates/invoice2.hbs', 'utf8');
+		Handlebars.registerHelper('calculateTotal', (price, discount) => {
+            return price * (1 - discount / 100);
+        });
+		// Biên dịch mẫu handlebars
+		const compiledTemplate = Handlebars.compile(htmlTemplate);
+		// Dữ liệu động để chèn vào mẫu
+		// Chèn dữ liệu vào mẫu
+		const templateData = {
+			subject: 'Subject of the email',
+			greeting: 'Hello!',
+			message: 'This is a sample email with dynamic content.',
+			user: user,
+			courses: courses,
+			paymentDetails:paymentDetail,
+			dateNow : this.getCurrentDateAsString(),	  // Sử dụng hàm để lấy ngày hiện tại dưới dạng chuỗi,
+			totalPrice: paymentDetail.purchase_units[0].amount.value
+		};
+		const htmlContent = compiledTemplate(templateData);
+		return await this.sendEmail('phucchp@gmail.com', 'Invoice', htmlContent);
+	}
 }
 
 export default Mail;

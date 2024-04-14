@@ -16,4 +16,6 @@ export interface ICourseService {
     getCourseByLessonId(lessonId: number): Promise<Course>;
     isUserOwnerCourse(courseId: number, userId: number): Promise<boolean>;
     getCourseByTopicId(topicId: number): Promise<Course>;
+    createDataCourseForPayment(courseIds: string[]): Promise<any>;
+    getCoursesByCourseIds(courseIds: number[]): Promise<Course[]>;
 }

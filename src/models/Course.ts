@@ -10,6 +10,7 @@ import { Favorite } from './Favorite';
 import { Enrollment } from './Enrollment';
 import { Cart } from './Cart';
 import { Review } from './Review';
+import { PaymentDetail } from './PaymentDetail';
 
 @Table({
   tableName: 'courses',
@@ -199,6 +200,9 @@ export class Course extends Model<Course> {
   @HasMany(() => Enrollment)
   enrollments!: Enrollment[];
 
+  @HasMany(() => PaymentDetail)
+  paymentDetails!: PaymentDetail[];
+  
   @DeletedAt
   deletedAt?: Date;
 
