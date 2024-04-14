@@ -13,7 +13,7 @@ import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 export class UserService implements IUserService {
     
     @Inject(() => UserRepository)
-	private UserRepository!: IUserRepository;
+	private userRepository!: IUserRepository;
     
     getUsers(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<User[]> {
         throw new Error('Method not implemented.');
@@ -23,7 +23,7 @@ export class UserService implements IUserService {
     }
 
     async isAdmin(userId: number): Promise<boolean>{
-        const user = await this.UserRepository.findById(userId);
+        const user = await this.userRepository.findById(userId);
         if(!user) {
             throw new NotFound('User not found or is not actived');
         }
@@ -34,7 +34,7 @@ export class UserService implements IUserService {
     }
 
     async isInstructor(userId: number): Promise<boolean>{
-        const user = await this.UserRepository.findById(userId);
+        const user = await this.userRepository.findById(userId);
         if(!user) {
             throw new NotFound('User not found or is not actived');
         }
@@ -45,6 +45,10 @@ export class UserService implements IUserService {
     }
 
     async getCarts(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
-        return await this.UserRepository.getCarts(userId, search);
+        return await this.userRepository.getCarts(userId, search);
+    }
+
+    async getUserInformation(userId: number): Promise<User> {
+        return await this.userRepository.getUserInformation(userId);
     }
 }

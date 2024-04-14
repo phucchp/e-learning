@@ -11,6 +11,9 @@ import ReviewRoutes from './routes/ReviewRoutes';
 import NoteRoutes from './routes/NoteRoutes';
 import { handleError } from './utils/CustomError';
 import UserRoutes from './routes/UserRoutes'
+import LessonRoutes from './routes/LessonRoutes';
+import StatisticalRoutes from './routes/StatisticalRoutes';
+import PaymentRoutes from './routes/PaymentRoutes';
 class App {
 	public app: Application;
 
@@ -44,6 +47,9 @@ class App {
 		this.app.use('/api/reviews', ReviewRoutes);
 		this.app.use('/api/notes', NoteRoutes);
 		this.app.use('/api/users', UserRoutes);
+		this.app.use('/api/lessons', LessonRoutes);
+		this.app.use('/api/statisticals', StatisticalRoutes);
+		this.app.use('/api/payments', PaymentRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {

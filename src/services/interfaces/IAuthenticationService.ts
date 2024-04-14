@@ -8,16 +8,18 @@ export interface IAuthenticationService {
         firstName?: string,
         lastName?: string,
 	): Promise<boolean>;
-	// forgotPassword: (
-	// 	email: string,
-	// 	token?: string | null,
-	// 	password?: string | null
-	// ) => Promise<any>;
-	// changePassword: (
-	// 	userId: number,
-	// 	oldPassword: string,
-	// 	newPassword: string
-	// ) => Promise<any>;
-	activeUser: (token: string) => Promise<boolean>;
+	forgotPassword (
+		email: string,
+	) : Promise<any>;
+	changePassword (
+		userId: number,
+		oldPassword: string,
+		newPassword: string
+	) : Promise<any>;
+	activeUser(token: string) : Promise<boolean>;
+	changePasswordUsingToken(
+		token: string,
+		newPassword: string
+	): Promise<any>;
 	// getAccessTokenByRefreshToken: (refreshToken: string) => Promise<any>;
 }

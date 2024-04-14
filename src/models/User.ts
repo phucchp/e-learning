@@ -10,7 +10,9 @@ import { Note } from './Note';
 import { Payment } from './Payment';
 import { Processing } from './Processing';
 import { Lesson } from './Lesson';
-
+import { EWallet } from './EWallet';
+import { Remind } from './Remind';
+import { Question } from './Question';
 
 @Table({
   tableName: 'users',
@@ -98,6 +100,12 @@ export class User extends Model<User> {
     @HasMany(() => Review)
     reviews!: Review[];
 
+    @HasMany(() => Remind)
+    reminds!: Remind[];
+
+    @HasMany(() => EWallet)
+    eWallets!: EWallet[];
+
     @BelongsToMany(() => Lesson, {
       through:() => Processing,
       as:'processing'
@@ -112,6 +120,9 @@ export class User extends Model<User> {
 
     @HasMany(() => Payment)
     payments!: Payment[];
+
+    @HasMany(() => Question)
+    questions!: Question[];
 
     @DeletedAt
     deletedAt?: Date;

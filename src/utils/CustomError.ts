@@ -17,7 +17,9 @@ export class DuplicateError extends CustomError {
 	}
 }
 
-
+/**
+ * Lỗi chưa được uỷ quyền, client không có quyền truy cập vào tài nguyên vì chưa xác thực
+ */
 export class UnauthorizedError extends CustomError {
 	constructor(message: string) {
 		super(message, 401, 'Unauthorized');
@@ -36,6 +38,9 @@ export class ContentNotFound extends CustomError {
 	}
 }
 
+/**
+ *  Client đã được xác thực nhưng không có quyền truy cập vào tài nguyên được yêu cầu
+ */
 export class NotEnoughAuthority extends CustomError {
 	constructor(message: string) {
 		super(message, 403, 'Forbidden');

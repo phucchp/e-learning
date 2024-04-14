@@ -28,7 +28,7 @@ export class Payment extends Model<Payment> {
 
   @AllowNull(false)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.FLOAT,
   })
   price!: number;
   
@@ -42,7 +42,7 @@ export class Payment extends Model<Payment> {
   @Unique(true)
   @AllowNull(false)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
   })
   transactionId!:string;
   

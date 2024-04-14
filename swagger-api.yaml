@@ -13,6 +13,8 @@ tags:
     description: API for Authentication
   - name: course
     description: API for Courses
+  - name: lesson
+    description: API for Lessons
   - name: category
     description: API for Categories
   - name: language
@@ -23,6 +25,8 @@ tags:
     description: API for notes
   - name: user
     description: API for users
+  - name: statistical
+    description: API for statisticals
 paths:
   /auth/login:
     post:
@@ -75,6 +79,74 @@ paths:
       responses:
         '200':
           description: Successful response
+        '500':
+          description: Internal server error
+  /auth/users/change-password:
+    post:
+      summary: Change password for user (Already login)
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  default: '123456Aa#'
+                newPassword:
+                  type: string
+                  default: "123456789Aa#"
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+      security:
+        - bearerAuth: []
+  /auth/users/change-password-token:
+    post:
+      summary: Change password for user
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  default: 'Add token here'
+                newPassword:
+                  type: string
+                  default: "123456789Aa#"
+      responses:
+        '200':
+          description: Successful
+        '500':
+          description: Internal server error
+  /auth/users/forgot-password:
+    post:
+      summary: Forgot password for user
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: 'user1@gmail.com'
+      responses:
+        '200':
+          description: Successful
         '500':
           description: Internal server error
   /courses:
@@ -406,7 +478,153 @@ paths:
               schema:
                 type: array
         '400':
-          description: Can not get category   
+          description: Can not get course
+
+  /lessons/{lessonId}:
+    get:
+      tags:
+        - lesson
+      summary: Get lesson details by lessonId
+      parameters:
+        - name: lessonId
+          in: path
+          description: Enter lessonId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - lesson
+      summary: Deletes a lesson by lessonId
+      parameters:
+        - name: lessonId
+          in: path
+          description: lessonId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - lesson
+      summary: Update a lesson
+      parameters:
+        - name: lessonId
+          in: path
+          description: lessonId of lesson that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: New Title
+                isPreview:
+                  type: boolean
+                  default: New Title
+                duration:
+                  type: integer
+                  default: New Title
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update lesson
+      security:
+        - bearerAuth: []
+  /lessons:
+    post:
+      tags:
+        - lesson
+      summary: Add new lessons
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessons:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      isPreview:
+                        type: boolean
+                      duration:
+                        type: integer
+                      topicId:
+                        type: integer
+              example:
+                lessons:
+                  - title: Lesson 1
+                    isPreview: true
+                    duration: 1
+                    topicId: 1
+                  - title: Lesson 2
+                    isPreview: false
+                    duration: 2
+                    topicId: 1
+      security:
+        - bearerAuth: []
+  /lessons/presign-url/upload-video:
+    get:
+      tags:
+        - lesson
+      summary: Get presign URL to upload video of lesson
+      parameters:
+        - name: lessonId
+          in: query
+          description: Enter lessonId
+          required: true
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
   /categories:
     get:
       tags:
@@ -1114,6 +1332,587 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
+  /users/favorite-courses:
+    post:
+          tags:
+            - user
+          summary: Add new favorite course for user
+          responses:
+            '200':
+              description: Successful
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                      default: 'cc8196b3-9ff8-4f6a-8387-a6aa998acedb'
+          security:
+            - bearerAuth: []
+    delete:
+          tags:
+            - user
+          summary: Delete courses favorite
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                      default: 'cc8196b3-9ff8-4f6a-8387-a6aa998acedb'
+          responses:
+            '204':
+              description: successfully
+              content:
+                application/json:
+                  example:
+                    message: successfully
+          security:
+            - bearerAuth: []
+  /statisticals/statistical-revenue:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue by week, month, year, and day for instructors
+      description: Thống kê doanh thu theo tuần, tháng, năm, ngày cho instructor
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string    
+        - name: statisBy
+          in: query
+          description: Choose statisBy
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - year
+                - month
+                - day
+                - week
+        - name: courseId
+          in: query
+          description: Enter value courseId
+          required: false
+          explode: true
+          schema:
+            type: string  
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []
+  /statisticals/admin/statistical-revenue:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue by week, month, year, and day for admin
+      description: Thống kê doanh thu theo tuần tháng năm ngày cho admin
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string    
+        - name: statisBy
+          in: query
+          description: Choose statisBy
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - year
+                - month
+                - day
+                - week
+        - name: courseId
+          in: query
+          description: Enter value courseId
+          required: false
+          explode: true
+          schema:
+            type: string   
+        - name: instructorId
+          in: query
+          description: Enter value instructorId
+          required: false
+          explode: true
+          schema:
+            type: string       
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-by-course:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each course for instructors
+      description: Thống kê doanh thu theo từng khoá học cho instructor
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: orderPrice
+          in: query
+          description: Choose orderPrice, default DESC
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC                  
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []  
+  /statisticals/admin/statistical-revenue-by-course:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each course for admin
+      description: Thống kê doanh thu theo khoá học cho admin
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: orderPrice
+          in: query
+          description: Choose orderPrice, default DESC
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC  
+        - name: instructorId
+          in: query
+          description: Enter value instructorId
+          required: false
+          explode: true
+          schema:
+            type: string       
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []  
+  /statisticals/admin/statistical-revenue-by-instructor:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each instructor
+      description: Thống kê doanh thu theo từng instructor
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default instructorId
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - instructorId
+                - total_price     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []   
+  /statisticals/statistical-courses-by-category:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on the number of courses by each category
+      description: Thống kê số lượng khoá học theo từng category
+      parameters:
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default id
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - totalCourses     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-by-category:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each category
+      description: Thống kê doanh thu theo từng chủ đề (category)
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default categoryId
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - categoryId
+                - total_price     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-courses-by-category:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue of courses in a category
+      description: Thống kê doanh thu các khoá học trong một chủ đề
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          description: Enter value categoryId
+          required: true
+          explode: true
+          schema:
+            type: number
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC (Sort by total_price)
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-courses-by-level:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on the number of courses by each level
+      description: Thống kê số lượng khoá học theo từng level
+      parameters:
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default id
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - totalCourses     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-by-level:
+    get:
+      tags:
+        - statistical
+      summary: Revenue statistics by each level
+      description: Thống kê doanh thu theo từng level
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Choose sortBy, default id
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - total_price     
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
+  /statisticals/statistical-revenue-courses-by-level:
+    get:
+      tags:
+        - statistical
+      summary: Statistics on revenue of courses in a level
+      description: Thống kê doanh thu các khoá học trong một level
+      parameters:
+        - name: startDate
+          in: query
+          description: Enter value startDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Enter value endDate
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: levelId
+          in: query
+          description: Enter value levelId
+          required: true
+          explode: true
+          schema:
+            type: number
+        - name: sortType
+          in: query
+          description: Choose sortType, default ASC (Sort by total_price)
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC      
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: [] 
 components:
   securitySchemes:
     bearerAuth:

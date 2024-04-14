@@ -4,7 +4,7 @@ import { Course } from '../models/Course';
 import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import { ContentNotFound, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
+import { ContentNotFound, DuplicateError, NotEnoughAuthority, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
 import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
@@ -16,6 +16,14 @@ import { IReviewRepository } from '../repositories/interfaces/IReviewRepository'
 import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';
 import { LevelRepository } from '../repositories/LevelRepository';
 import { S3Service } from './S3Service';
+import { LessonRepository } from '../repositories/LessonRepository';
+import { TopicRepository } from '../repositories/TopicRepository';
+import { ILessonRepository } from '../repositories/interfaces/ILessonRepository';
+import { ITopicRepository } from '../repositories/interfaces/ITopicRepository';
+import { FavoriteRepository } from '../repositories/FavoriteRepository';
+import { IFavoriteRepository } from '../repositories/interfaces/IFavoriteRepository';
+import { Favorite } from '../models/Favorite';
+import { IoTRoboRunner } from 'aws-sdk';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -31,6 +39,15 @@ export class CourseService implements ICourseService {
 
     @Inject(() => LevelRepository)
 	private levelRepository!: ILevelRepository;
+
+    @Inject(() => LessonRepository)
+	private lessonRepository!: ILessonRepository;
+
+    @Inject(() => TopicRepository)
+	private topicRepository!: ITopicRepository;
+
+    @Inject(() => FavoriteRepository)
+	private favoriteRepository!: IFavoriteRepository;
 
     @Inject(() => S3Service)
 	private s3Service!: S3Service;
@@ -89,7 +106,6 @@ export class CourseService implements ICourseService {
     }
 
     async getCourses(req: Request): Promise<{ rows: Course[]; count: number}> {
-        console.log(await this.s3Service.getObjectUrl('lessons/me-removebg-preview.png'));
         let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
         const whereCondition: any = {};
         if(search){
@@ -275,5 +291,182 @@ export class CourseService implements ICourseService {
         });
 
         return newCourse;
+    }
+
+    async getCourseIdByLessonId(lessonId: number): Promise<number> {
+        const lesson = await this.lessonRepository.findById(lessonId);
+        if(!lesson) {
+            throw new NotFound('lesson not found');
+        }
+
+        const topic = await this.topicRepository.findById(lesson.topicId);
+        if(!topic) {
+            throw new ServerError('Server error: Can not find topic of lesson');
+        }
+
+        return topic.courseId;
+    }
+
+    async getCourseByLessonId(lessonId: number): Promise<Course> {
+        const lesson = await this.lessonRepository.findById(lessonId);
+        if(!lesson) {
+            throw new NotFound('lesson not found');
+        }
+
+        const topic = await this.topicRepository.findById(lesson.topicId);
+        if(!topic) {
+            throw new ServerError('Server error: Can not find topic of lesson');
+        }
+
+        const course = await this.courseRepository.findById(topic.courseId);
+        if(!course) {
+            throw new NotFound('Course not found');
+        }
+        return course;
+    }
+
+    async getCourseByTopicId(topicId: number): Promise<Course> {
+
+        const topic = await this.topicRepository.findById(topicId);
+        if(!topic) {
+            throw new ServerError('Server error: Can not find topic of lesson');
+        }
+
+        const course = await this.courseRepository.findById(topic.courseId);
+        if(!course) {
+            throw new NotFound('Course not found');
+        }
+        return course;
+    }
+
+    /**
+     * Check the user's favorite course.
+     * 
+     * @param courseId 
+     * @param userId 
+     * @returns 
+     */
+    async isCourseFavorite(courseId: number, userId: number): Promise<boolean> {
+        const favorite = await this.favoriteRepository.findOneByCondition({
+            courseId: courseId,
+            userId: userId
+        }, true);
+        if(!favorite){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check the user's favorite course.
+     * 
+     * @param courseId 
+     * @param userId 
+     * @returns 
+     */
+    async isUserOwnerCourse(courseId: number, userId: number): Promise<boolean> {
+        const course = await this.courseRepository.findOneByCondition({
+            courseId: courseId,
+            instructorId: userId
+        }, true);
+        if(!course){
+            return false;
+        }
+        return true;
+    }
+
+    async addCourseFavorite(courseId: string, userId: number): Promise<boolean> {
+        const course  = await this.courseRepository.findOneByCondition({
+            courseId: courseId,
+            active: true
+        });
+        // Check course is exist
+        if(!course){
+            throw new NotFound('Course not found or is not actived');
+        }
+
+        if(await this.isCourseFavorite(course.id, userId)){
+            // Return error if user already favorited course
+            throw new DuplicateError('The user already favorited the course before.');
+        }
+
+        await this.favoriteRepository.create({
+            courseId: course.id,
+            userId: userId
+        });
+
+        return true;
+    }
+
+    async deleteCourseFavorite(courseId: string, userId: number): Promise<boolean> {
+        const course  = await this.courseRepository.findOneByCondition({
+            courseId: courseId,
+            active: true
+        });
+        // Check course is exist
+        if(!course){
+            throw new NotFound('Course not found or is not actived');
+        }
+        const favorite = await this.favoriteRepository.findOneByCondition({
+            courseId: course.id,
+            userId: userId
+        }, true);
+
+        if(!favorite){
+            // Return error if user is not favorited course
+            throw new NotFound('The user is not favorited the course before.');
+        }
+        
+        await this.favoriteRepository.deleteInstace(favorite);
+        return true;
+    }
+
+    async getCoursesFavorite(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: Favorite[]; count: number; }> {
+        throw Error("Method not implemented");
+    }
+
+    /**
+     * Using create data for payment with paypal
+     * @param courseIds 
+     * @returns 
+     */
+    async createDataCourseForPayment(courseIds: string[]): Promise<{totalPrice: number; items: any[]}> {
+        const items = [];
+        let totalPrice = 0;
+        const courses = await this.courseRepository.getAll({
+            where: {
+                courseId: {
+					[Op.in]:courseIds
+				}
+            }
+        });
+
+        for(const course of courses) {
+            const price = course.price - course.price * course.discount/100;
+            totalPrice += parseFloat(price.toFixed(2));
+            items.push({
+                name : course.id.toString(),
+                quantity: '1',
+                unit_amount: {
+                    currency_code: "USD",
+                    value: price.toFixed(2),
+                }
+            });
+        }
+
+        return {
+            totalPrice: totalPrice,
+            items: items
+        };
+    }
+
+    async getCoursesByCourseIds(courseIds: number[]): Promise<Course[]> {
+        return await this.courseRepository.getAll({
+            where: {
+                courseId: {
+					[Op.in]:courseIds
+				}
+            }
+        });
     }
 }

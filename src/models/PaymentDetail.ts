@@ -22,7 +22,7 @@ export class PaymentDetail extends Model<PaymentDetail> {
   @ForeignKey(() => Course)
   @AllowNull(false)
   @Column({
-    type: DataType.STRING(100),
+    type: DataType.INTEGER,
     unique: 'compositeIndex'
   })
   courseId!: number;
@@ -40,6 +40,9 @@ export class PaymentDetail extends Model<PaymentDetail> {
 
   @BelongsTo(() => Payment)
   payment!: Payment;
+
+  @BelongsTo(() => Course)
+  course!: Course;
 
   @DeletedAt
   deletedAt?: Date;

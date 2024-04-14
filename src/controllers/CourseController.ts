@@ -34,10 +34,17 @@ export class CourseController{
         const courseId = req.params.courseId;
         const course = await this.courseService.getCourse(courseId);
         const groupReview = await this.reviewService.getStatiscalReviews(courseId);
-
+        const userId = req.payload.userId;
+        let isCourseFavorite = false;
+        if(userId) {
+            isCourseFavorite = await this.courseService.isCourseFavorite(course.id, userId);
+        }
         return res.status(200).json({
             message: "successfully",
-            data: course,
+            data: {
+                course,
+                isCourseFavorite
+            },
             groupReview: groupReview.rows
         });
     }
