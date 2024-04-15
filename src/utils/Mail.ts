@@ -102,7 +102,7 @@ export class Mail {
 	  	  
 	sendBill = async(user: User, courses: Course[], paymentDetail: any) : Promise<void> =>{
 			// Đọc nội dung HTML từ file mẫu handlebars
-		let htmlTemplate = fs.readFileSync('src/utils/templates/invoice2.hbs', 'utf8');
+		let htmlTemplate = fs.readFileSync('src/utils/templates/invoice.hbs', 'utf8');
 		Handlebars.registerHelper('calculateTotal', (price, discount) => {
             return price * (1 - discount / 100);
         });

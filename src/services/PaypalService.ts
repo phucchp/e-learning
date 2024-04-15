@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import fetch from "node-fetch";
-import { NotEnoughAuthority, NotFound, ServerError } from '../utils/CustomError';
+import { NotEnoughAuthority, NotFound, ServerError, UnprocessableError } from '../utils/CustomError';
 import { CourseService } from './CourseService';
 import { ICourseService } from './interfaces/ICourseService';
 import { PaymentService } from './PaymentService';
@@ -259,7 +259,7 @@ export class PaypalService {
     async getOrderPaypalDetails(orderID: string): Promise<any> {
         const { PAYPAL_BASE_API } = process.env;
         if(!PAYPAL_BASE_API) {
-            throw new Error("MISSING_API_CREDENTIALS PAYPAL");;
+            throw new Error("MISSING_API_CREDENTIALS PAYPAL");
         }
         const url = `${PAYPAL_BASE_API}/v2/checkout/orders/${orderID}`;
         const accessToken = await this.generateAccessToken();
@@ -285,4 +285,65 @@ export class PaypalService {
         throw new ServerError('Server error: ' + jsonResponse);
     }
 
+    async transferMoney(items: any[]): Promise<any> {
+        // Lấy tài khoản paypal admin hiện tại
+        // Gọi API kiểm tra số dư xem đủ để trả không
+        // chuyển tiền và return kết quả
+        const { PAYPAL_BASE_API } = process.env;
+        if(!PAYPAL_BASE_API) {
+            throw new Error("MISSING_API_CREDENTIALS PAYPAL");
+        }
+        const url = `${PAYPAL_BASE_API}/v1/payments/payouts`;
+        const accessToken = await this.generateAccessToken();
+
+        const requestData = {
+            sender_batch_header: {
+                sender_batch_id: String(Date.now()),
+                recipient_type: 'EMAIL',
+                email_subject: 'You have money!',
+                email_message: 'You received a payment. Thanks for using our service!',
+            },
+            items: items,
+        };
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(requestData),
+        });
+        console.log(`Status code: ${response.status}`);
+        if(response.status == 422) {
+            throw new UnprocessableError('The account does not have sufficient balance.');
+        }
+        if(response.status != 201) {
+            const responseData = await response.json();
+            console.log(responseData);
+            throw new ServerError('Server Error');
+        }
+        const responseData = await response.json();
+        console.log('Payout request successful');
+        return responseData;
+    }
+
+    async getBatchPayoutDetails(batchId: string): Promise<any> {
+        const { PAYPAL_BASE_API } = process.env;
+        if(!PAYPAL_BASE_API) {
+            throw new Error("MISSING_API_CREDENTIALS PAYPAL");
+        }
+        const url = `${PAYPAL_BASE_API}/v1/payments/payouts/${batchId}`;
+        const accessToken = await this.generateAccessToken();
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        const responseData = await response.json();
+        console.log('Payout request successful');
+        return responseData;
+    }
 }

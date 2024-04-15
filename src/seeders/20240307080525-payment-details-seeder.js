@@ -9,11 +9,12 @@ const generateRandomPaymentDetail = (existingPairs) => {
   } while (existingPairs.has(`${paymentId}-${courseId}`));
 
   existingPairs.add(`${paymentId}-${courseId}`);
-
+  let price = faker.number.float({ min: 0, max: 300 });
   return {
     payment_id: paymentId,
     course_id: courseId,
-    price: faker.number.float({ min: 0, max: 300 }),
+    price: parseFloat(price.toFixed(2)),
+    is_paid_to_instructor:true,
     discount: faker.number.int({ min: 0, max: 50 }),
     created_at: new Date(),
     updated_at: new Date(),
