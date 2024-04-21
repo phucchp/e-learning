@@ -24,6 +24,7 @@ import { FavoriteRepository } from '../repositories/FavoriteRepository';
 import { IFavoriteRepository } from '../repositories/interfaces/IFavoriteRepository';
 import { Favorite } from '../models/Favorite';
 import { IoTRoboRunner } from 'aws-sdk';
+import { HandleS3 } from './utils/HandleS3';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -49,8 +50,8 @@ export class CourseService implements ICourseService {
     @Inject(() => FavoriteRepository)
 	private favoriteRepository!: IFavoriteRepository;
 
-    @Inject(() => S3Service)
-	private s3Service!: S3Service;
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
@@ -155,7 +156,8 @@ export class CourseService implements ICourseService {
             sortType: sortType || 'ASC',
             sort : sort || 'createdAt'
         }
-        const courses = await this.courseRepository.getCourses(options);
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
         return courses;
     }
 
@@ -164,7 +166,7 @@ export class CourseService implements ICourseService {
         if(!course){
             throw new NotFound('Course not found');
         }
-        return course;
+        return await this.handleS3.getResourceCourse(course);
     }
 
     /**

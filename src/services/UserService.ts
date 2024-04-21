@@ -8,6 +8,7 @@ import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../ut
 import * as crypto from 'crypto';
 import { UserRepository } from '../repositories/UserRepository';
 import { IUserRepository } from '../repositories/interfaces/IUserRepository';
+import { HandleS3 } from './utils/HandleS3';
 
 @Service()
 export class UserService implements IUserService {
@@ -21,6 +22,9 @@ export class UserService implements IUserService {
     getUser(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<User> {
         throw new Error('Method not implemented.');
     }
+
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
 
     async isAdmin(userId: number): Promise<boolean>{
         const user = await this.userRepository.findById(userId);
@@ -46,6 +50,18 @@ export class UserService implements IUserService {
 
     async getCarts(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
         return await this.userRepository.getCarts(userId, search);
+    }
+
+    async getFavoriteCourses(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
+        let data = await this.userRepository.getFavoriteCourses(userId, search);
+        
+        if (data.rows.length >= 1 && data.rows !== undefined) {
+            console.log(data.rows);
+            const courses = data.rows[0].getDataValue('favorites');
+            data.rows[0].setDataValue('favorites', await this.handleS3.getResourceCourses(courses));
+        }
+
+        return data;
     }
 
     async getUserInformation(userId: number): Promise<User> {
