@@ -2,6 +2,7 @@ import { Service } from "typedi";
 import { PaymentDetail } from "../models/PaymentDetail";
 import { IPaymentDetailRepository } from "./interfaces/IPaymentDetailRepository";
 import { BaseRepository } from "./BaseRepository";
+import { Op } from 'sequelize';
 
 @Service()
 export class PaymentDetailRepository extends BaseRepository<PaymentDetail> implements IPaymentDetailRepository{
@@ -18,6 +19,18 @@ export class PaymentDetailRepository extends BaseRepository<PaymentDetail> imple
 		await this.model.destroy({ 
 			where: { paymentId: paymentId },
 			force: true
+		});
+	}
+
+	async updateStatusTransfer(paymentDetailsIds: number[]): Promise<void> {
+		await this.model.update({
+			isPaidToInstructor: true
+		}, {
+			where: {
+				id: {
+					[Op.in]: paymentDetailsIds
+				}
+			}
 		});
 	}
 }

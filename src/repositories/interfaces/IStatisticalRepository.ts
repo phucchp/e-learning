@@ -12,4 +12,5 @@ export interface IStatisticalRepository extends BaseRepositoryInterface<PaymentD
     getRevenueStatisticsByLevel(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]>;
     getStatisticsCoursesByLevel(sortBy: string, sortType: string): Promise<any[]>;
     getRevenueStatisticsCourseByLevel(startDate: string, endDate: string, levelId: number, sortType: string): Promise<any[]>;
+    calculateMonthlyRevenueByInstructor(): Promise<any[]>; // Thống kê tiền trong 1 tháng của từng instructor
 }
