@@ -7,17 +7,51 @@ import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 @Service()
 export class S3Service {
 
-    private static s3Client = new S3({
-        accessKeyId: process.env.AWS_ACCESS_KEY || 'ftpFjHO7fVotfgaDiO5A',
-        secretAccessKey: process.env.AWS_SECRET_KEY || 'Jx89z4nsbGevSOMDWemErKu3zplNmo03b0WZz1ri',
-        region: process.env.AWS_REGION || 'ap-southeast-1', // Thay thế bằng khu vực AWS của bạn
-        signatureVersion: 'v4'
-    });
+    private static s3Client: S3;
+    private cloudfrontDistributionId: string;
+    private cloudFrontDomain: string; // Thay thế bằng tên miền CloudFront của bạn
+    private BUCKET_NAME: string;
+    private awsRegion: string;
+    private awsAccessKey: string;
+    private awsSecretKey: string;
 
-    private cloudfrontDistributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || 'EGZQ2Z6SRLE1A'
+    constructor() {
+        // Danh sách các biến môi trường
+        const requiredEnvVariables = [
+          'AWS_ACCESS_KEY',
+          'AWS_SECRET_KEY',
+          'AWS_REGION',
+          'CLOUDFRONT_DISTRIBUTION_ID',
+          'CLOUDFRONT_DOMAIN',
+          'AWS_BUCKET_NAME',
+          'CLOUDFRONT_DOMAIN',
+          'AWS_BUCKET_NAME',
+          'CLOUDFRONT_PRIVATE_KEY',
+          'CLOUDFRONT_KEY_PAIR_ID'
+        ];
 
-    private cloudFrontDomain =process.env.CLOUDFRONT_DOMAIN|| 'https://d3h2k6w8gpk1ys.cloudfront.net'; // Thay thế bằng tên miền CloudFront của bạn
-    private BUCKET_NAME = process.env.AWS_BUCKET_NAME || 'elearning-project-chp';
+        // Lặp qua danh sách biến môi trường và kiểm tra xem chúng đã được đặt hay không
+        const missingVariables = requiredEnvVariables.filter(variable => !process.env[variable]);
+        if (missingVariables.length > 0) {
+            throw new Error(`Missing AWS environment variables: ${missingVariables.join(', ')}`);
+        }
+
+        // Khởi tạo đối tượng S3 chỉ nếu các biến môi trường tồn tại
+        S3Service.s3Client = new S3({
+            accessKeyId: process.env.AWS_ACCESS_KEY,
+            secretAccessKey: process.env.AWS_SECRET_KEY,
+            region: process.env.AWS_REGION,
+            signatureVersion: 'v4'
+        });
+
+        this.cloudfrontDistributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || 'EGZQ2Z6SRLE1A';
+        this.cloudFrontDomain = process.env.CLOUDFRONT_DOMAIN|| 'https://d3h2k6w8gpk1ys.cloudfront.net'; // Thay thế bằng tên miền CloudFront của bạn
+        this.BUCKET_NAME = process.env.AWS_BUCKET_NAME || 'elearning-project-chp';
+        this.awsRegion = process.env.AWS_REGION || 'ap-southeast-1';
+        this.awsAccessKey = process.env.AWS_ACCESS_KEY || '';
+        this.awsSecretKey = process.env.AWS_SECRET_KEY || '';
+    }
+
     private EXPIRATION = 24 * 60 * 60;
     // Thời gian expire được sửa thành 1 phút (60 giây)
     private expireTime = 24*60*60 * 1000; // 60 phut *60 giây * 1000 milliseconds
@@ -61,8 +95,8 @@ export class S3Service {
             const client = new S3Client({
                 region: process.env.AWS_REGION || 'ap-southeast-1',
                 credentials: {
-                  accessKeyId:  process.env.AWS_ACCESS_KEY || '', // Thay thế bằng access key của bạn
-                  secretAccessKey: process.env.AWS_SECRET_KEY || '', // Thay thế bằng secret access key của bạn
+                  accessKeyId:  this.awsAccessKey, // Thay thế bằng access key của bạn
+                  secretAccessKey: this.awsSecretKey || '', // Thay thế bằng secret access key của bạn
                 },
               });
           const command = new DeleteObjectCommand({
@@ -83,14 +117,14 @@ export class S3Service {
         try{
             this.deleteObject('ok')
             AWS.config.update({
-                accessKeyId: process.env.AWS_ACCESS_KEY,
-                secretAccessKey: process.env.AWS_SECRET_KEY,
-                region: process.env.AWS_REGION || 'ap-southeast-1'
+                accessKeyId: this.awsAccessKey,
+                secretAccessKey: this.awsSecretKey,
+                region: this.awsRegion
               });
             var cloudfront = new AWS.CloudFront();
 
             var params = {
-                DistributionId: 'EGZQ2Z6SRLE1A', /* required */
+                DistributionId: this.cloudfrontDistributionId, /* required */
                 InvalidationBatch: { /* required */
                   CallerReference: String(new Date().getTime()), /* required */
                   Paths: { /* required */
