@@ -25,7 +25,7 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param courseId 
      * @returns 
      */
-    getRevenueStatistics(startDate: string, endDate: string, statisBy: string, instructorId?: number, courseId?: number): Promise<any[]> {
+    async getRevenueStatistics(startDate: string, endDate: string, statisBy: string, instructorId?: number, courseId?: number): Promise<any[]> {
             let filterByCourse = '';
             let filterByInstructor = '';
             if(courseId) {
@@ -40,7 +40,7 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
             if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT 
                 ${this.getSelectExpression('payment_details', statisBy)} AS interval,
                 SUM("payment_details"."price") AS total_price
@@ -73,7 +73,7 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param instructorId 
      * @returns 
      */
-    getRevenueStatisticsByCourses(startDate: string, endDate: string, orderPrice: string, instructorId?: number): Promise<any[]> {
+    async getRevenueStatisticsByCourses(startDate: string, endDate: string, orderPrice: string, instructorId?: number): Promise<any[]> {
             let filterByInstructor = '';
             if(instructorId) {
                 filterByInstructor = `AND "courses"."instructor_id" = ${instructorId}`
@@ -83,7 +83,7 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
             if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT courses.course_id, courses.title, temp_table.total_price, courses.poster_url  FROM
             (SELECT 
                 "payment_details"."course_id" AS courseId,
@@ -130,12 +130,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param sortType 
      * @returns 
      */
-    getRevenueStatisticsByInstructor(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]> {
+    async getRevenueStatisticsByInstructor(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]> {
             const sequelize = this.model.sequelize;
             if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT 
                 "courses"."instructor_id" AS instructorId,
                 "users"."user_name",
@@ -163,12 +163,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param sortType 
      * @returns 
      */
-    getStatisticsCoursesByCategory(sortBy: string, sortType: string): Promise<any[]> {
+    async getStatisticsCoursesByCategory(sortBy: string, sortType: string): Promise<any[]> {
         const sequelize = this.model.sequelize;
         if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT
                 categories.id AS id,
                 categories.category_id as categoryId,
@@ -192,12 +192,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param sortType 
      * @returns 
      */
-    getStatisticsCoursesByLevel(sortBy: string, sortType: string): Promise<any[]> {
+    async getStatisticsCoursesByLevel(sortBy: string, sortType: string): Promise<any[]> {
         const sequelize = this.model.sequelize;
         if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT
                 levels.id,
                 levels.level_name,
@@ -217,12 +217,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
     /**
      * Thống kê doanh thu theo từng category
      */
-    getRevenueStatisticsByCategory(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]> {
+    async getRevenueStatisticsByCategory(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]> {
         const sequelize = this.model.sequelize;
         if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT 
                 "courses"."category_id" AS categoryId,
                 categories."name",
@@ -253,12 +253,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param sortType 
      * @returns 
      */
-    getRevenueStatisticsCourseByCategory(startDate: string, endDate: string, categoryId: number, sortBy: string, sortType: string): Promise<any[]> {
+    async getRevenueStatisticsCourseByCategory(startDate: string, endDate: string, categoryId: number, sortBy: string, sortType: string): Promise<any[]> {
         const sequelize = this.model.sequelize;
         if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT courses.course_id, courses.title, temp_table.total_price, courses.poster_url  FROM
             (SELECT 
                 payment_details.course_id AS courseId,
@@ -292,12 +292,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param sortType 
      * @returns 
      */
-    getRevenueStatisticsCourseByLevel(startDate: string, endDate: string, levelId: number, sortType: string): Promise<any[]> {
+    async getRevenueStatisticsCourseByLevel(startDate: string, endDate: string, levelId: number, sortType: string): Promise<any[]> {
         const sequelize = this.model.sequelize;
         if(!sequelize){
                 throw new ServerError('Server error!');
             }
-            return sequelize.query(`
+            return await sequelize.query(`
             SELECT courses.course_id, courses.title, temp_table.total_price, courses.poster_url  FROM
             (SELECT 
                 payment_details.course_id AS courseId,
@@ -330,12 +330,12 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
      * @param sortType 
      * @returns 
      */
-    getRevenueStatisticsByLevel(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]> {
+    async getRevenueStatisticsByLevel(startDate: string, endDate: string, sortBy: string, sortType: string): Promise<any[]> {
         const sequelize = this.model.sequelize;
         if(!sequelize){
                 throw new ServerError('Server error!');
-            }
-            return sequelize.query(`
+        }
+        return await sequelize.query(`
             SELECT 
                 "levels"."id",
                 "levels"."level_name",
@@ -356,4 +356,32 @@ export class StatisticalRepository extends BaseRepository<PaymentDetail> impleme
             raw: true,
         });
     }
-}
+
+    /**
+     * Thống kê tiền trong một tháng cho từng instructor
+     * Dùng để chuyển tiền cho instructor dựa vào doanh thu của họ mỗi tháng
+     */
+    async calculateMonthlyRevenueByInstructor(): Promise<any[]> {
+        const sequelize = this.model.sequelize;
+        if(!sequelize){
+                throw new ServerError('Server error!');
+        }
+        return await sequelize.query(`
+        SELECT users.id, users.user_name,e_wallets.email as paymentMail, users.email AS userMail ,COUNT(payment_details.id) AS totalBills, 
+            SUM(payment_details.price*(1-payment_details.discount/100)),
+            ARRAY_AGG(payment_details.id) as list_payment_details_id
+        FROM payments
+        JOIN payment_details ON payments.id = payment_details.payment_id AND payments.is_payment = true
+            AND EXTRACT(MONTH FROM payments.created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
+            AND EXTRACT(YEAR FROM payments.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
+            AND payment_details.is_paid_to_instructor = false
+        JOIN courses ON courses.id = payment_details.course_id
+        JOIN users ON users.id = courses.instructor_id
+        JOIN e_wallets ON e_wallets.user_id = users.id
+        GROUP BY users.user_name, e_wallets.email, users.email, users.id;
+        `, {
+            type: QueryTypes.SELECT,
+            raw: true,
+        });
+    }
+ }

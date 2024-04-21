@@ -38,6 +38,13 @@ export class PaymentDetail extends Model<PaymentDetail> {
   })
   discount!: number;
 
+  @AllowNull(false)
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  isPaidToInstructor!: boolean;
+
   @BelongsTo(() => Payment)
   payment!: Payment;
 

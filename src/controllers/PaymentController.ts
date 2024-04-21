@@ -77,4 +77,14 @@ export class PaymentController{
             message: "Success",
         })        
     }
+
+    test = async (req: Request, res: Response) => {
+        const data= await this.paymentService.paymentMonthlyRevenueForInstructor();
+        return res.status(200).json(data);
+    }
+
+    test2 = async (req: Request, res: Response) => {
+        // const data= await this.paypalService.getBatchPayoutDetails();
+        // return res.status(200).json(data);
+    }
 }

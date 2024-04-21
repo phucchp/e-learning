@@ -23,6 +23,7 @@ import { Subtitle } from '../models/Subtitle';
 import { Remind } from '../models/Remind';
 import { Question } from '../models/Question';
 import { Answer } from '../models/Answer';
+import { InstructorPayment } from '../models/InstructorPayment';
 
 
 dotenv.config();
@@ -93,7 +94,7 @@ class Database {
 			Remind,
 			Question,
 			Answer,
-
+			InstructorPayment,
 		]);
 
 		await this.sequelize
