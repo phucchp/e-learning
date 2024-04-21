@@ -1392,6 +1392,26 @@ paths:
                     message: successfully
           security:
             - bearerAuth: []
+  /users/presign-url/upload-avatar:
+    get:
+          tags:
+            - user
+          summary: Get presign-url to upload avatar for user
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/cloud-front/clear-cache-avatar:
+    post:
+          tags:
+            - user
+          summary: Using clear cache cloudfront after update avatar user
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
   /payments/create-order:
     post:
       tags:

@@ -94,4 +94,27 @@ export class UserController{
             data: result.rows,
         })
     }
+
+    /**
+     * Get presign url to upload avatar user to AWS S3
+     */
+    getPresignUrlToUploadAvatar = async (req: Request, res: Response) => {
+        const userId =req.payload.userId;
+        const result = await this.userService.getPresignUrlToUploadAvatar(userId);
+        return res.status(200).json({
+            message: "Successful",
+            url: result,
+        })
+    }
+
+    /**
+     * Using clear cache cloudfront after update avatar user
+     */
+    clearCacheAvatar = async (req: Request, res: Response) => {
+        const userId =req.payload.userId;
+        await this.userService.clearCacheAvatar(userId);
+        return res.status(200).json({
+            message: "Successful",
+        });
+    }
 }

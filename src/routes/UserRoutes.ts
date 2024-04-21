@@ -17,6 +17,8 @@ class UserRoutes extends BaseRoutes {
 		this.router.get('/favorite-courses',auth, this.controller.getFavoriteCourses);
 		this.router.post('/favorite-courses',auth, validateAddFavoriteCourse, validate, this.controller.addCourseFavorite);
 		this.router.delete('/favorite-courses',auth, validateDeleteFavoriteCourse, validate, this.controller.deleteCourseFavorite);
+		this.router.get('/presign-url/upload-avatar',auth, this.controller.getPresignUrlToUploadAvatar);
+		this.router.post('/cloud-front/clear-cache-avatar',auth, this.controller.clearCacheAvatar);
 	}
 }
 
