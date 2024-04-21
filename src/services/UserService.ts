@@ -12,6 +12,7 @@ import { HandleS3 } from './utils/HandleS3';
 import { S3Service } from './S3Service';
 import { ProfileRepository } from '../repositories/ProfileRepository';
 import { IProfileRepository } from '../repositories/interfaces/IProfileRepository';
+import { Profile } from '../models/Profile';
 
 @Service()
 export class UserService implements IUserService {
@@ -111,5 +112,31 @@ export class UserService implements IUserService {
         }
 
 		return await this.s3Service.clearCacheCloudFront(avatar);
+    }
+
+    async getListInstructors(req: Request): Promise<{ rows: User[]; count: number; }> {
+        const page  = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        const results = await this.userRepository.getListInstructors(page, pageSize);
+        if (results.rows.length > 0) {
+            for (const user of results.rows) {
+                if (!user.profile) {
+                    throw new ServerError('Profile user is missing!');
+                }
+                user.setDataValue('profile', await this.handleS3.getAvatarUser(user.profile));
+            }
+        }
+
+        return results;
+    }
+
+    async getInstructorDetail(instructorId: number): Promise<Profile> {
+       const profile = await this.profileRepository.findById(instructorId);
+        
+       if (!profile) {
+        throw new NotFound("Profile not found!");
+       }
+
+       return await this.handleS3.getAvatarUser(profile);
     }
 }

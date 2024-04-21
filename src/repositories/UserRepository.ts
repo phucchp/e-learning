@@ -111,4 +111,27 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 		}
 		return user;
 	}
+
+	async getListInstructors(page: number, pageSize: number): Promise<{ rows: User[]; count: number; }> {
+        const offset = (page - 1) * pageSize;
+		const results = await this.model.findAndCountAll({
+			attributes: ['userName'],
+			where: {
+				roleId: {
+					[Op.gte] : 2
+				},
+				isActive: true
+			},
+			include: [
+				{
+					model: Profile,
+					attributes: ['fullName','firstName', 'lastName', 'avatar', 'description'] ,
+				}
+			],
+			limit: pageSize,
+            offset: offset,
+		});
+
+		return results;
+	}
 }
