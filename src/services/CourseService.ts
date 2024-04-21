@@ -162,11 +162,29 @@ export class CourseService implements ICourseService {
     }
 
     async getCourse(courseId: string): Promise<Course> {
-        const course = await this.courseRepository.getCourse(courseId);
+        let course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
         }
-        return await this.handleS3.getResourceCourse(course);
+        // Get resource S3 for course
+        course = await this.handleS3.getResourceCourse(course);
+        // Get link avatar instructor of course
+        if (course.getDataValue('instructor')) {
+            const profile = course.getDataValue('instructor').getDataValue('profile');
+            if (profile) {
+                course.instructor.setDataValue('profile', await this.handleS3.getAvatarUser(profile));
+            }
+        }
+        // Get link avatar user review course
+        if (course.getDataValue('reviews')) {
+            for(const review of course.reviews) {
+                if (review.getDataValue('user').getDataValue('profile')) {
+                    review.user.setDataValue('profile', await this.handleS3.getAvatarUser(review.user.profile));
+                }
+            }
+        }
+
+        return course;
     }
 
     /**

@@ -2,6 +2,7 @@ import { Service, Inject } from "typedi";
 import { S3Service } from "../S3Service";
 import { ICartService } from "../interfaces/ICartService";
 import { Course } from "../../models/Course";
+import { Profile } from "../../models/Profile";
 
 
 @Service()
@@ -38,5 +39,19 @@ export class HandleS3 {
         course.setDataValue('posterUrl', await this.s3Service.getObjectUrl(posterUrl));
 
 		return course;
+	}
+
+	/**
+	 * Get avatar url of user from S3 service
+	 * @param profileUser 
+	 * @returns 
+	 */
+	async getAvatarUser(profileUser: Profile): Promise<Profile> {
+		if ('avatar' in profileUser) {
+			const avatar = profileUser.getDataValue('avatar') || 'users/defaults/avatar.jpg';
+			profileUser.setDataValue('avatar', await this.s3Service.getObjectUrl(avatar));
+		}
+
+		return profileUser;
 	}
 }
