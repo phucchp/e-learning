@@ -123,13 +123,13 @@ export class Course extends Model<Course> {
 
   @Column({
     type: DataType.STRING,
-    get() {
-        const rawValue = this.getDataValue('posterUrl');
-        if(rawValue) {
-          return 
-        }
-        return rawValue ? rawValue.toUpperCase() : null;
-    }
+    // get() {
+    //     const rawValue = this.getDataValue('posterUrl');
+    //     if(rawValue) {
+    //       return 
+    //     }
+    //     return rawValue ? rawValue.toUpperCase() : null;
+    // }
   })
   posterUrl!: string | null;
 

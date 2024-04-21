@@ -1335,6 +1335,23 @@ paths:
       security:
         - bearerAuth: []
   /users/favorite-courses:
+    get:
+          tags:
+            - user
+          summary: Get favorite course of user
+          parameters:
+            - name: search
+              in: query
+              description: Enter value to search by title and discription of courses
+              required: false
+              explode: true
+              schema:
+                type: string
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
     post:
           tags:
             - user

@@ -82,4 +82,16 @@ export class UserController{
             message : "Successful",
         })
     }
+
+    getFavoriteCourses = async (req: Request, res: Response) => {
+        // const userId = req.payload.userId;
+        const userId =req.payload.userId;
+        const search = req.query.search || '';
+        const result = await this.userService.getFavoriteCourses(userId, search.toString());
+        return res.status(200).json({
+            message: "Successful",
+            totalCount: result.count,
+            data: result.rows,
+        })
+    }
 }

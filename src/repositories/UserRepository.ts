@@ -65,7 +65,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 			include:[
 				{
 					model: Course,
-					as: 'carts',
+					as: 'favorites',
 					attributes: { exclude: ['id', 'deletedAt', 'subUrl', 'isActive', 'instructorId', 'trailerUrl', 
 					'requirementsDescription', 'learnsDescription', 'levelId', 'categoryId', 'languageId'] },
 					where:{

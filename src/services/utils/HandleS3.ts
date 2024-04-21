@@ -11,12 +11,15 @@ export class HandleS3 {
 
     /**
 	 * Using get resource S3 for courses
+     * When get list course, only return poster
 	 * @param courses 
 	 * @returns array
 	 */
 	async getResourceCourses(courses: Course[]): Promise<Course[]> {
-        for(let course of courses) {
-            course = await this.getResourceCourse(course);
+        for(const course of courses) {
+            let posterUrl = course.getDataValue('posterUrl') || 'courses/defaults/poster.jpg';
+
+            course.setDataValue('posterUrl', await this.s3Service.getObjectUrl(posterUrl));
         }
 
 		return courses;
