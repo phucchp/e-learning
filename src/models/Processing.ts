@@ -27,6 +27,20 @@ export class Processing extends Model<Processing> {
     unique: 'compositeIndex'
   })
   lessonId!: number;
+
+  @AllowNull(false)
+  @Default(0)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  time!: number;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  isDone!: boolean;
   
   @DeletedAt
   deletedAt?: Date;

@@ -30,24 +30,18 @@ export class PaymentController{
         // Nếu thanh toán tiếp (truyền thêm 1 tham số gì đó) thì dựa vào thông tin
         // payment cũ để tạo lại order và update lại orderId
         // Hoặc dựa vào orderID trong db trả về cho user
-        const courseIds = [
-            '559942a9-5d3e-40ef-9b70-54c66deb9a81',
-            '631dfc3e-56af-4899-a108-089eeb6160b0',
-            'c434bbcd-da0f-4b37-afa6-9ceb29f25d95'
-        ];
-        const userId =1 ;
-        // const userId = req.payload.userId;
-        // const isContinueOrder = req.body.isContinueOrder;
-        // const courseIds = req.body.courseIds;
+        const userId = req.payload.userId;
+        const isContinueOrder = req.body.isContinueOrder;
+        const courseIds = req.body.courseIds;
         const paymentNotCheckout = await this.paymentService.getPaymentNotCheckout(userId);
         if(!paymentNotCheckout) {
             const {jsonResponse, httpStatusCode} = await this.paypalService.createOrder(userId, courseIds);
             return res.status(200).json(jsonResponse);
         }
-        // if(!isContinueOrder || isContinueOrder == false) {
-        //     // Nếu không tiếp tục order thì phải huỷ order đó trước mới được tạo lại order
-        //     return res.status(403).json('Can not create new order if user has already payment is not checkout!');
-        // }
+        if(!isContinueOrder || isContinueOrder == false) {
+            // Nếu không tiếp tục order thì phải huỷ order đó trước mới được tạo lại order
+            return res.status(403).json('Can not create new order if user has already payment is not checkout!');
+        }
 
         // Nếu tiếp tục order, get paymentID để trả về cho user tiếp tục dùng id đó thanh toán với paypal
         // check id paypal còn dùng được hay không, nếu được thì trả về, ko dc thì tao order mới dựa vào các thông tin trong order cũ
@@ -79,5 +73,15 @@ export class PaymentController{
         return res.status(200).json({
             message: "Success",
         })        
+    }
+
+    test = async (req: Request, res: Response) => {
+        const data= await this.paymentService.paymentMonthlyRevenueForInstructor();
+        return res.status(200).json(data);
+    }
+
+    test2 = async (req: Request, res: Response) => {
+        // const data= await this.paypalService.getBatchPayoutDetails();
+        // return res.status(200).json(data);
     }
 }

@@ -53,6 +53,12 @@ export class ServerError extends CustomError {
 	}
 }
 
+export class UnprocessableError extends CustomError {
+	constructor(message: string) {
+		super(message, 422, 'Unprocessable Error');
+	}
+}
+
 
 export class NotFound extends CustomError {
 	constructor(message: string = 'Record not found') {

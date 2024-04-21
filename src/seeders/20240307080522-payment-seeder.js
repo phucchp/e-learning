@@ -19,7 +19,7 @@ function generateUniqueId() {
 
 const generateRandomPayment = () => ({
   user_id: faker.number.int({ min: 1, max: 20 }),
-  price: faker.number.float({ min: 0, max: 1000 }),
+  price: parseFloat(faker.number.float({ min: 0, max: 1000 }).toFixed(2)),
   transaction_id: generateUniqueId(),
   status: 'Completed',
   payment_method: 'Paypal',

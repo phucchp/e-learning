@@ -8,10 +8,6 @@ import { ContentNotFound, NotEnoughAuthority, NotFound, RecordExistsError, Serve
 import * as crypto from 'crypto';
 import { ProcessingRepository } from '../repositories/ProcessingRepository';
 import { IProcessingRepository } from '../repositories/interfaces/IProcessingRepository';
-import { LessonRepository } from '../repositories/LessonRepository';
-import { ILessonRepository } from '../repositories/interfaces/ILessonRepository';
-import { TopicRepository } from '../repositories/TopicRepository';
-import { ITopicRepository } from '../repositories/interfaces/ITopicRepository';
 import { EnrollmentService } from './EnrollmentService';
 import { IEnrollmentService } from './interfaces/IEnrollmentService';
 import { CourseService } from './CourseService';
@@ -29,7 +25,7 @@ export class ProcessingService implements IProcessingService {
     @Inject(() => CourseService)
 	private courseService!: ICourseService;
 
-    async addProcessing(userId: number, lessonId: number): Promise<Processing> {
+    async addProcessing(userId: number, lessonId: number, time: number, isDone: boolean): Promise<Processing> {
         // check user is enrolled course
         const courseId = await this.courseService.getCourseIdByLessonId(lessonId);
 
@@ -39,11 +35,50 @@ export class ProcessingService implements IProcessingService {
 
         return await this.processingRepository.create({
             userId: userId,
-            lessonId: lessonId
+            lessonId: lessonId,
+            time: time,
+            isDone: isDone
         });
     }
+
+    async updateProcessing(userId: number, lessonId: number, time: number, isDone: boolean): Promise<Processing> {
+        // check user is enrolled course
+        const courseId = await this.courseService.getCourseIdByLessonId(lessonId);
+
+        if(await this.enrollmentService.isUserEnrollmentCourse(userId, courseId)){
+            throw new NotEnoughAuthority('The user has not yet enrolled in the course!');
+        }
+
+        const processing = await this.processingRepository.findOneByCondition({
+            userId: userId,
+            lessonId: lessonId
+        });
+
+        if(!processing) {
+            throw new NotFound('Not found!');
+        }
+        processing.time = time;
+        processing.isDone = isDone;
+
+        const newProcessing = await this.processingRepository.updateInstace(processing);
+        if(!newProcessing) {
+            throw new ServerError('Error updating processing');
+        }
+        return newProcessing;
+    }
+
+    async percentageCompletedCourse(userId: number, courseId: string): Promise<number> {
+        // Lấy tổng số bài đã tích / tổng số bài học của khoá học * 100
+        // Get tổng số bài học của khoá học
+        // Get tổng số bài đã tích -> get list enrollment where isDone = true and ... (Get các lesson của course trc)
+        const course = await this.courseService.getCourse(courseId);
+        const totalLessons = course.totalLessons;
+        //
+        return 100;
+    }
+
     async getNewestProcessing(userId: number, courseId: number): Promise<Processing> {
-        // get theo ngay tao moi nhat
+        // get theo ngay update moi nhat
         
         throw new Error('Method not implemented.');
     }

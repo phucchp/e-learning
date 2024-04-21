@@ -21,4 +21,5 @@ export interface IPaymentService {
     cancelOrder(userId: number): Promise<void>;
     getPaymentNotCheckoutInformation(userId: number): Promise<Payment | null>;
     getPaymentByTransactionId(transactionId: string): Promise<Payment| null>;
+    paymentMonthlyRevenueForInstructor(): Promise<any>;
 }

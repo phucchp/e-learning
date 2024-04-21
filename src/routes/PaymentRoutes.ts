@@ -11,6 +11,7 @@ class PaymentRoutes extends BaseRoutes {
 		this.router.post('/create-order', this.controller.createOrder);
 		this.router.post('/orders/:orderID/capture', this.controller.captureOrder);
 		this.router.get('/test', this.controller.test);
+		this.router.get('/test2', this.controller.test2);
 
 	}
 }
