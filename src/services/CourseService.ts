@@ -24,6 +24,7 @@ import { FavoriteRepository } from '../repositories/FavoriteRepository';
 import { IFavoriteRepository } from '../repositories/interfaces/IFavoriteRepository';
 import { Favorite } from '../models/Favorite';
 import { IoTRoboRunner } from 'aws-sdk';
+import { HandleS3 } from './utils/HandleS3';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -49,8 +50,8 @@ export class CourseService implements ICourseService {
     @Inject(() => FavoriteRepository)
 	private favoriteRepository!: IFavoriteRepository;
 
-    @Inject(() => S3Service)
-	private s3Service!: S3Service;
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
@@ -155,15 +156,34 @@ export class CourseService implements ICourseService {
             sortType: sortType || 'ASC',
             sort : sort || 'createdAt'
         }
-        const courses = await this.courseRepository.getCourses(options);
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
         return courses;
     }
 
     async getCourse(courseId: string): Promise<Course> {
-        const course = await this.courseRepository.getCourse(courseId);
+        let course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
         }
+        // Get resource S3 for course
+        course = await this.handleS3.getResourceCourse(course);
+        // Get link avatar instructor of course
+        if (course.getDataValue('instructor')) {
+            const profile = course.getDataValue('instructor').getDataValue('profile');
+            if (profile) {
+                course.instructor.setDataValue('profile', await this.handleS3.getAvatarUser(profile));
+            }
+        }
+        // Get link avatar user review course
+        if (course.getDataValue('reviews')) {
+            for(const review of course.reviews) {
+                if (review.getDataValue('user').getDataValue('profile')) {
+                    review.user.setDataValue('profile', await this.handleS3.getAvatarUser(review.user.profile));
+                }
+            }
+        }
+
         return course;
     }
 

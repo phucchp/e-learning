@@ -33,6 +33,9 @@ export class PaymentController{
         const userId = req.payload.userId;
         const isContinueOrder = req.body.isContinueOrder;
         const courseIds = req.body.courseIds;
+        if (!userId) {
+            throw new UnauthorizedError('Unauthorized Error!');
+        }
         const paymentNotCheckout = await this.paymentService.getPaymentNotCheckout(userId);
         if(!paymentNotCheckout) {
             const {jsonResponse, httpStatusCode} = await this.paypalService.createOrder(userId, courseIds);

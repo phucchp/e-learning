@@ -25,6 +25,8 @@ tags:
     description: API for notes
   - name: user
     description: API for users
+  - name: payment
+    description: API for payments
   - name: statistical
     description: API for statisticals
 paths:
@@ -1333,6 +1335,23 @@ paths:
       security:
         - bearerAuth: []
   /users/favorite-courses:
+    get:
+          tags:
+            - user
+          summary: Get favorite course of user
+          parameters:
+            - name: search
+              in: query
+              description: Enter value to search by title and discription of courses
+              required: false
+              explode: true
+              schema:
+                type: string
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
     post:
           tags:
             - user
@@ -1373,6 +1392,61 @@ paths:
                     message: successfully
           security:
             - bearerAuth: []
+  /payments/create-order:
+    post:
+      tags:
+        - payment
+      summary: Create order payment with Paypal
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isContinueOrder:
+                  type: boolean
+                  default: true
+                courseIds:
+                  type: array
+                  items:
+                    type: string
+              example:
+                isContinueOrder: false
+                courseIds:
+                  - 'fbd9255e-6d29-4a60-adb1-f03d1e83675d'
+                  - '1894c34c-c77c-4627-a459-ad78a382f4fa'
+      security:
+        - bearerAuth: []
+  /payments/orders/:orderID/capture:
+    post:
+      tags:
+        - payment
+      summary: Confirm order paypal when payment successful
+      responses:
+        '200':
+          description: Successfulnote that needs to be updated
+      parameters:
+        - name: orderID
+          in: path
+          description: orderID of payment
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+  /payments/cancel-orders:
+    post:
+      tags:
+        - payment
+      summary: Cancel current order paypal
+      responses:
+        '200':
+          description: Successfulnote that needs to be updated
+      security:
+        - bearerAuth: []
   /statisticals/statistical-revenue:
     get:
       tags:
