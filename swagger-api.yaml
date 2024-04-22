@@ -23,6 +23,8 @@ tags:
     description: API for Languages
   - name: review
     description: API for reviews
+  - name: remind
+    description: API for reminds
   - name: note
     description: API for notes
   - name: comment
@@ -1003,6 +1005,75 @@ paths:
           required: true
           schema:
             type: number
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /reminds: 
+    post:
+      tags:
+        - remind
+      summary: Add new remind for user
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                time:
+                  type: string
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - remind
+      summary: Updates a remind
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                time:
+                  type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update remind
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - remind
+      summary: Deletes a remind
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
       responses:
         '204':
           description: successfully

@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { Request, Response } from 'express';
 import { EnrollmentService } from "../services/EnrollmentService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
-import { NotEnoughAuthority } from "../utils/CustomError";
+import { NotEnoughAuthority, NotFound } from "../utils/CustomError";
 import { IUserService } from "../services/interfaces/IUserService";
 import { UserService } from "../services/UserService";
 import { CourseService } from "../services/CourseService";
@@ -39,8 +39,12 @@ export class LessonController{
 
         // Check user is enrollment course
         const course = await this.courseService.getCourseByLessonId(lessonId);
+        if(!course){ // Check course is exist
+            throw new NotFound('Course not found!');
+        }
+        
         if(
-            !await this.enrollmentService.isUserEnrollmentCourse(userId, lessonId) // User is not enrollment course
+            !await this.enrollmentService.isUserEnrollmentCourse(userId, course.id) // User is not enrollment course
             && !await this.userService.isAdmin(userId) // User is not admin
             && course.instructorId !== userId // User is not instructor owner this course
         ){

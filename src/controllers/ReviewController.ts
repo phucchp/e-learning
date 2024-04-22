@@ -14,7 +14,7 @@ export class ReviewController{
     getReviews = async (req: Request, res: Response) => {
         const {rows, count} = await this.reviewService.getReviews(req);
         return res.status(200).json({
-            message: "Successfull",
+            message: "Successful",
             data: {
                 totalCount: count,
                 totalPage:  Math.ceil(count/Number(req.query.pageSize || 10)),
