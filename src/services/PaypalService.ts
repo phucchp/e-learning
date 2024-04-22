@@ -237,7 +237,7 @@ export class PaypalService {
             //  2.1 Remove order details of order
             await this.paymentDetailRepository.deletePaymentDetailsByPaymentId(paymentNotCheckout.id);
             //  2.2 Remove order
-            await this.paymentRepository.deleteInstace(paymentNotCheckout, true);
+            await this.paymentRepository.deleteInstance(paymentNotCheckout, true);
             // 3. Call createOrder to recreate
             return await this.createOrder(userId, courseIds);
         }

@@ -437,7 +437,7 @@ export class CourseService implements ICourseService {
             throw new NotFound('The user is not favorited the course before.');
         }
         
-        await this.favoriteRepository.deleteInstace(favorite);
+        await this.favoriteRepository.deleteInstance(favorite);
         return true;
     }
 

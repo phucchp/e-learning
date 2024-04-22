@@ -60,7 +60,7 @@ export class ProcessingService implements IProcessingService {
         processing.time = time;
         processing.isDone = isDone;
 
-        const newProcessing = await this.processingRepository.updateInstace(processing);
+        const newProcessing = await this.processingRepository.updateInstance(processing);
         if(!newProcessing) {
             throw new ServerError('Error updating processing');
         }

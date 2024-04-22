@@ -116,7 +116,7 @@ export class AuthenticationService implements IAuthenticationService {
 
         // Active account
         user.isActive = true;
-        await this.userRepository.updateInstace(user);
+        await this.userRepository.updateInstance(user);
         return true;
     }
 
@@ -170,7 +170,7 @@ export class AuthenticationService implements IAuthenticationService {
                 newPassword
             );
             user.password = hashedPassword;
-            return await this.userRepository.updateInstace(user);
+            return await this.userRepository.updateInstance(user);
         } else {
             throw new BadRequestError('Old password is not correct!');
         }
@@ -232,7 +232,7 @@ export class AuthenticationService implements IAuthenticationService {
             newPassword
         );
         user.password = hashedPassword;
-        return await this.userRepository.updateInstace(user);
+        return await this.userRepository.updateInstance(user);
     }
     
 }

@@ -80,7 +80,7 @@ export class LessonService implements ILessonService {
         if(duration) {
             lesson.duration = duration;
         }
-        const newLesson =  await this.lessonRepository.updateInstace(lesson);
+        const newLesson =  await this.lessonRepository.updateInstance(lesson);
         if(!newLesson) {
             throw new ServerError('Server error: Cannot update lesson !');
         }

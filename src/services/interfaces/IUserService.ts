@@ -6,6 +6,7 @@ export interface IUserService {
     getUser(req: Request): Promise<User>;
     getCarts(userId: number, search : string): Promise<{ rows: User[]; count: number}>;
     isAdmin(userId: number): Promise<boolean>;
+    isInstructor(userId: number): Promise<boolean>;
     getUserInformation(userId: number): Promise<User>;
     getFavoriteCourses(userId: number, search : string): Promise<{ rows: User[]; count: number}>;
 }

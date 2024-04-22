@@ -93,7 +93,7 @@ export class ReviewService implements IReviewService {
         reviewInstance.rating = rating;
         reviewInstance.review = review;
 
-        const newReview = await this.reviewRepository.updateInstace(reviewInstance);
+        const newReview = await this.reviewRepository.updateInstance(reviewInstance);
         if(!newReview){
             throw new ServerError('Error updating review, please try again!');
         }
@@ -108,7 +108,7 @@ export class ReviewService implements IReviewService {
         if(review.userId !== userId) {
             throw new NotEnoughAuthority('Not Enough Authority');
         }
-        await this.reviewRepository.deleteInstace(review, true);
+        await this.reviewRepository.deleteInstance(review, true);
     }
 
     async getReviewsOfCourse(req: Request): Promise<{ rows: Review[]; count: number }> {
