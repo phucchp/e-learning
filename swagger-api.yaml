@@ -15,6 +15,8 @@ tags:
     description: API for Courses
   - name: lesson
     description: API for Lessons
+  - name: topic
+    description: API for topics
   - name: category
     description: API for Categories
   - name: language
@@ -23,12 +25,14 @@ tags:
     description: API for reviews
   - name: note
     description: API for notes
+  - name: comment
+    description: API for comments
   - name: user
     description: API for users
   - name: payment
     description: API for payments
   - name: statistical
-    description: API for statisticals
+    description: API for statistical
 paths:
   /auth/login:
     post:
@@ -1139,6 +1143,80 @@ paths:
         - name: noteId
           in: path
           description: noteId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /comments:
+    post:
+      tags:
+        - note
+      summary: Add new comment to lesson
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                content:
+                  type: string
+                  default: "Add comment here"
+      security:
+        - bearerAuth: []
+  /comments/{commentId}: 
+    put:
+      tags:
+        - note
+      summary: Updates a comment for user
+      parameters:
+        - name: commentId
+          in: path
+          description: commentId of comment that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  default: "New content of note to update"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - note
+      summary: Deletes a comment by commentId
+      parameters:
+        - name: commentId
+          in: path
+          description: commentId to delete
           required: true
           schema:
             type: string
