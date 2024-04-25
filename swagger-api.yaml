@@ -15,8 +15,6 @@ tags:
     description: API for Courses
   - name: lesson
     description: API for Lessons
-  - name: topic
-    description: API for topics
   - name: category
     description: API for Categories
   - name: language
@@ -358,6 +356,8 @@ paths:
                 type: array
         '400':
           description: Can not get category
+      security:
+        - bearerAuth: []
     put:
       tags:
         - course
@@ -418,6 +418,8 @@ paths:
                 type: array
         '400':
           description: Can not update category
+      security:
+        - bearerAuth: []
   /courses/{courseId}/reviews:
     get:
       tags:
@@ -487,7 +489,91 @@ paths:
                 type: array
         '400':
           description: Can not get course
-
+      security:
+        - bearerAuth: []
+  /courses/{courseId}/topics:
+    post:
+      tags:
+        - course
+      summary: Create topics for a course
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                names:
+                  type: array
+                  default: ['Topic 1', Topic 2]
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get course
+      security:
+        - bearerAuth: []
+  /courses/topics/{topicId}:
+    put:
+      tags:
+        - course
+      summary: Updates a topic of course
+      parameters:
+        - name: topicId
+          in: path
+          description: topicId of topic that needs to be updated
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: "Name of topic"
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - course
+      summary: Deletes a topic by topicId
+      parameters:
+        - name: topicId
+          in: path
+          description: topicId to delete
+          required: true
+          schema:
+            type: number
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
   /lessons/{lessonId}:
     get:
       tags:

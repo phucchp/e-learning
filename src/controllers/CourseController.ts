@@ -4,14 +4,19 @@ import Container from 'typedi';
 import { Request, Response } from 'express';
 import { IReviewService } from "../services/interfaces/IReviewService";
 import { ReviewService } from "../services/ReviewService";
+import { NotEnoughAuthority } from "../utils/CustomError";
+import { ITopicService } from "../services/interfaces/ITopicService";
+import { TopicService } from "../services/TopicService";
 
 export class CourseController{
 	private courseService: ICourseService;
 	private reviewService: IReviewService;
+	private topicService: ITopicService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
 		this.reviewService = Container.get(ReviewService);
+		this.topicService = Container.get(TopicService);
 
 	}
 
@@ -77,6 +82,58 @@ export class CourseController{
         return res.status(201).json({
             message: "successfully",
             data: course,
+        });
+    }
+
+    // =================================== TOPIC ==================================
+    deleteTopic = async (req: Request, res: Response) => {
+        const userId = Number(req.payload.userId); // Get userId from payload
+        const topicId = Number(req.params.topicId);
+        const course = await this.courseService.getCourseByTopicId(topicId);
+        // Check instructor is owner this course of topic
+        if (course.instructorId !== userId) {
+            throw new NotEnoughAuthority('User is not owner of this course');
+        }
+
+        await this.topicService.deleteTopic(topicId);
+
+        return res.status(200).json({
+            message: "Successful"
+        });
+    }
+
+    updateTopic = async (req: Request, res: Response) => {
+        const userId = Number(req.payload.userId); // Get userId from payload
+        const topicId = Number(req.params.topicId);
+        const name = req.body.name;
+        const course = await this.courseService.getCourseByTopicId(topicId);
+        // Check instructor is owner this course of topic
+        if (course.instructorId !== userId) {
+            throw new NotEnoughAuthority('User is not owner of this course');
+        }
+
+        const newTopic = await this.topicService.updateTopic(topicId, name);
+        
+        return res.status(200).json({
+            message: "Successful",
+            data: newTopic,
+        });
+    }
+
+    createTopic = async (req: Request, res: Response) => {
+        const userId = Number(req.payload.userId); // Get userId from payload
+        const names = req.body.names;
+        const courseId = req.params.courseId;
+        // Check user is owner this course
+        const course = await this.courseService.getCourse(courseId);
+        if (course.instructorId !== userId) {
+            throw new NotEnoughAuthority('User is not owner of this course');
+        }
+
+        const topics = await this.topicService.createTopics(course.id, names);
+        return res.status(201).json({
+            message: "Successful",
+            data: topics,
         });
     }
 }

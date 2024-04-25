@@ -26,7 +26,7 @@ export const validateActiveUser = [
     query('token').notEmpty().withMessage('token is required'),
 ]
 
-export const validatChangePassword = [
+export const validateChangePassword = [
     body('oldPassword').notEmpty().withMessage('oldPassword is required'),
     body('newPassword').notEmpty().withMessage('newPassword is required')
     .isStrongPassword({
@@ -39,7 +39,7 @@ export const validatChangePassword = [
     .isLength({min:5, max:100}).withMessage('newPassword must be at least 5 characters and maximum length 100'),
 ]
 
-export const validatChangePasswordUsingToken = [
+export const validateChangePasswordUsingToken = [
     body('token').notEmpty().withMessage('token is required'),
     body('newPassword').notEmpty().withMessage('newPassword is required')
     .isStrongPassword({
