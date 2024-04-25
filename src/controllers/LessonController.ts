@@ -9,18 +9,22 @@ import { IUserService } from "../services/interfaces/IUserService";
 import { UserService } from "../services/UserService";
 import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
+import { SubtitleService } from "../services/SubtitleService";
+import { ISubtitleService } from "../services/interfaces/ISubtitleService";
 
 export class LessonController{
 	private lessonService: ILessonService;
 	private enrollmentService: IEnrollmentService;
 	private userService: IUserService;
 	private courseService: ICourseService;
+	private subtitleService: ISubtitleService;
 
 	constructor() {
 		this.lessonService = Container.get(LessonService);
 		this.enrollmentService = Container.get(EnrollmentService);
 		this.userService = Container.get(UserService);
 		this.courseService = Container.get(CourseService);
+		this.subtitleService = Container.get(SubtitleService);
 	}
 
     getLesson = async (req: Request, res: Response) => {
@@ -101,5 +105,23 @@ export class LessonController{
             message: "Successfully",
             data: url
         });
+    }
+
+    //=================== SUBTITLE FOR LESSON ===============================
+    getSubtitle = async (req: Request, res: Response) => {
+        // Check user is enrolled course or user is instructor owner this course or user is administrator
+        const userId = req.payload.userId;
+        const lessonId = req.params.lessonId;
+        const languageCode = req.body.languageCode;
+    }
+
+    getPresignUrlUpdateSubtitle = async (req: Request, res: Response) => {
+        // Check user is instructor owner this course or user is administrator
+
+    }
+
+    deleteSubtitle = async (req: Request, res: Response) => {
+        // Check user is instructor owner this course or user is administrator
+
     }
 }
