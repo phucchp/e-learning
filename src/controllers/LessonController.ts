@@ -31,7 +31,7 @@ export class LessonController{
         const userId = req.payload.userId;
         const lessonId = Number(req.params.lessonId);
         // Get lesson
-        const lesson = await this.lessonService.getLesson(lessonId, userId);
+        const lesson = await this.lessonService.getLesson(lessonId);
 
         // Return lesson if it allow preview
         if(lesson.isPreview) {

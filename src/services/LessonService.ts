@@ -31,8 +31,8 @@ export class LessonService implements ILessonService {
      * @param userId 
      * @returns 
      */
-    async getLesson(lessonId: number, userId: number): Promise<Lesson> {
-       const lesson = await this.lessonRepository.getLessonDetails(lessonId, userId);
+    async getLesson(lessonId: number): Promise<Lesson> {
+       const lesson = await this.lessonRepository.getLessonDetails(lessonId);
        if(!lesson) {
         throw new NotFound("Lesson Not Found");
        }
