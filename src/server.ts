@@ -14,6 +14,7 @@ import UserRoutes from './routes/UserRoutes'
 import LessonRoutes from './routes/LessonRoutes';
 import StatisticalRoutes from './routes/StatisticalRoutes';
 import PaymentRoutes from './routes/PaymentRoutes';
+import RemindRoutes from './routes/RemindRoutes';
 class App {
 	public app: Application;
 
@@ -50,6 +51,7 @@ class App {
 		this.app.use('/api/lessons', LessonRoutes);
 		this.app.use('/api/statisticals', StatisticalRoutes);
 		this.app.use('/api/payments', PaymentRoutes);
+		this.app.use('/api/reminds', RemindRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {
