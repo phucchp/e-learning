@@ -119,17 +119,20 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                 },
                 {
                     model: Topic,
-                    attributes: ['name'], 
+                    attributes: ['id' ,'name'], 
                     include: [
                         {
                             model: Lesson,
-                            attributes: ['title', 'duration', 'isPreview'],
+                            attributes: ['id' ,'title', 'duration', 'isPreview'],
                         },
                     ],
                 }
-
+               
             ],
-
+            order: [
+                // We start the order array with the model we want to sort
+                [{ model: Topic, as: 'topics' }, 'id', 'ASC'],
+            ],
         });
         return course;
     }
