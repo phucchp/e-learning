@@ -113,7 +113,7 @@ export class PaymentService implements IPaymentService {
     }
 
     async updatePayment(payment: Payment): Promise<Payment> {
-        const newPayment =  await this.paymentRepository.updateInstace(payment);
+        const newPayment =  await this.paymentRepository.updateInstance(payment);
         if(!newPayment) {
             throw new ServerError('Error updating payment!');
         }
@@ -168,7 +168,7 @@ export class PaymentService implements IPaymentService {
         // Remove order details of order
         await this.paymentDetailRepository.deletePaymentDetailsByPaymentId(paymentNotCheckout.id);
         // Remove order
-        await this.paymentRepository.deleteInstace(paymentNotCheckout);
+        await this.paymentRepository.deleteInstance(paymentNotCheckout);
 
     }
 

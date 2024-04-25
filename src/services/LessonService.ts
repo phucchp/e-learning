@@ -80,7 +80,7 @@ export class LessonService implements ILessonService {
         if(duration) {
             lesson.duration = duration;
         }
-        const newLesson =  await this.lessonRepository.updateInstace(lesson);
+        const newLesson =  await this.lessonRepository.updateInstance(lesson);
         if(!newLesson) {
             throw new ServerError('Server error: Cannot update lesson !');
         }
@@ -102,7 +102,7 @@ export class LessonService implements ILessonService {
 
         if(!lesson.lessonUrl) {
             lesson.lessonUrl = `lessons/${lesson.id}/video.mp4`;
-            await this.lessonRepository.updateInstace(lesson);
+            await this.lessonRepository.updateInstance(lesson);
         }
 
         return await this.s3Service.generatePresignedUrlUpdate(lesson.lessonUrl, 'video/mp4');

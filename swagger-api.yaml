@@ -21,8 +21,12 @@ tags:
     description: API for Languages
   - name: review
     description: API for reviews
+  - name: remind
+    description: API for reminds
   - name: note
     description: API for notes
+  - name: comment
+    description: API for comments
   - name: user
     description: API for users
   - name: instructor
@@ -30,7 +34,7 @@ tags:
   - name: payment
     description: API for payments
   - name: statistical
-    description: API for statisticals
+    description: API for statistical
 paths:
   /auth/login:
     post:
@@ -361,6 +365,8 @@ paths:
                 type: array
         '400':
           description: Can not get category
+      security:
+        - bearerAuth: []
     put:
       tags:
         - course
@@ -421,6 +427,8 @@ paths:
                 type: array
         '400':
           description: Can not update category
+      security:
+        - bearerAuth: []
   /courses/{courseId}/reviews:
     get:
       tags:
@@ -490,7 +498,91 @@ paths:
                 type: array
         '400':
           description: Can not get course
-
+      security:
+        - bearerAuth: []
+  /courses/{courseId}/topics:
+    post:
+      tags:
+        - course
+      summary: Create topics for a course
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                names:
+                  type: array
+                  default: ['Topic 1', Topic 2]
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get course
+      security:
+        - bearerAuth: []
+  /courses/topics/{topicId}:
+    put:
+      tags:
+        - course
+      summary: Updates a topic of course
+      parameters:
+        - name: topicId
+          in: path
+          description: topicId of topic that needs to be updated
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: "Name of topic"
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - course
+      summary: Deletes a topic by topicId
+      parameters:
+        - name: topicId
+          in: path
+          description: topicId to delete
+          required: true
+          schema:
+            type: number
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
   /lessons/{lessonId}:
     get:
       tags:
@@ -1017,6 +1109,75 @@ paths:
                 message: successfully
       security:
         - bearerAuth: []
+  /reminds: 
+    post:
+      tags:
+        - remind
+      summary: Add new remind for user
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                time:
+                  type: string
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - remind
+      summary: Updates a remind
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                time:
+                  type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update remind
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - remind
+      summary: Deletes a remind
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
   /notes:
     get:
       tags:
@@ -1148,6 +1309,80 @@ paths:
         - name: noteId
           in: path
           description: noteId to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /comments:
+    post:
+      tags:
+        - note
+      summary: Add new comment to lesson
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lessonId:
+                  type: number
+                  default: 1
+                content:
+                  type: string
+                  default: "Add comment here"
+      security:
+        - bearerAuth: []
+  /comments/{commentId}: 
+    put:
+      tags:
+        - note
+      summary: Updates a comment for user
+      parameters:
+        - name: commentId
+          in: path
+          description: commentId of comment that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  default: "New content of note to update"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - note
+      summary: Deletes a comment by commentId
+      parameters:
+        - name: commentId
+          in: path
+          description: commentId to delete
           required: true
           schema:
             type: string

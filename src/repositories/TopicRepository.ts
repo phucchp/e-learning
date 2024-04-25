@@ -9,4 +9,8 @@ export class TopicRepository extends BaseRepository<Topic> implements ITopicRepo
     constructor(){
 		super(Topic);
 	}
+
+	async createTopics(topics: any[]): Promise<Topic[]> {
+		return await this.model.bulkCreate(topics);
+	}
 }

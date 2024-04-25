@@ -82,7 +82,7 @@ export class NoteService implements INoteService {
         if(time){
             noteInstance.time = time;
         }
-        const newNote = await this.noteRepository.updateInstace(noteInstance);
+        const newNote = await this.noteRepository.updateInstance(noteInstance);
         if(!newNote) {
             throw new Error('Error while updating!');
         }

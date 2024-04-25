@@ -65,6 +65,22 @@ export const validateDeleteFavoriteCourse = [
   body('courseId').notEmpty().isString().withMessage('courseId must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of title must be min:1 and max:255'),
 ]
 
+// Topic
+export const validateCreateTopic = [
+  param('courseId').notEmpty().isString().withMessage('courseId must be a string'),
+  body('names').isArray().withMessage('Names must be an array'),
+  body('names.*').isString().withMessage('Each element in names must be a string'),
+]
+
+export const validateUpdateTopic = [
+  param('topicId').notEmpty().isInt({min: 1}).withMessage('topicId must be a integer number and must be greater than 1'),
+  body('name').notEmpty().isString().withMessage('name is required and must be string')
+]
+
+export const validateDeleteTopic = [
+  param('topicId').notEmpty().isInt({min: 1}).withMessage('topicId must be a integer number and must be greater than 1') 
+]
+
 export const validateGetListInstructors= [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
   query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),

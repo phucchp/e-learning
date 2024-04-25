@@ -92,7 +92,7 @@ export class UserService implements IUserService {
             // If user using avt default, update link avt user profile
             const profile = user.profile;
             profile.avatar = `users/${user.id}/avatar.jpg`;
-            await this.profileRepository.updateInstace(profile);
+            await this.profileRepository.updateInstance(profile);
             url = await this.s3Service.generatePresignedUrlUpdate(profile.avatar, 'image/jpeg');
         }
         url = await this.s3Service.generatePresignedUrlUpdate('ok.jpg', 'image/jpeg');

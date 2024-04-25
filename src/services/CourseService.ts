@@ -353,7 +353,7 @@ export class CourseService implements ICourseService {
 
         const topic = await this.topicRepository.findById(topicId);
         if(!topic) {
-            throw new ServerError('Server error: Can not find topic of lesson');
+            throw new NotFound('Topic not found!');
         }
 
         const course = await this.courseRepository.findById(topic.courseId);
@@ -441,7 +441,7 @@ export class CourseService implements ICourseService {
             throw new NotFound('The user is not favorited the course before.');
         }
         
-        await this.favoriteRepository.deleteInstace(favorite);
+        await this.favoriteRepository.deleteInstance(favorite);
         return true;
     }
 

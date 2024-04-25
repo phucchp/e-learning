@@ -1,6 +1,6 @@
 import { CourseController } from "../controllers/CourseController";
 import { auth, authInstructor, authUser } from "../middlewares/AuthMiddleware";
-import { validateGetCourse, validateGetCourses, validateUpdateCourse, validateCreateCourse } from "../validators/CourseValidator";
+import { validateGetCourse, validateGetCourses, validateUpdateCourse, validateCreateCourse, validateCreateTopic, validateDeleteTopic, validateUpdateTopic } from "../validators/CourseValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
 
@@ -14,8 +14,11 @@ class CourseRoutes extends BaseRoutes {
 		this.router.get('/:courseId', authUser, validateGetCourse, validate, this.controller.getCourse);
 		this.router.get('/:courseId/reviews', this.controller.getReviewsOfCourse);
 		this.router.put('/:courseId', auth, authInstructor, validateUpdateCourse, validate, this.controller.updateCourse);
-		this.router.post('/', auth, authInstructor,validateCreateCourse, validate, this.controller.createCourse);
-
+		this.router.post('/', auth, authInstructor, validateCreateCourse, validate, this.controller.createCourse);
+		// Topic
+		this.router.post('/:courseId/topics/', auth, authInstructor, validateCreateTopic, validate, this.controller.createTopic);
+		this.router.put('/topics/:topicId', auth, authInstructor, validateUpdateTopic, validate, this.controller.updateTopic);
+		this.router.delete('/topics/:topicId', auth, authInstructor, validateDeleteTopic, validate, this.controller.deleteTopic);
 	}
 }
 

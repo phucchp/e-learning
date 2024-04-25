@@ -15,6 +15,11 @@ class LessonRoutes extends BaseRoutes {
 		this.router.delete('/:lessonId',authInstructor, validateDeleteLesson, validate, this.controller.deleteLesson);
 		this.router.put('/:lessonId',authInstructor, validateUpdateLesson, validate, this.controller.updateLesson);
 		this.router.get('/presign-url/upload-video', authInstructor, validateGetUrlUploadVideo, validate, this.controller.getLinkUpdateVideo);
+		// Subtitle for lesson
+		this.router.get('/:lessonId/subtitles', this.controller.getLesson); // Get all subtitles hiện có của lesson (kh bao gồm link)
+		this.router.get('/:lessonId/subtitles/presign-url', this.controller.getSubtitle); // Get link subtitles by language code
+		this.router.get('/:lessonId/subtitles/presign-url-to-update/:languageCode', this.controller.getPresignUrlUpdateSubtitle);
+		this.router.delete('/:lessonId/subtitles/:languageCode', this.controller.deleteSubtitle);
 	}
 }
 
