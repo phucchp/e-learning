@@ -107,7 +107,7 @@ export class CourseService implements ICourseService {
     }
 
     async getCourses(req: Request): Promise<{ rows: Course[]; count: number}> {
-        let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
+        let { search, category, averageRating, languageId, instructorId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
         const whereCondition: any = {};
         if(search){
             whereCondition[Op.or] = [
@@ -131,6 +131,10 @@ export class CourseService implements ICourseService {
 
         if(languageId){
             whereCondition['languageId'] = {[Op.eq]: languageId};
+        }
+
+        if(instructorId){
+            whereCondition['instructorId'] = {[Op.eq]: instructorId};
         }
 
         if(level){

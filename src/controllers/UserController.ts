@@ -94,4 +94,54 @@ export class UserController{
             data: result.rows,
         })
     }
+
+    /**
+     * Get presign url to upload avatar user to AWS S3
+     */
+    getPresignUrlToUploadAvatar = async (req: Request, res: Response) => {
+        const userId =req.payload.userId;
+        const result = await this.userService.getPresignUrlToUploadAvatar(userId);
+        return res.status(200).json({
+            message: "Successful",
+            url: result,
+        })
+    }
+
+    /**
+     * Using clear cache cloudfront after update avatar user
+     */
+    clearCacheAvatar = async (req: Request, res: Response) => {
+        const userId =req.payload.userId;
+        await this.userService.clearCacheAvatar(userId);
+        return res.status(200).json({
+            message: "Successful",
+        });
+    }
+
+    /**
+     * Get list instructors
+     */
+    getListInstructors = async (req: Request, res: Response) => {
+        const users = await this.userService.getListInstructors(req);
+        const pageSize = Number(req.query.pageSize) || 10;
+        return res.status(200).json({
+            message: "Successful",
+            page:  Number(req.query.page) || 1,
+            pageSize:  pageSize,
+            totalCount: Math.ceil(users.count/pageSize),
+            data: users.rows
+        });
+    }
+
+    /**
+     * Get instructor details
+     */
+    getInstructorDetail = async (req: Request, res: Response) => {
+        const instructorId  = Number(req.params.instructorId);
+        const profile = await this.userService.getInstructorDetail(instructorId);
+        return res.status(200).json({
+            message: "Successful",
+            data: profile
+        });
+    }
 }

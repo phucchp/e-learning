@@ -102,6 +102,7 @@ export class LessonService implements ILessonService {
 
         if(!lesson.lessonUrl) {
             lesson.lessonUrl = `lessons/${lesson.id}/video.mp4`;
+            await this.lessonRepository.updateInstance(lesson);
         }
 
         return await this.s3Service.generatePresignedUrlUpdate(lesson.lessonUrl, 'video/mp4');

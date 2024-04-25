@@ -82,7 +82,7 @@ export class Mail {
 			subject: 'Subject of the email',
 			greeting: 'Hello!',
 			message: 'This is a sample email with dynamic content.',
-			link: `http://localhost:8000/api/active?token=${token}`
+			link: `http://localhost:8000/api/auth/active?token=${token}`
 		};
 		// Chèn dữ liệu vào mẫu
 		const htmlContent = compiledTemplate(templateData);

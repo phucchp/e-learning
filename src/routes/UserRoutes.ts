@@ -1,6 +1,6 @@
 import { UserController } from "../controllers/UserController";
 import { auth } from "../middlewares/AuthMiddleware";
-import { validateAddFavoriteCourse, validateDeleteFavoriteCourse } from "../validators/CourseValidator";
+import { validateAddFavoriteCourse, validateDeleteFavoriteCourse, validateGetInstructorDetail, validateGetListInstructors } from "../validators/CourseValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
 
@@ -17,6 +17,10 @@ class UserRoutes extends BaseRoutes {
 		this.router.get('/favorite-courses',auth, this.controller.getFavoriteCourses);
 		this.router.post('/favorite-courses',auth, validateAddFavoriteCourse, validate, this.controller.addCourseFavorite);
 		this.router.delete('/favorite-courses',auth, validateDeleteFavoriteCourse, validate, this.controller.deleteCourseFavorite);
+		this.router.get('/presign-url/upload-avatar',auth, this.controller.getPresignUrlToUploadAvatar);
+		this.router.post('/cloud-front/clear-cache-avatar',auth, this.controller.clearCacheAvatar);
+		this.router.get('/instructors', validateGetListInstructors, validate, this.controller.getListInstructors);
+		this.router.get('/instructors/:instructorId',validateGetInstructorDetail, validate, this.controller.getInstructorDetail);
 	}
 }
 

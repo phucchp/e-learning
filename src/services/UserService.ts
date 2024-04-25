@@ -9,12 +9,19 @@ import * as crypto from 'crypto';
 import { UserRepository } from '../repositories/UserRepository';
 import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 import { HandleS3 } from './utils/HandleS3';
+import { S3Service } from './S3Service';
+import { ProfileRepository } from '../repositories/ProfileRepository';
+import { IProfileRepository } from '../repositories/interfaces/IProfileRepository';
+import { Profile } from '../models/Profile';
 
 @Service()
 export class UserService implements IUserService {
     
     @Inject(() => UserRepository)
 	private userRepository!: IUserRepository;
+
+    @Inject(() => ProfileRepository)
+	private profileRepository!: IProfileRepository;
     
     getUsers(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<User[]> {
         throw new Error('Method not implemented.');
@@ -25,6 +32,9 @@ export class UserService implements IUserService {
 
     @Inject(() => HandleS3)
 	private handleS3!: HandleS3;
+
+    @Inject(() => S3Service)
+	private s3Service!: S3Service;
 
     async isAdmin(userId: number): Promise<boolean>{
         const user = await this.userRepository.findById(userId);
@@ -66,5 +76,67 @@ export class UserService implements IUserService {
 
     async getUserInformation(userId: number): Promise<User> {
         return await this.userRepository.getUserInformation(userId);
+    }
+
+    async getPresignUrlToUploadAvatar(userId: number): Promise<string> {
+        const user = await this.getUserInformation(userId);
+        let url = '';
+        if (!user.profile) {
+            throw new NotFound('Server error, Profile of user does not exist');
+        }
+
+        const avatar = user.profile.getDataValue('avatar');
+        if (avatar && avatar !== 'users/defaults/avatar.jpg') {
+            url = await this.s3Service.generatePresignedUrlUpdate(avatar, 'image/jpeg');
+        } else{
+            // If user using avt default, update link avt user profile
+            const profile = user.profile;
+            profile.avatar = `users/${user.id}/avatar.jpg`;
+            await this.profileRepository.updateInstace(profile);
+            url = await this.s3Service.generatePresignedUrlUpdate(profile.avatar, 'image/jpeg');
+        }
+        url = await this.s3Service.generatePresignedUrlUpdate('ok.jpg', 'image/jpeg');
+
+        return url;
+    }
+
+    async clearCacheAvatar(userId: number): Promise<void> {
+        const user = await this.getUserInformation(userId);
+        if (!user.profile) {
+            throw new NotFound('Server error, Profile of user does not exist');
+        }
+
+        const avatar = user.profile.getDataValue('avatar');
+        if(!avatar) {
+            throw new ServerError('Server error');
+        }
+
+		return await this.s3Service.clearCacheCloudFront(avatar);
+    }
+
+    async getListInstructors(req: Request): Promise<{ rows: User[]; count: number; }> {
+        const page  = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        const results = await this.userRepository.getListInstructors(page, pageSize);
+        if (results.rows.length > 0) {
+            for (const user of results.rows) {
+                if (!user.profile) {
+                    throw new ServerError('Profile user is missing!');
+                }
+                user.setDataValue('profile', await this.handleS3.getAvatarUser(user.profile));
+            }
+        }
+
+        return results;
+    }
+
+    async getInstructorDetail(instructorId: number): Promise<Profile> {
+       const profile = await this.profileRepository.findById(instructorId);
+        
+       if (!profile) {
+        throw new NotFound("Profile not found!");
+       }
+
+       return await this.handleS3.getAvatarUser(profile);
     }
 }
