@@ -25,6 +25,8 @@ tags:
     description: API for notes
   - name: user
     description: API for users
+  - name: instructor
+    description: API for instructors
   - name: payment
     description: API for payments
   - name: statistical
@@ -210,6 +212,13 @@ paths:
         - name: languageId
           in: query
           description: Filter by language of course
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: instructorId
+          in: query
+          description: Filter by instrucor
           required: false
           explode: true
           schema:
@@ -1390,6 +1399,69 @@ paths:
                 application/json:
                   example:
                     message: successfully
+          security:
+            - bearerAuth: []
+  /users/presign-url/upload-avatar:
+    get:
+          tags:
+            - user
+          summary: Get presign-url to upload avatar for user
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/cloud-front/clear-cache-avatar:
+    post:
+          tags:
+            - user
+          summary: Using clear cache cloudfront after update avatar user
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/instructors:
+    get:
+          tags:
+            - instructor
+          parameters:
+          - name: page
+            in: query
+            description: Use to pagination, default page = 1
+            required: false
+            explode: true
+            schema:
+              type: number
+          - name: pageSize
+            in: query
+            description: Use to pagination, default pageSize = 10
+            required: false
+            explode: true
+            schema:
+              type: number
+          summary: Get list instructor
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/instructors/{instructorId}:
+    get:
+          tags:
+            - instructor
+          parameters:
+            - name: instructorId
+              in: path
+              description: Enter instructorId
+              required: true
+              schema:
+                type: number
+                default: 1
+          summary: Get list instructor
+          responses:
+            '200':
+              description: Successful
           security:
             - bearerAuth: []
   /payments/create-order:

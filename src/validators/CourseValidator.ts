@@ -16,7 +16,8 @@ export const validateGetCourses = [
     query('category').optional().isString().withMessage('Category must be a string').trim(),
     query('averageRating').optional().isFloat({ min: 0.0, max: 5.0 }).withMessage('Average rating must be a float between 0.0 and 5.0'),
     query('languageId').optional().isInt({ min: 1 }).withMessage('languageId is min 1').custom(languageIdExists),
-    query('level').optional().isInt({ min: 1 }).withMessage('Level must be an integer greater than or equal to 1'),
+    query('instructorId').optional().isInt({ min: 1 }).withMessage('languageId is min 1'),
+    query('level').optional().isInt({ min: 1 }).withMessage('Level instructorId be an integer greater than or equal to 1'),
     query('duration').optional().isArray().isIn(['extraShort', 'short', 'medium', 'long', 'extraLong']).withMessage(`Invalid duration, duration is one of 'extraShort', 'short', 'medium', 'long', 'extraLong'`),
     query('sort').optional().isIn(['price', 'discount', 'duration', 'averageRating', 'totalStudents', 'createdAt']).withMessage('Invalid sort parameter'),
     query('sortType').optional().isIn(['ASC', 'DESC']).withMessage('Invalid sortType parameter'),
@@ -62,4 +63,13 @@ export const validateAddFavoriteCourse = [
 
 export const validateDeleteFavoriteCourse = [
   body('courseId').notEmpty().isString().withMessage('courseId must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of title must be min:1 and max:255'),
+]
+
+export const validateGetListInstructors= [
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
+  query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
+]
+
+export const validateGetInstructorDetail = [
+  param('instructorId').notEmpty().isInt({ min: 1 }).withMessage('instructorId must be an integer greater than or equal to 1')
 ]
