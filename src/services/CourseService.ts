@@ -390,9 +390,9 @@ export class CourseService implements ICourseService {
      */
     async isUserOwnerCourse(courseId: number, userId: number): Promise<boolean> {
         const course = await this.courseRepository.findOneByCondition({
-            courseId: courseId,
+            id: courseId,
             instructorId: userId
-        }, true);
+        });
         if(!course){
             return false;
         }
