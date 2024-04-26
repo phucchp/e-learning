@@ -12,15 +12,15 @@ import { ICourseService } from "../services/interfaces/ICourseService";
 
 export class UserController{
 	private userService: IUserService;
-    private cartSerivce: ICartService;
-    private enrollmentSerivce: IEnrollmentService;
-    private courseSerivce: ICourseService;
+    private cartService: ICartService;
+    private enrollmentService: IEnrollmentService;
+    private courseService: ICourseService;
 
 	constructor() {
 		this.userService = Container.get(UserService);
-		this.cartSerivce = Container.get(CartService);
-		this.enrollmentSerivce = Container.get(EnrollmentService);
-		this.courseSerivce = Container.get(CourseService);
+		this.cartService = Container.get(CartService);
+		this.enrollmentService = Container.get(EnrollmentService);
+		this.courseService = Container.get(CourseService);
 	}
     
     //--------------CART------------------//
@@ -38,7 +38,7 @@ export class UserController{
     deleteCourseFromCart = async (req: Request, res: Response) => {
         const userId = req.payload.userId;
         const courseIds = req.body.courseIds;
-        const rowEffect = await this.cartSerivce.deleteCoursesFromCart(userId, courseIds);
+        const rowEffect = await this.cartService.deleteCoursesFromCart(userId, courseIds);
         return res.status(200).json({
             message: "Successful",
             rowEffect: rowEffect
@@ -48,7 +48,7 @@ export class UserController{
     addCourseToCart = async (req: Request, res: Response) => {
         const userId = 1;
         const courseId = req.body.courseId;
-        await this.cartSerivce.addCourseToCart(userId, courseId);
+        await this.cartService.addCourseToCart(userId, courseId);
         return res.status(202).json({
             message: "Successful",
         })
@@ -56,7 +56,7 @@ export class UserController{
     //--------------ENROLLMENT COURSE------------------//
 
     getEnrollmentCourses = async (req: Request, res: Response) => {
-        const results = await this.enrollmentSerivce.getEnrollmentCourses(req);
+        const results = await this.enrollmentService.getEnrollmentCourses(req);
         return res.status(200).json({
             message : "Successful",
             totalCount: results.count,
@@ -68,7 +68,7 @@ export class UserController{
     addCourseFavorite = async (req: Request, res: Response) => {
         const userId = req.payload.userId;
         const courseId = req.body.courseId;
-        await this.courseSerivce.addCourseFavorite(userId, courseId);
+        await this.courseService.addCourseFavorite(userId, courseId);
         return res.status(200).json({
             message : "Successful",
         })
@@ -77,7 +77,7 @@ export class UserController{
     deleteCourseFavorite = async (req: Request, res: Response) => {
         const userId = req.payload.userId;
         const courseId = req.body.courseId;
-        await this.courseSerivce.deleteCourseFavorite(userId, courseId);
+        await this.courseService.deleteCourseFavorite(userId, courseId);
         return res.status(200).json({
             message : "Successful",
         })

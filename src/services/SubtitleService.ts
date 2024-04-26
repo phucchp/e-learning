@@ -22,7 +22,7 @@ export class SubtitleService implements ISubtitleService {
     }
 
     /**
-     * Get presignUrl to update subtitle to S3
+     * Get pre-signedUrl to update subtitle to S3
      * @param subtitleId 
      * @param name 
      */
