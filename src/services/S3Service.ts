@@ -9,14 +9,14 @@ export class S3Service {
 
     private static s3Client: S3;
     private cloudfrontDistributionId: string;
-    private cloudFrontDomain: string; // Thay thế bằng tên miền CloudFront của bạn
-    private BUCKET_NAME: string;
+    private cloudFrontDomain: string; // CloudFront domain name
+    private bucketName: string;
     private awsRegion: string;
     private awsAccessKey: string;
     private awsSecretKey: string;
 
     constructor() {
-        // Danh sách các biến môi trường
+        // List of environment variables
         const requiredEnvVariables = [
           'AWS_ACCESS_KEY',
           'AWS_SECRET_KEY',
@@ -30,13 +30,13 @@ export class S3Service {
           'CLOUDFRONT_KEY_PAIR_ID'
         ];
 
-        // Lặp qua danh sách biến môi trường và kiểm tra xem chúng đã được đặt hay không
+        // Loop through the list of environment variables and check if they are set or not
         const missingVariables = requiredEnvVariables.filter(variable => !process.env[variable]);
         if (missingVariables.length > 0) {
             throw new Error(`Missing AWS environment variables: ${missingVariables.join(', ')}`);
         }
 
-        // Khởi tạo đối tượng S3 chỉ nếu các biến môi trường tồn tại
+        // Initialize the S3 object only if the environment variables exist
         S3Service.s3Client = new S3({
             accessKeyId: process.env.AWS_ACCESS_KEY,
             secretAccessKey: process.env.AWS_SECRET_KEY,
@@ -45,8 +45,8 @@ export class S3Service {
         });
 
         this.cloudfrontDistributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || 'EGZQ2Z6SRLE1A';
-        this.cloudFrontDomain = process.env.CLOUDFRONT_DOMAIN|| 'https://d3h2k6w8gpk1ys.cloudfront.net'; // Thay thế bằng tên miền CloudFront của bạn
-        this.BUCKET_NAME = process.env.AWS_BUCKET_NAME || 'elearning-project-chp';
+        this.cloudFrontDomain = process.env.CLOUDFRONT_DOMAIN|| 'https://d3h2k6w8gpk1ys.cloudfront.net'; // Replace with your CloudFront domain name
+        this.bucketName = process.env.AWS_BUCKET_NAME || 'elearning-project-chp';
         this.awsRegion = process.env.AWS_REGION || 'ap-southeast-1';
         this.awsAccessKey = process.env.AWS_ACCESS_KEY || '';
         this.awsSecretKey = process.env.AWS_SECRET_KEY || '';
@@ -57,8 +57,14 @@ export class S3Service {
     private expireTime = 24*60*60 * 1000; // 60 phut *60 giây * 1000 milliseconds
     private expires = new Date(Date.now() + this.expireTime);
     
-    // Get link Object 
-    getObjectUrl = async (objectName: string, expiration: number = this.EXPIRATION, bucketName: string = this.BUCKET_NAME) => {
+    /**
+     * Get pre-Signed URLs of objects in S3
+     * @param objectName 
+     * @param expiration 
+     * @param bucketName 
+     * @returns 
+     */
+    getObjectUrl = async (objectName: string, expiration: number = this.EXPIRATION, bucketName: string = this.bucketName) => {
         try {
             const url = await getSignedUrl({
                 url: this.cloudFrontDomain+"/"+objectName,
@@ -73,10 +79,17 @@ export class S3Service {
         }
     }
 
+    /**
+     * Get pre-signed URL to upload object to S3 from client
+     * @param objectName 
+     * @param contentType 
+     * @param expiration 
+     * @returns 
+     */
     generatePresignedUrlUpdate = async (objectName: string, contentType: string , expiration: number = this.EXPIRATION) => {
         try {
             const params = {
-                Bucket: this.BUCKET_NAME,
+                Bucket: this.bucketName,
                 Key: objectName,
                 ContentType: contentType,
                 Expires: expiration
@@ -90,6 +103,10 @@ export class S3Service {
         }
     }
 
+    /**
+     * Using delete object from S3
+     * @param objectName 
+     */
     deleteObject = async(objectName: string)=>{
         try {
             const client = new S3Client({
@@ -100,7 +117,7 @@ export class S3Service {
                 },
               });
           const command = new DeleteObjectCommand({
-            Bucket: this.BUCKET_NAME,
+            Bucket: this.bucketName,
             Key: objectName,
           });
         
@@ -112,10 +129,12 @@ export class S3Service {
           }
     }
     
-
+    /**
+     * Using clear cache each endpoint cloudfront when update object to S3
+     * @param path 
+     */
     clearCacheCloudFront = async (path: string) => {
         try{
-            this.deleteObject('ok')
             AWS.config.update({
                 accessKeyId: this.awsAccessKey,
                 secretAccessKey: this.awsSecretKey,
