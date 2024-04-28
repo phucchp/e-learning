@@ -30,22 +30,21 @@ export class CommentService implements ICommentService {
     @Inject(() => CourseService)
 	private courseService!: ICourseService;
 
-    async createComment(userId: number, lessonId: number, content: string): Promise<Comment> {
-        // Check lessonId is exists
-        const lesson = await this.lessonRepository.findById(lessonId);
-        if(!lesson) {
-            throw new NotFound('Lesson not found!');
+    async createComment(userId: number, lessonId: number, parentId: number, content: string): Promise<Comment> {
+        if (!parentId) {
+            parentId = 0;
         }
         return await this.commentRepository.create({
             lessonId: lessonId,
             userId: userId,
-            content: content
+            content: content,
+            parentId: parentId,
         });
     }
 
     async updateComment(commentId: number, userId: number, content: string): Promise<Comment> {
         const comment = await this.commentRepository.findById(commentId, true);
-        if(!comment || comment.deletedAt === null) {
+        if(!comment) {
             // check comment id is exists
             throw new NotFound('Comment not found or deleted!');
         }
@@ -65,7 +64,7 @@ export class CommentService implements ICommentService {
 
     async deleteComment(commentId: number, userId: number): Promise<void> {
         const comment = await this.commentRepository.findById(commentId, true);
-        if (!comment || comment.deletedAt === null) {
+        if (!comment) {
             // check comment id is exists
             throw new NotFound('Comment not found or deleted!');
         }
