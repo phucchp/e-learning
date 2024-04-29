@@ -157,6 +157,27 @@ paths:
           description: Successful
         '500':
           description: Internal server error
+  /auth/get-access-token:
+    post:
+      summary: Get new Access Token By Refresh Token
+      tags:
+        - authentication
+      requestBody:
+        description: Refresh Token
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  default: string
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
   /courses:
     get:
       tags:
