@@ -235,4 +235,35 @@ export class AuthenticationService implements IAuthenticationService {
         return await this.userRepository.updateInstance(user);
     }
     
+    /**
+     * Generate Access Token by Refresh Token
+     * @param refreshToken 
+     * @returns 
+     */
+     async getAccessTokenByRefreshToken(refreshToken: string): Promise<any> {
+        const payload = Authentication.validateToken(refreshToken);
+        if (!payload) {
+            throw new UnauthorizedError('Token is invalid or is expired');
+        }
+
+        const user = await this.userRepository.findOneByCondition({
+            email: payload.email
+        });
+        if (user) {
+            if (!user.isActive) {
+                throw new BadRequestError('User is not active!');
+            }
+
+            return {
+                accessToken: Authentication.generateAccessToken(
+                    user.id,
+                    user.roleId,
+                    user.userName,
+                    user.email
+                ),
+            };
+        } else {
+            throw new NotFound('User not found!');
+        }
+	};
 }

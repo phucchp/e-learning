@@ -21,5 +21,5 @@ export interface IAuthenticationService {
 		token: string,
 		newPassword: string
 	): Promise<any>;
-	// getAccessTokenByRefreshToken: (refreshToken: string) => Promise<any>;
+	getAccessTokenByRefreshToken: (refreshToken: string) => Promise<any>;
 }

@@ -55,3 +55,7 @@ export const validateChangePasswordUsingToken = [
 export const validateForgotPassword = [
     body('email').notEmpty().withMessage('email is required'),
 ]
+
+export const validateGetAccessToken = [
+    body('refreshToken').notEmpty().withMessage('Refresh Token is required').isString().withMessage('Refresh Token must be a string'),
+  ];
