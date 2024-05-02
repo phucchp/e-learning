@@ -299,7 +299,7 @@ export class CourseService implements ICourseService {
         }
 
         const userId = Number(req.payload.userId);
-        const newCourse = this.courseRepository.create({
+        const newCourse = await this.courseRepository.create({
             title: title,
             introduction: introduction,
             description: description,
