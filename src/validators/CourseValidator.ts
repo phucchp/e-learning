@@ -89,3 +89,9 @@ export const validateGetListInstructors= [
 export const validateGetInstructorDetail = [
   param('instructorId').notEmpty().isInt({ min: 1 }).withMessage('instructorId must be an integer greater than or equal to 1')
 ]
+
+export const validateUpdateProfile = [
+  body('firstName').optional().isString().withMessage('firstName must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of firstName must be min:1 and max:255'),
+  body('lastName').optional().isString().withMessage('lastName must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of lastName must be min:1 and max:255'),
+  body('description').optional().isString().withMessage('description must be a string').trim()
+]

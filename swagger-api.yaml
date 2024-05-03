@@ -1482,6 +1482,35 @@ paths:
                   default: "d2b734f2-eee1-4a34-ae77-919cb7af46fc"
       security:
         - bearerAuth: []
+  /users/profile:
+    put:
+      tags:
+        - user
+      summary: Updates profile information for user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  default: " optional"
+                lastName:
+                  type: string
+                  default: " optional"
+                description:
+                  type: string
+                  default: " optional"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []
   /users/enrollment-courses:
     get:
       tags:
