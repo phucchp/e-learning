@@ -163,5 +163,15 @@ export class UserController{
             data:data
         });
     }
-
+    
+    /**
+     * Update user profile information
+     */
+    updateUserInformation = async (req: Request, res: Response) => {
+        const profile = await this.userService.updateUserInformation(req);
+        return res.status(200).json({
+            message: "Successful",
+            data: profile
+        });
+    }
 }
