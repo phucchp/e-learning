@@ -28,12 +28,14 @@ export class EWallet extends Model<EWallet> {
     @Default('Paypal')
     @Column({
         type: DataType.STRING,
+        unique: 'compositeIndex'
     })
     type!: string;
 
     @AllowNull(false)
     @Column({
         type: DataType.STRING,
+        unique: 'compositeIndex'
     })
     email!: string;
 

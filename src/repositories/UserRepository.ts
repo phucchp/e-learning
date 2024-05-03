@@ -99,9 +99,11 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 			where: {
 				id: userId
 			},
+			attributes: { exclude: ['id','roleId','password','isActive','createdAt', 'updatedAt', 'deletedAt'] },
 			include: [
 				{
 					model: Profile,
+					attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
 				}
 			]
 		});

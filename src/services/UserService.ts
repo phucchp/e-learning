@@ -139,4 +139,35 @@ export class UserService implements IUserService {
 
        return await this.handleS3.getAvatarUser(profile);
     }
+
+    async updateUserInformation(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<Profile> {
+        const userId = req.payload.userId;
+        const {firstName, lastName, description} = req.body;
+        const profile = await this.profileRepository.findOneByCondition({
+            userId: userId
+        });
+
+        if (!profile) {
+            throw new NotFound("Profile not found!");
+        }
+
+        if (firstName) {
+            profile.firstName = firstName;
+        }
+
+        if (lastName) {
+            profile.firstName = lastName;
+        }
+
+        if (description) {
+            profile.description = description;
+        }
+
+        const newProfile = await this.profileRepository.updateInstance(profile);
+        if (!newProfile) {
+            throw new ServerError('Error updating profile!');
+        }
+
+        return newProfile;
+    }
 }

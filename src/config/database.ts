@@ -41,6 +41,20 @@ class Database {
 	private static instance: Database | null = null;
 
 	private constructor() {
+		// List of environment variables
+        const requiredEnvVariables = [
+			'POSTGRES_DB',
+			'POSTGRES_HOST',
+			'POSTGRES_PORT',
+			'POSTGRES_USER',
+			'POSTGRES_PASSWORD',
+			'POSTGRES_SSL',
+		];
+		// Loop through the list of environment variables and check if they are set or not
+		const missingVariables = requiredEnvVariables.filter(variable => !process.env[variable]);
+		if (missingVariables.length > 0) {
+			throw new Error(`Missing POSTGRESQL DB environment variables: ${missingVariables.join(', ')}`);
+		}
 		this.connectToPostgreSQL();
 	}
 

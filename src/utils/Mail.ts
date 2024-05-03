@@ -13,6 +13,20 @@ export class Mail {
 	client_url = process.env.CLIENT_URL?.toString();
 
 	constructor() {
+		if(!process.env.CLIENT_URL) {
+			console.log("WARNING: CLIENT_URL in .env is missing!");
+		}
+
+		const requiredEnvVariables = [
+			'EMAIL_USER',
+			'EMAIL_PASSWORD',
+		];
+		// Loop through the list of environment variables and check if they are set or not
+		const missingVariables = requiredEnvVariables.filter(variable => !process.env[variable]);
+		if (missingVariables.length > 0) {
+			throw new Error(`Missing environment variables for MAIL service: ${missingVariables.join(', ')}`);
+		}
+
 		this.transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: {

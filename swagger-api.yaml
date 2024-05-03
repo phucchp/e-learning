@@ -33,6 +33,8 @@ tags:
     description: API for instructors
   - name: payment
     description: API for payments
+  - name: e-wallet
+    description: API for electronic wallet
   - name: statistical
     description: API for statistical
 paths:
@@ -1480,6 +1482,35 @@ paths:
                   default: "d2b734f2-eee1-4a34-ae77-919cb7af46fc"
       security:
         - bearerAuth: []
+  /users/profile:
+    put:
+      tags:
+        - user
+      summary: Updates profile information for user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  default: " optional"
+                lastName:
+                  type: string
+                  default: " optional"
+                description:
+                  type: string
+                  default: " optional"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []
   /users/enrollment-courses:
     get:
       tags:
@@ -1677,6 +1708,22 @@ paths:
               description: Successful
           security:
             - bearerAuth: []
+  /users/profile:
+    get:
+      tags:
+        - user
+      summary: Get user information
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
   /users/instructors:
     get:
           tags:
@@ -1775,7 +1822,65 @@ paths:
           description: Successfulnote that needs to be updated
       security:
         - bearerAuth: []
-  /statisticals/statistical-revenue:
+  /e-wallets/paypal:
+    get:
+      tags:
+        - e-wallet
+      summary: Get current electronic wallet of user
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - e-wallet
+      summary:  Add electronic wallet Paypal
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: 'phucchp@gmail.com'
+              example:
+                email: 'phucchp@gmail.com'
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - e-wallet
+      summary: Updates a electronic ewallet for user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: " new email to update"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not update language
+      security:
+        - bearerAuth: []
+  /statistical/statistical-revenue:
     get:
       tags:
         - statistical
@@ -1826,7 +1931,7 @@ paths:
                 type: array
       security:
         - bearerAuth: []
-  /statisticals/admin/statistical-revenue:
+  /statistical/admin/statistical-revenue:
     get:
       tags:
         - statistical
@@ -1884,7 +1989,7 @@ paths:
                 type: array
       security:
         - bearerAuth: [] 
-  /statisticals/statistical-revenue-by-course:
+  /statistical/statistical-revenue-by-course:
     get:
       tags:
         - statistical
@@ -1926,7 +2031,7 @@ paths:
                 type: array
       security:
         - bearerAuth: []  
-  /statisticals/admin/statistical-revenue-by-course:
+  /statistical/admin/statistical-revenue-by-course:
     get:
       tags:
         - statistical
@@ -1975,7 +2080,7 @@ paths:
                 type: array
       security:
         - bearerAuth: []  
-  /statisticals/admin/statistical-revenue-by-instructor:
+  /statistical/admin/statistical-revenue-by-instructor:
     get:
       tags:
         - statistical
@@ -2029,7 +2134,7 @@ paths:
                 type: array
       security:
         - bearerAuth: []   
-  /statisticals/statistical-courses-by-category:
+  /statistical/statistical-courses-by-category:
     get:
       tags:
         - statistical
@@ -2069,7 +2174,7 @@ paths:
                 type: array
       security:
         - bearerAuth: [] 
-  /statisticals/statistical-revenue-by-category:
+  /statistical/statistical-revenue-by-category:
     get:
       tags:
         - statistical
@@ -2123,7 +2228,7 @@ paths:
                 type: array
       security:
         - bearerAuth: [] 
-  /statisticals/statistical-revenue-courses-by-category:
+  /statistical/statistical-revenue-courses-by-category:
     get:
       tags:
         - statistical
@@ -2172,7 +2277,7 @@ paths:
                 type: array
       security:
         - bearerAuth: [] 
-  /statisticals/statistical-courses-by-level:
+  /statistical/statistical-courses-by-level:
     get:
       tags:
         - statistical
@@ -2212,7 +2317,7 @@ paths:
                 type: array
       security:
         - bearerAuth: [] 
-  /statisticals/statistical-revenue-by-level:
+  /statistical/statistical-revenue-by-level:
     get:
       tags:
         - statistical
@@ -2266,7 +2371,7 @@ paths:
                 type: array
       security:
         - bearerAuth: [] 
-  /statisticals/statistical-revenue-courses-by-level:
+  /statistical/statistical-revenue-courses-by-level:
     get:
       tags:
         - statistical

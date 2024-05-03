@@ -14,4 +14,5 @@ export interface IUserService {
     clearCacheAvatar(userId: number): Promise<void>;
     getListInstructors(req: Request): Promise<{ rows: User[]; count: number; }>;
     getInstructorDetail(instructorId: number): Promise<Profile>;
+    updateUserInformation(req: Request): Promise<Profile>;
 }
