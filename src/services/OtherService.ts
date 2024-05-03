@@ -18,6 +18,7 @@ import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
 import { TopicService } from './TopicService';
 import { ITopicService } from './interfaces/ITopicService';
+import axios from 'axios';
 
 @Service()
 export class OtherService {
@@ -57,6 +58,9 @@ export class OtherService {
         // Get pre-signed URL
         const presignUrl = await this.s3Service.generatePresignedUrlUpdate(posterUrl, 'image/jpeg');
         // Using pre-signed URL to put the poster to S3
+        const fileContent = fs.readFileSync(posterPath);
+        
+        await axios.put(presignUrl, 'image/jpeg', { headers: { 'Content-Type': 'image/jpeg' } });
 
     }
 
@@ -186,7 +190,7 @@ export class OtherService {
                     await this.courseRepository.updateInstance(newCourse);
                     // Put poster to S3
                     const posterPath = path.join(coursePath, 'poster-url.jpg');
-                    await this.putImageToS3(posterUrl, posterPath);
+                    // await this.putImageToS3(posterUrl, posterPath);
 
                     // =========START CREATE TOPIC FOR COURSE =============
                     const topicPath = path.join(coursePath, 'topics');

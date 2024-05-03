@@ -11,7 +11,7 @@ export class OtherController{
 	}
 
     createDataCourse = async (req: Request, res: Response) => {
-        
+        await this.otherService.readDirRecursive('../new-big-data');
         return res.status(200).json({
             message: "Success",
         });
