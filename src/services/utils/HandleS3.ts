@@ -21,6 +21,14 @@ export class HandleS3 {
             let posterUrl = course.getDataValue('posterUrl') || 'courses/defaults/poster.jpg';
 
             course.setDataValue('posterUrl', await this.s3Service.getObjectUrl(posterUrl));
+
+			if (course.getDataValue('instructor')) {
+				const profile = course.getDataValue('instructor').getDataValue('profile');
+				if (profile) {
+					course.instructor.setDataValue('profile', await this.getAvatarUser(profile));
+				}
+			}
+			
         }
 
 		return courses;
