@@ -44,7 +44,7 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                     include: [
                         {
                             model: Profile,
-                            attributes: ['fullName', 'avatar'],
+                            attributes: ['fullName','firstName', 'lastName', 'avatar'],
                         },
                     ],
                 },
