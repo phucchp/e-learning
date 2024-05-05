@@ -1,6 +1,6 @@
-// 'use strict';
+'use strict';
 
-// const { faker } = require('@faker-js/faker');
+const { faker } = require('@faker-js/faker');
 
 // const generateRandomReview = (userId, courseId) => {
 //   return {
@@ -29,13 +29,13 @@
 
 // const reviews = generateReviewSeeds();
 
-// /** @type {import('sequelize-cli').Migration} */
-// module.exports = {
-//   async up (queryInterface, Sequelize) {
-//     await queryInterface.bulkInsert('reviews', reviews, {});
-//   },
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up (queryInterface, Sequelize) {
+    // await queryInterface.bulkInsert('reviews', reviews, {});
+  },
 
-//   async down (queryInterface, Sequelize) {
-//     await queryInterface.bulkDelete('reviews', null, {});
-//   }
-// };
+  async down (queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('reviews', null, {});
+  }
+};
