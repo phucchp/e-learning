@@ -146,7 +146,7 @@ export class PaymentService implements IPaymentService {
      * @returns 
      */
     async getPaymentNotCheckoutInformation(userId: number): Promise<Payment | null> {
-        const payment = await this.paymentRepository.getPaymentNotCheckoutInfomation(userId);
+        const payment = await this.paymentRepository.getPaymentNotCheckoutInformation(userId);
         return payment;
     }
 

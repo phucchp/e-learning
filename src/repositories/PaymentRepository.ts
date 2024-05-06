@@ -12,7 +12,7 @@ export class PaymentRepository extends BaseRepository<Payment> implements IPayme
 		super(Payment);
 	}
 
-	async getPaymentNotCheckoutInfomation(userId: number): Promise<Payment| null> {
+	async getPaymentNotCheckoutInformation(userId: number): Promise<Payment| null> {
 		return await this.model.findOne({
 			where: {
 				userId: userId,
@@ -45,5 +45,13 @@ export class PaymentRepository extends BaseRepository<Payment> implements IPayme
 		})
 	}
 
+	async getPaymentOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }> {
+		return await this.model.findAndCountAll({
+			where : {
+				isPayment: true,
+				userId: userId
+			}
+		});
+	}
 
 }

@@ -9,6 +9,7 @@ import { Category } from "../models/Category";
 import { Op } from 'sequelize';
 import { NotFound } from "../utils/CustomError";
 import { Profile } from "../models/Profile";
+import { EWallet } from "../models/EWallet";
 
 @Service()
 export class UserRepository extends BaseRepository<User> implements IUserRepository{
@@ -136,4 +137,54 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 
 		return results;
 	}
+
+	/**
+	 * For admin
+	 */
+	async getUsers(options: any): Promise<{ rows: User[]; count: number; }> {
+		const {page, pageSize, whereCondition, sort, sortType} = options;
+		const offset = (page - 1) * pageSize;
+		const results = await this.model.findAndCountAll({
+			attributes: { exclude: ['password'] },
+			where: whereCondition,
+			include: [
+				{
+					model: Profile,
+				}
+			],
+			limit: pageSize,
+            offset: offset,
+			order: [
+                [sort, sortType],
+            ]
+		});
+
+		return results;
+	}
+
+	/**
+	 * For admin
+	 */
+	async getUser(userId: number): Promise<User> {
+		const user = await this.model.findOne({
+			where: {
+				id: userId
+			},
+			attributes: { exclude: ['password'] },
+			include: [
+				{
+					model: Profile,
+				},
+				{
+					model: EWallet,
+				}
+			]
+		});
+
+		if(!user) {
+			throw new NotFound('User not found');
+		}
+		return user;
+	}
+
 }

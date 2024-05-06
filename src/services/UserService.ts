@@ -13,6 +13,11 @@ import { S3Service } from './S3Service';
 import { ProfileRepository } from '../repositories/ProfileRepository';
 import { IProfileRepository } from '../repositories/interfaces/IProfileRepository';
 import { Profile } from '../models/Profile';
+import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
+import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
+import { PaymentRepository } from '../repositories/PaymentRepository';
+import { IPaymentRepository } from '../repositories/interfaces/IPaymentRepository';
+import { Op } from 'sequelize';
 
 @Service()
 export class UserService implements IUserService {
@@ -22,13 +27,12 @@ export class UserService implements IUserService {
 
     @Inject(() => ProfileRepository)
 	private profileRepository!: IProfileRepository;
-    
-    getUsers(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<User[]> {
-        throw new Error('Method not implemented.');
-    }
-    getUser(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<User> {
-        throw new Error('Method not implemented.');
-    }
+
+    @Inject(() => EnrollmentRepository)
+	private enrollmentRepository!: IEnrollmentRepository;
+
+    @Inject(() => PaymentRepository)
+	private paymentRepository!: IPaymentRepository;
 
     @Inject(() => HandleS3)
 	private handleS3!: HandleS3;
@@ -175,5 +179,87 @@ export class UserService implements IUserService {
         }
 
         return newProfile;
+    }
+
+    async getUsers(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: User[]; count: number; }> {
+        const {search,isActive, roleId, page, pageSize, sortBy, sortType} = req.query;
+        const whereCondition: any = {};
+        if(search){
+            whereCondition[Op.or] = [
+                { userName: { [Op.iLike]: `%${search}%` } },
+                { email: { [Op.iLike]: `%${search}%` } },
+            ];
+        }
+
+        if(isActive){
+            whereCondition['isActive'] = {[Op.eq]: isActive};
+        }
+
+        if(roleId){
+            whereCondition['roleId'] = {[Op.eq]: roleId};
+        }
+
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 10,
+            whereCondition: whereCondition,
+            sortType: sortType || 'ASC',
+            sort : sortBy || 'id'
+        }
+        // Sort: id, createdAt, roleId
+        // Search by username, email
+        const results = await this.userRepository.getUsers(options);
+        if (results.rows.length > 0) {
+            for (const user of results.rows) {
+                if (!user.profile) {
+                    throw new ServerError('Profile user is missing!');
+                }
+                user.setDataValue('profile', await this.handleS3.getAvatarUser(user.profile));
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Get all information of user for administrator
+     * @param userId 
+     * @returns 
+     */
+    async getUser(userId: number): Promise<User> {
+        const user = await this.userRepository.getUser(userId);
+
+        if (!user.profile) {
+            throw new ServerError('Profile user is missing!');
+        }
+        user.setDataValue('profile', await this.handleS3.getAvatarUser(user.profile));
+        return user;
+    }
+
+    /**
+     * Get total courses enrollment of user
+     * @param userId 
+     * @returns 
+     */
+    async getTotalCoursesEnrollment(userId: number): Promise<number> {
+        const totalCoursesEnrollment = await this.enrollmentRepository.getEnrollmentCoursesOfUser(userId);
+        return totalCoursesEnrollment.count;
+    }
+
+    /**
+     * Get total amount is paid of user
+     * @param userId 
+     * @returns 
+     */
+    async getTotalAmountPaid(userId: number): Promise<{totalPayment: number, totalAmount: number}> {
+        const {rows, count} = await this.paymentRepository.getPaymentOfUser(userId);
+        let totalAmount = 0;
+        for (const payment of rows) {
+            totalAmount += payment.price;
+        }
+
+        return {
+            totalPayment : count,
+            totalAmount : totalAmount
+        }
     }
 }

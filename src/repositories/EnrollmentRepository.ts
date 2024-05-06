@@ -67,4 +67,12 @@ export class EnrollmentRepository extends BaseRepository<Enrollment> implements 
 	async createMultiple(data: any): Promise<Enrollment[]> {
 		return await this.model.bulkCreate(data);
 	}
+
+	async getEnrollmentCoursesOfUser(userId: number): Promise<{ rows: Enrollment[]; count: number; }> {
+		return await this.model.findAndCountAll({
+			where:{
+				userId: userId
+			},
+		});
+	}
 }

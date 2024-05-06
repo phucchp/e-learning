@@ -7,4 +7,6 @@ export interface IUserRepository extends BaseRepositoryInterface<User> {
     getFavoriteCourses(userId: number, search : string): Promise<{ rows: User[]; count: number}>;
     getUserInformation(userId: number): Promise<User>;
     getListInstructors(page: number, pageSize: number): Promise<{ rows: User[]; count: number; }>;
+    getUsers(options: any): Promise<{ rows: User[]; count: number; }>
+    getUser(userId: number): Promise<User>;
 }

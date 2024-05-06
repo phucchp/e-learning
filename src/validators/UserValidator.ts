@@ -58,4 +58,16 @@ export const validateForgotPassword = [
 
 export const validateGetAccessToken = [
     body('refreshToken').notEmpty().withMessage('Refresh Token is required').isString().withMessage('Refresh Token must be a string'),
-  ];
+];
+
+export const validateGetUser = [
+    param('userId').notEmpty().withMessage('userId is required').isInt({min: 1}).withMessage('userId Token must be a number'),
+];
+
+export const validateGetUsers = [
+    query('roleId').optional().isInt().isIn([1, 2, 3]).withMessage(`Invalid roleId, roleId is one of 1,2,3`),
+    query('isActive').optional().isBoolean().withMessage('isActive is true or false'),
+    query('search').trim().optional().isString().withMessage('Search must be a string'),
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
+    query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
+];
