@@ -87,3 +87,7 @@ export const validateUpdateProcessing = [
     body('time').notEmpty().isInt({min:0}).withMessage('lessonId must be a integer number'),
     body('isDone').notEmpty().isBoolean().withMessage('isDone must be a boolean')
 ];
+
+export const validateGetNewestProcessing = [
+    query('courseId').notEmpty().isString().withMessage('courseId must be a string').trim(),
+];

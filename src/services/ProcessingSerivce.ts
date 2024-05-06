@@ -12,6 +12,7 @@ import { EnrollmentService } from './EnrollmentService';
 import { IEnrollmentService } from './interfaces/IEnrollmentService';
 import { CourseService } from './CourseService';
 import { ICourseService } from './interfaces/ICourseService';
+import { Op } from 'sequelize';
 
 @Service()
 export class ProcessingService implements IProcessingService {
@@ -82,11 +83,28 @@ export class ProcessingService implements IProcessingService {
      * @param userId 
      * @param courseId 
      */
-    async getNewestProcessing(userId: number, courseId: number): Promise<Processing> {
+    async getNewestProcessing(userId: number, courseId: string): Promise<Processing|null> {
         // get theo ngay update moi nhat
         // Để khi user bấm vào khoá học thì sẽ tiếp tục học từ bài trước
-        
-        throw new Error('Method not implemented.');
+        const lessonIds = await this.courseService.getLessonIdsOfCourse(courseId);
+        const processing = await this.processingRepository.getAll({
+            where: {
+                userId: userId,
+                lessonId: {
+					[Op.in]:lessonIds
+				},
+                isDone: true,
+            },
+            order: [
+                ['updatedAt', 'DESC']
+            ]
+        });
+
+        if (processing.length === 0) {
+            return null
+        }
+
+        return processing[0];
     }
 
 }

@@ -1724,6 +1724,25 @@ paths:
               description: Successful
           security:
             - bearerAuth: []
+  /users/newest-processing:
+    get:
+          tags:
+            - user
+          summary: Get newest processing learning course for user
+          parameters:
+            - name: courseId
+              in: query
+              description: Enter string courseId
+              required: false
+              explode: true
+              schema:
+                type: string
+                default: '12-strategies-for-dealing-with-difficult-people-0564f951-1714883817206'
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
   /users/processing:
     post:
           tags:

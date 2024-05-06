@@ -258,4 +258,20 @@ export class UserController{
         });
     }
 
+    /**
+     * API update processing course for user
+     */
+    getNewestProcessing = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const courseId = req.query.courseId;
+        if (!courseId) {
+            throw new BadRequestError('courseId is required');
+        }
+        const processing = await this.processingService.getNewestProcessing(userId, courseId.toString());
+        
+        return res.status(200).json({
+            message: "Successful",
+            data: processing
+        });
+    }
 }
