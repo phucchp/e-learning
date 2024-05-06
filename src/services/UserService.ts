@@ -283,7 +283,6 @@ export class UserService implements IUserService {
         totalDone: number
     }> {
         const lessonIds = await this.courseService.getLessonIdsOfCourse(courseId);
-        console.log(lessonIds);
         const processing = await this.processingRepository.getAll({
             where: {
                 userId: userId,
@@ -293,7 +292,6 @@ export class UserService implements IUserService {
                 isDone: true
             }
         });
-        console.log(processing);
 
         return {
             percent: (processing.length / lessonIds.length)* 100,

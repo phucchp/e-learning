@@ -10,12 +10,15 @@ import { EnrollmentService } from "../services/EnrollmentService";
 import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
 import { HandleS3 } from "../services/utils/HandleS3";
+import { ProcessingService } from "../services/ProcessingSerivce";
+import { IProcessingService } from "../services/interfaces/IProcessingService";
 
 export class UserController{
 	private userService: IUserService;
     private cartService: ICartService;
     private enrollmentService: IEnrollmentService;
     private courseService: ICourseService;
+    private processingService: IProcessingService;
     private handleS3: HandleS3;
 
 	constructor() {
@@ -24,6 +27,7 @@ export class UserController{
 		this.enrollmentService = Container.get(EnrollmentService);
 		this.courseService = Container.get(CourseService);
 		this.handleS3 = Container.get(HandleS3);
+		this.processingService = Container.get(ProcessingService);
 	}
     
     //--------------CART------------------//
@@ -223,4 +227,35 @@ export class UserController{
             data: data
         });
     }
+
+    /**
+     * API add processing course for user
+     */
+    addProcessing = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const lessonId = req.body.lessonId;
+        const time = req.body.time;
+        const isDone = req.body.isDone;
+        const process = await this.processingService.addProcessing(userId, lessonId, time, isDone);
+        return res.status(200).json({
+            message: "Successful",
+            data: process
+        });
+    }
+
+    /**
+     * API update processing course for user
+     */
+    updateProcessing = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const lessonId = req.body.lessonId;
+        const time = req.body.time;
+        const isDone = req.body.isDone;
+        const process = await this.processingService.updateProcessing(userId, lessonId, time, isDone);
+        return res.status(200).json({
+            message: "Successful",
+            data: process
+        });
+    }
+
 }
