@@ -174,4 +174,38 @@ export class UserController{
             data: profile
         });
     }
+
+    /**
+     * Get user information details for admin
+     */
+    getUserDetail = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const user = await this.userService.getUser(userId);
+        const totalCoursesEnrollment = await this.userService.getTotalCoursesEnrollment(userId);
+        const { totalPayment ,totalAmount } = await this.userService.getTotalAmountPaid(userId);
+        return res.status(200).json({
+            message: "Successful",
+            data: {
+                user: user,
+                totalCoursesEnrollment: totalCoursesEnrollment,
+                totalPayment: totalPayment,
+                totalAmount: totalAmount
+            }
+        });
+    }
+
+    /**
+     * Get users for admin
+     */
+    getUsers = async (req: Request, res: Response) => {
+        const results = await this.userService.getUsers(req);
+        return res.status(200).json({
+            message: "Successful",
+            page: req.query.page || 1,
+            pageSize: req.query.pageSize || 10,
+            totalCount: results.count,
+            data: results.rows
+        });
+    }
+
 }

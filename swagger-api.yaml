@@ -29,6 +29,8 @@ tags:
     description: API for comments
   - name: user
     description: API for users
+  - name: admin
+    description: API users for admin
   - name: instructor
     description: API for instructors
   - name: payment
@@ -1762,6 +1764,96 @@ paths:
                 type: number
                 default: 1
           summary: Get list instructor
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/{userId}:
+    get:
+          tags:
+            - admin
+          parameters:
+            - name: userId
+              in: path
+              description: Enter userId
+              required: true
+              schema:
+                type: number
+                default: 1
+          summary: Get user information details (for Admin)
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users:
+    get:
+          tags:
+            - admin
+          parameters:
+          - name: search
+            in: query
+            description: Search by email or username
+            required: false
+            explode: true
+            schema:
+              type: string
+          - name: roleId
+            in: query
+            description: To filter by role user (1 - user, 2 - instructor, 3 - admin)
+            required: false
+            explode: true
+            schema:
+              type: number
+          - name: isActive
+            in: query
+            description: Filter by account is active or not
+            required: false
+            explode: true
+            schema:
+              type: boolean
+          - name: sortBy
+            in: query
+            description: Choose addition to sort, default sortBy id
+            required: false
+            explode: true
+            schema:
+              type: array
+              items:
+                type: string
+                enum:
+                  - id
+                  - roleId
+                  - createdAt
+          - name: sortType
+            in: query
+            description: Default sort ASC, if you want change to DESC, select below
+            required: false
+            explode: true
+            schema:
+              type: array
+              items:
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+                default: ASC
+          - name: page
+            in: query
+            description: Use to pagination, default page = 1
+            required: false
+            explode: true
+            schema:
+              type: number
+          - name: pageSize
+            in: query
+            description: Use to pagination, default pageSize = 10
+            required: false
+            explode: true
+            schema:
+              type: number
+          summary: Get user information details (for Admin)
           responses:
             '200':
               description: Successful
