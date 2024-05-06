@@ -59,7 +59,13 @@ export class UserService implements IUserService {
     }
 
     async getCarts(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
-        return await this.userRepository.getCarts(userId, search);
+        const {rows, count} = await this.userRepository.getCarts(userId, search);
+        if(rows.length > 0) {
+            if(rows[0].carts.length > 0) {
+                rows[0].setDataValue('carts', await this.handleS3.getResourceCourses(rows[0].carts));
+            }
+        }
+        return {rows, count};
     }
 
     async getFavoriteCourses(userId: number, search: string): Promise<{ rows: User[]; count: number; }> {
