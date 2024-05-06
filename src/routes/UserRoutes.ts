@@ -24,6 +24,7 @@ class UserRoutes extends BaseRoutes {
 		this.router.get('/instructors/:instructorId',validateGetInstructorDetail, validate, this.controller.getInstructorDetail);
 		this.router.get('/profile', auth, this.controller.getUserInformation);
 		this.router.put('/profile/',auth, validateUpdateProfile, validate, this.controller.updateUserInformation);
+		this.router.get('/percent-complete-course', this.controller.getCompletionPercentageCourse);
 		/**
 		 * API for admin
 		 */

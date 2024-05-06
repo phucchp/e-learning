@@ -10,6 +10,7 @@ import { Profile } from "../models/Profile";
 import { Topic } from "../models/Topic";
 import { Lesson } from "../models/Lesson";
 import { Review } from "../models/Review";
+import { NotFound } from "../utils/CustomError";
 
 @Service()
 export class CourseRepository extends BaseRepository<Course> implements ICourseRepository{
@@ -136,4 +137,33 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
         });
         return course;
     }
+
+    async getAllLessonOfCourse(courseId: string): Promise<Course> {
+        const course = await this.model.findOne({
+            where: {
+                courseId: courseId
+            },
+            include: [
+                {
+                    model: Topic,
+                    attributes: ['id' ,'name'], 
+                    include: [
+                        {
+                            model: Lesson,
+                            attributes: ['id' ,'title', 'duration', 'isPreview'],
+                        },
+                    ],
+                }
+               
+            ],
+            
+        });
+
+        if(!course) {
+            throw new NotFound('Course not found!');
+        }
+
+        return course;
+    }
+
 }

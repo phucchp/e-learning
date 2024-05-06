@@ -1665,6 +1665,25 @@ paths:
               description: Successful
           security:
             - bearerAuth: []
+  /users/percent-complete-course:
+    get:
+          tags:
+            - user
+          summary: Get percent complete course of user
+          parameters:
+            - name: courseId
+              in: query
+              description: Enter string courseId
+              required: false
+              explode: true
+              schema:
+                type: string
+                default: '12-strategies-for-dealing-with-difficult-people-0564f951-1714883817206'
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
     post:
           tags:
             - user

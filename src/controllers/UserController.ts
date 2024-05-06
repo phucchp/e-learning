@@ -3,7 +3,7 @@ import { ICartService } from "../services/interfaces/ICartService";
 import { IUserService } from "../services/interfaces/IUserService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { ServerError, UnauthorizedError } from "../utils/CustomError";
+import { BadRequestError, ServerError, UnauthorizedError } from "../utils/CustomError";
 import { CartService } from "../services/CartService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
 import { EnrollmentService } from "../services/EnrollmentService";
@@ -208,4 +208,19 @@ export class UserController{
         });
     }
 
+    /**
+     * Get users for admin
+     */
+    getCompletionPercentageCourse = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const courseId = req.query.courseId;
+        if (!courseId) {
+            throw new BadRequestError('courseId is required');
+        }
+        const data = await this.userService.getCompletionPercentageCourse(userId, courseId.toString());
+        return res.status(200).json({
+            message: "Successful",
+            data: data
+        });
+    }
 }

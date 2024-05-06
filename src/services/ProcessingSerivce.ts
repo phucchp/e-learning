@@ -77,8 +77,14 @@ export class ProcessingService implements IProcessingService {
         return 100;
     }
 
+    /**
+     * Get newest processing of user
+     * @param userId 
+     * @param courseId 
+     */
     async getNewestProcessing(userId: number, courseId: number): Promise<Processing> {
         // get theo ngay update moi nhat
+        // Để khi user bấm vào khoá học thì sẽ tiếp tục học từ bài trước
         
         throw new Error('Method not implemented.');
     }

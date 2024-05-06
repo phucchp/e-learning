@@ -18,4 +18,5 @@ export interface ICourseService {
     getCourseByTopicId(topicId: number): Promise<Course>;
     createDataCourseForPayment(courseIds: string[]): Promise<any>;
     getCoursesByCourseIds(courseIds: number[]): Promise<Course[]>;
+    getLessonIdsOfCourse(courseId: string): Promise<number[]>;
 }
