@@ -21,6 +21,7 @@ class UserRoutes extends BaseRoutes {
 		this.router.post('/cloud-front/clear-cache-avatar',auth, this.controller.clearCacheAvatar);
 		this.router.get('/instructors', validateGetListInstructors, validate, this.controller.getListInstructors);
 		this.router.get('/instructors/:instructorId',validateGetInstructorDetail, validate, this.controller.getInstructorDetail);
+		this.router.get('/profile', auth, this.controller.getUserInformation);
 		this.router.put('/profile/',auth, validateUpdateProfile, validate, this.controller.updateUserInformation);
 	}
 }

@@ -3,24 +3,27 @@ import { ICartService } from "../services/interfaces/ICartService";
 import { IUserService } from "../services/interfaces/IUserService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
-import { UnauthorizedError } from "../utils/CustomError";
+import { ServerError, UnauthorizedError } from "../utils/CustomError";
 import { CartService } from "../services/CartService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
 import { EnrollmentService } from "../services/EnrollmentService";
 import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
+import { HandleS3 } from "../services/utils/HandleS3";
 
 export class UserController{
 	private userService: IUserService;
     private cartService: ICartService;
     private enrollmentService: IEnrollmentService;
     private courseService: ICourseService;
+    private handleS3: HandleS3;
 
 	constructor() {
 		this.userService = Container.get(UserService);
 		this.cartService = Container.get(CartService);
 		this.enrollmentService = Container.get(EnrollmentService);
 		this.courseService = Container.get(CourseService);
+		this.handleS3 = Container.get(HandleS3);
 	}
     
     //--------------CART------------------//
@@ -145,6 +148,22 @@ export class UserController{
         });
     }
 
+    /**
+     * Get user information
+     */
+    getUserInformation = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const data = await this.userService.getUserInformation(userId);
+        if(!data.profile) { 
+            throw new ServerError('Profile user not found!');
+        }
+        data.setDataValue('profile', await this.handleS3.getAvatarUser(data.profile))
+        return res.status(200).json({
+            message: "Successful",
+            data:data
+        });
+    }
+    
     /**
      * Update user profile information
      */

@@ -12,7 +12,7 @@ export class LessonRepository extends BaseRepository<Lesson> implements ILessonR
 		super(Lesson);
 	}
 
-	async getLessonDetails(lessonId: number, userId: number): Promise<Lesson|null> {
+	async getLessonDetails(lessonId: number): Promise<Lesson|null> {
 		return await this.model.findOne({
 			where: {
                 id: lessonId

@@ -10,7 +10,7 @@ class LessonRoutes extends BaseRoutes {
 		super(new LessonController());
 	}
 	public routes(): void {
-		this.router.get('/:lessonId',authUser, validateGetLesson, this.controller.getLesson);
+		this.router.get('/:lessonId',auth, authUser, validateGetLesson, this.controller.getLesson);
 		this.router.post('/',authInstructor, validateCreateLessons, validate, this.controller.createLessons);
 		this.router.delete('/:lessonId',authInstructor, validateDeleteLesson, validate, this.controller.deleteLesson);
 		this.router.put('/:lessonId',authInstructor, validateUpdateLesson, validate, this.controller.updateLesson);

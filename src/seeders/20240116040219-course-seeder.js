@@ -1,5 +1,5 @@
-// 'use strict';
-// const { faker } = require('@faker-js/faker');
+'use strict';
+const { faker } = require('@faker-js/faker');
 
 // const generateRandomCourse = () => ({
 //   course_id: faker.string.uuid(), // Generate unique IDs
@@ -26,13 +26,13 @@
 //   updated_at: new Date(),
 // });
 // const courses = [...Array(100)].map(() => generateRandomCourse());
-// /** @type {import('sequelize-cli').Migration} */
-// module.exports = {
-//   async up (queryInterface, Sequelize) {
-//     await queryInterface.bulkInsert('courses', courses, {});
-//   },
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up (queryInterface, Sequelize) {
+    // await queryInterface.bulkInsert('courses', courses, {});
+  },
 
-//   async down (queryInterface, Sequelize) {
-//     await queryInterface.bulkDelete('courses', null, {});
-//   }
-// };
+  async down (queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('courses', null, {});
+  }
+};

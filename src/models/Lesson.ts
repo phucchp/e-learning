@@ -25,7 +25,7 @@ export class Lesson extends Model<Lesson> {
 
   @AllowNull(false)
   @Column({
-    type: DataType.STRING(150),
+    type: DataType.STRING,
   })
   title!: string;
 
