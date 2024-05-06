@@ -7,16 +7,24 @@ import { ReviewService } from "../services/ReviewService";
 import { NotEnoughAuthority } from "../utils/CustomError";
 import { ITopicService } from "../services/interfaces/ITopicService";
 import { TopicService } from "../services/TopicService";
+import { UserService } from "../services/UserService";
+import { IUserService } from "../services/interfaces/IUserService";
+import { CartService } from "../services/CartService";
+import { ICartService } from "../services/interfaces/ICartService";
 
 export class CourseController{
 	private courseService: ICourseService;
 	private reviewService: IReviewService;
 	private topicService: ITopicService;
+	private userService: IUserService;
+	private cartService: ICartService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
 		this.reviewService = Container.get(ReviewService);
 		this.topicService = Container.get(TopicService);
+		this.userService = Container.get(UserService);
+		this.cartService = Container.get(CartService);
 
 	}
 
@@ -41,14 +49,20 @@ export class CourseController{
         const groupReview = await this.reviewService.getStatiscalReviews(courseId);
         const userId = req.payload.userId;
         let isCourseFavorite = false;
+        let percentCompleteCourse = null;
+        let isAddedToCart = false;
         if(userId) {
             isCourseFavorite = await this.courseService.isCourseFavorite(course.id, userId);
+            percentCompleteCourse = await this.userService.getCompletionPercentageCourse(userId, courseId);
+            isAddedToCart = await this.cartService.isCourseInCartUser(userId, course.id);
         }
         return res.status(200).json({
             message: "successfully",
             data: {
                 course,
-                isCourseFavorite
+                isCourseFavorite,
+                percentCompleteCourse,
+                isAddedToCart
             },
             groupReview: groupReview.rows
         });
