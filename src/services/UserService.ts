@@ -18,6 +18,10 @@ import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRep
 import { PaymentRepository } from '../repositories/PaymentRepository';
 import { IPaymentRepository } from '../repositories/interfaces/IPaymentRepository';
 import { Op } from 'sequelize';
+import { ProcessingRepository } from '../repositories/ProcessingRepository';
+import { IProcessingRepository } from '../repositories/interfaces/IProcessingRepository';
+import { CourseService } from './CourseService';
+import { ICourseService } from './interfaces/ICourseService';
 
 @Service()
 export class UserService implements IUserService {
@@ -33,6 +37,12 @@ export class UserService implements IUserService {
 
     @Inject(() => PaymentRepository)
 	private paymentRepository!: IPaymentRepository;
+
+    @Inject(() => ProcessingRepository)
+	private processingRepository!: IProcessingRepository;
+
+    @Inject(() => CourseService)
+	private courseService!: ICourseService;
 
     @Inject(() => HandleS3)
 	private handleS3!: HandleS3;
@@ -261,5 +271,32 @@ export class UserService implements IUserService {
             totalPayment : count,
             totalAmount : totalAmount
         }
+    }
+
+    /**
+     * Statistics on how many % of a course a user has learned
+     * @param userId 
+     */
+    async getCompletionPercentageCourse(userId: number, courseId: string): Promise<{
+        percent: number,
+        totalLesson: number,
+        totalDone: number
+    }> {
+        const lessonIds = await this.courseService.getLessonIdsOfCourse(courseId);
+        const processing = await this.processingRepository.getAll({
+            where: {
+                userId: userId,
+                lessonId: {
+					[Op.in]:lessonIds
+				},
+                isDone: true
+            }
+        });
+
+        return {
+            percent: (processing.length / lessonIds.length)* 100,
+            totalLesson: lessonIds.length,
+            totalDone: processing.length
+        };
     }
 }

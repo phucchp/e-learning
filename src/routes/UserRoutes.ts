@@ -1,7 +1,7 @@
 import { UserController } from "../controllers/UserController";
 import { auth, authAdmin } from "../middlewares/AuthMiddleware";
 import { validateAddFavoriteCourse, validateDeleteFavoriteCourse, validateGetInstructorDetail, validateGetListInstructors, validateUpdateProfile } from "../validators/CourseValidator";
-import { validateGetUser, validateGetUsers } from "../validators/UserValidator";
+import { validateGetPercentCompleteCourse, validateGetUser, validateGetUsers, validateUpdateProcessing, validateAddProcessing, validateGetNewestProcessing } from "../validators/UserValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
 
@@ -24,6 +24,10 @@ class UserRoutes extends BaseRoutes {
 		this.router.get('/instructors/:instructorId',validateGetInstructorDetail, validate, this.controller.getInstructorDetail);
 		this.router.get('/profile', auth, this.controller.getUserInformation);
 		this.router.put('/profile/',auth, validateUpdateProfile, validate, this.controller.updateUserInformation);
+		this.router.get('/percent-complete-course',auth, validateGetPercentCompleteCourse, validate, this.controller.getCompletionPercentageCourse);
+		this.router.post('/processing',auth, validateAddProcessing, validate, this.controller.addProcessing);
+		this.router.put('/processing',auth, validateUpdateProcessing, validate, this.controller.updateProcessing);
+		this.router.get('/newest-processing',auth, validateGetNewestProcessing, validate, this.controller.getNewestProcessing);
 		/**
 		 * API for admin
 		 */

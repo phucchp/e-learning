@@ -482,6 +482,11 @@ export class CourseService implements ICourseService {
         };
     }
 
+    /**
+     * Get list courses by courseIds
+     * @param courseIds 
+     * @returns 
+     */
     async getCoursesByCourseIds(courseIds: number[]): Promise<Course[]> {
         return await this.courseRepository.getAll({
             where: {
@@ -491,4 +496,22 @@ export class CourseService implements ICourseService {
             }
         });
     }
+
+    /**
+     * Get list lessonIds of Course
+     * @param courseId 
+     * @returns 
+     */
+    async getLessonIdsOfCourse(courseId: string): Promise<number[]> {
+        const course = await this.courseRepository.getAllLessonOfCourse(courseId);
+        const lessonIds: number[] = [];
+        for (const topic of course.topics) {
+            for(const lesson of topic.lessons) {
+                lessonIds.push(lesson.id);
+            }
+        }
+
+        return lessonIds;
+    }
+
 }

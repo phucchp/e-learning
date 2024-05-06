@@ -1705,6 +1705,93 @@ paths:
                     message: successfully
           security:
             - bearerAuth: []
+  /users/percent-complete-course:
+    get:
+          tags:
+            - user
+          summary: Get percent complete course of user
+          parameters:
+            - name: courseId
+              in: query
+              description: Enter string courseId
+              required: false
+              explode: true
+              schema:
+                type: string
+                default: '12-strategies-for-dealing-with-difficult-people-0564f951-1714883817206'
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/newest-processing:
+    get:
+          tags:
+            - user
+          summary: Get newest processing learning course for user
+          parameters:
+            - name: courseId
+              in: query
+              description: Enter string courseId
+              required: false
+              explode: true
+              schema:
+                type: string
+                default: '12-strategies-for-dealing-with-difficult-people-0564f951-1714883817206'
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+  /users/processing:
+    post:
+          tags:
+            - user
+          summary: Add processing course for user
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    lessonId:
+                      type: number
+                      default: 1
+                    time:
+                      type: number
+                      default: 1
+                    isDone:
+                      type: boolean
+                      default: false
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
+    put:
+          tags:
+            - user
+          summary: Update processing course for user
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    lessonId:
+                      type: number
+                      default: 1
+                    time:
+                      type: number
+                      default: 1
+                    isDone:
+                      type: boolean
+                      default: false
+          responses:
+            '200':
+              description: Successful
+          security:
+            - bearerAuth: []
   /users/presign-url/upload-avatar:
     get:
           tags:

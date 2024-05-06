@@ -17,4 +17,9 @@ export interface IUserService {
     updateUserInformation(req: Request): Promise<Profile>;
     getTotalCoursesEnrollment(userId: number): Promise<number>;
     getTotalAmountPaid(userId: number): Promise<{totalPayment: number, totalAmount: number}>;
+    getCompletionPercentageCourse(userId: number, courseId: string): Promise<{
+        percent: number,
+        totalLesson: number,
+        totalDone: number
+    }>;
 }
