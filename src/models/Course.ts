@@ -11,6 +11,7 @@ import { Enrollment } from './Enrollment';
 import { Cart } from './Cart';
 import { Review } from './Review';
 import { PaymentDetail } from './PaymentDetail';
+import { CourseTag } from './CourseTag';
 
 @Table({
   tableName: 'courses',
@@ -196,6 +197,9 @@ export class Course extends Model<Course> {
   // reviews!: User[];
   @HasMany(() => Review)
   reviews!: Review[];
+
+  @HasMany(() => CourseTag)
+  courseTags!: CourseTag[];
 
   @HasMany(() => Enrollment)
   enrollments!: Enrollment[];

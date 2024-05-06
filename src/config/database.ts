@@ -24,6 +24,8 @@ import { Remind } from '../models/Remind';
 import { Question } from '../models/Question';
 import { Answer } from '../models/Answer';
 import { InstructorPayment } from '../models/InstructorPayment';
+import { CourseTag } from '../models/CourseTag';
+import { Tag } from '../models/Tag';
 
 
 dotenv.config();
@@ -109,6 +111,8 @@ class Database {
 			Question,
 			Answer,
 			InstructorPayment,
+			Tag,
+			CourseTag
 		]);
 
 		await this.sequelize
