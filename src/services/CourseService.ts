@@ -374,7 +374,7 @@ export class CourseService implements ICourseService {
         const favorite = await this.favoriteRepository.findOneByCondition({
             courseId: courseId,
             userId: userId
-        }, true);
+        },[], true);
         if(!favorite){
             return false;
         }
@@ -402,7 +402,6 @@ export class CourseService implements ICourseService {
     async addCourseFavorite(courseId: string, userId: number): Promise<boolean> {
         const course  = await this.courseRepository.findOneByCondition({
             courseId: courseId,
-            active: true
         });
         // Check course is exist
         if(!course){
@@ -413,7 +412,7 @@ export class CourseService implements ICourseService {
             // Return error if user already favorited course
             throw new DuplicateError('The user already favorited the course before.');
         }
-
+        console.log('ok');
         await this.favoriteRepository.create({
             courseId: course.id,
             userId: userId
@@ -425,7 +424,6 @@ export class CourseService implements ICourseService {
     async deleteCourseFavorite(courseId: string, userId: number): Promise<boolean> {
         const course  = await this.courseRepository.findOneByCondition({
             courseId: courseId,
-            active: true
         });
         // Check course is exist
         if(!course){
