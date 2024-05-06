@@ -49,7 +49,7 @@ export class UserController{
     }
 
     addCourseToCart = async (req: Request, res: Response) => {
-        const userId = 1;
+        const userId = req.payload.userId;
         const courseId = req.body.courseId;
         await this.cartService.addCourseToCart(userId, courseId);
         return res.status(202).json({
