@@ -753,6 +753,110 @@ paths:
           description: Can not get lesson information
       security:
         - bearerAuth: []
+  /lessons/{lessonId}/subtitles:
+    get:
+      tags:
+        - lesson
+      summary: Get subtitle of lesson by lessonId and languageCode
+      parameters:
+        - name: lessonId
+          in: path
+          description: Enter lessonId
+          required: true
+          schema:
+            type: string
+            default: '1'
+        - name: languageCode
+          in: query
+          description: languageCode of subtitle
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: 'en'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - lesson
+      summary: Add new subtitle
+      parameters:
+        - name: lessonId
+          in: path
+          description: Enter lessonId
+          required: true
+          schema:
+            type: string
+            default: '1'
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageId:
+                  type: number
+      security:
+        - bearerAuth: []
+  /lessons/subtitles/{subtitleId}/presigned-url:
+    get:
+      tags:
+        - lesson
+      summary: Get pre-signedUrl to update subtitle to S3
+      parameters:
+        - name: subtitleId
+          in: path
+          description: Enter subtitleId
+          required: true
+          schema:
+            type: string
+            default: '1'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get lesson information
+      security:
+        - bearerAuth: []
+  /lessons/subtitles/{subtitleId}:
+    delete:
+      tags:
+        - lesson
+      summary: Deletes a subtitle of lesson by subtitleId
+      parameters:
+        - name: subtitleId
+          in: path
+          description: subtitleId to delete
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
   /categories:
     get:
       tags:

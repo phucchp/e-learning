@@ -36,4 +36,22 @@ export const validateUpdateLesson = [
 
 export const validateGetUrlUploadVideo = [
     query('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+];
+
+export const validateGetSubtitle = [
+    param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+    query('languageCode').notEmpty().withMessage('languageCode is required').isString().withMessage('languageCode must be a string')
+];
+
+export const validateGetPresignUrlUpdateSubtitle = [
+    param('subtitleId').notEmpty().withMessage('subtitleId is required').isInt({min:1}).withMessage('subtitleId must be an number')
+]
+
+export const validateAddSubtitle = [
+    param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+    body('languageId').notEmpty().withMessage('languageId is required').isInt({min:1}).withMessage('languageId must be an number')
+]
+
+export const validateDeleteSubtitle = [
+    param('subtitleId').notEmpty().withMessage('subtitleId is required').isInt({min:1}).withMessage('subtitleId must be an number')
 ]
