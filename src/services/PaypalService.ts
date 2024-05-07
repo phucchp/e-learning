@@ -79,7 +79,7 @@ export class PaypalService {
         // Viết hàm tạo payment and payment details
         const {totalPrice, items} = await this.courseService.createDataCourseForPayment(courseIds);
         const accessToken = await this.generateAccessToken();
-        const { PAYPAL_BASE_API } = process.env;
+        const { PAYPAL_BASE_API, CLIENT_URL } = process.env;
         if(!PAYPAL_BASE_API) {
             throw new Error("MISSING_API_CREDENTIALS PAYPAL");;
         }
@@ -102,6 +102,13 @@ export class PaypalService {
             items: items
             },
         ],
+        application_context: {
+            brand_name: 'ALPHA E-LEARNING',
+            landing_page: 'LOGIN',
+            user_action: 'PAY_NOW',
+            return_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill',
+            cancel_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill/cancel',
+        },
         };
         
         const response = await fetch(url, {
