@@ -11,6 +11,8 @@ import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
 import { SubtitleService } from "../services/SubtitleService";
 import { ISubtitleService } from "../services/interfaces/ISubtitleService";
+import { IResourceService } from "../services/interfaces/IResourceService";
+import { ResourceService } from "../services/ResourceService";
 
 export class LessonController{
 	private lessonService: ILessonService;
@@ -18,6 +20,7 @@ export class LessonController{
 	private userService: IUserService;
 	private courseService: ICourseService;
 	private subtitleService: ISubtitleService;
+	private resourceService: IResourceService;
 
 	constructor() {
 		this.lessonService = Container.get(LessonService);
@@ -25,6 +28,7 @@ export class LessonController{
 		this.userService = Container.get(UserService);
 		this.courseService = Container.get(CourseService);
 		this.subtitleService = Container.get(SubtitleService);
+		this.resourceService = Container.get(ResourceService);
 	}
 
     getLesson = async (req: Request, res: Response) => {
@@ -212,4 +216,37 @@ export class LessonController{
         });
     }
 
+    //=================== RESOURCE FOR LESSON ===============================
+    getResource = async (req: Request, res: Response) => {
+        const resourceId = req.params.resourceId;
+        // Check user is admin or is instructor owner this course or user enrollment course
+        const resource = await this.resourceService.getResource(Number(resourceId));
+        return res.status(200).json({
+            message: "Successful",
+            data: resource
+        });
+    }
+
+    getAllResourceOfLesson = async (req: Request, res: Response) => {
+        const lessonId = req.params.lessonId;
+        const resources = await this.resourceService.getAllResourceOfLesson(Number(lessonId));
+        return res.status(200).json({
+            message: "Successful",
+            data: resources
+        });
+    }
+
+    createResource = async (req: Request, res: Response) => {
+        const lessonId = req.body.lessonId;
+        const name = req.body.name;
+        const newResource = await this.resourceService.createResource(name, lessonId);
+    }
+
+    deleteResource = async (req: Request, res: Response) => {
+        const resourceId = req.params.resourceId;
+        const resource = await this.resourceService.deleteResource(Number(resourceId));
+        return res.status(200).json({
+            message: "Successful"
+        });
+    }
 }
