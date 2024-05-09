@@ -20,6 +20,8 @@ class LessonRoutes extends BaseRoutes {
 		this.router.get('/subtitles/:subtitleId/presigned-url', auth, authInstructor, validateGetPresignUrlUpdateSubtitle, validate, this.controller.getPresignUrlUpdateSubtitle); // Get link subtitles by language code
 		this.router.post('/:lessonId/subtitles', auth, authInstructor, validateAddSubtitle, validate, this.controller.addSubtitle);
 		this.router.delete('/subtitles/:subtitleId', auth, authInstructor, validateDeleteSubtitle, validate, this.controller.deleteSubtitle);
+		// Resource for lesson
+		
 	}
 }
 

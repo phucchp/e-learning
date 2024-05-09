@@ -36,7 +36,8 @@ export class LessonService implements ILessonService {
        if(!lesson) {
         throw new NotFound("Lesson Not Found");
        }
-       lesson.lessonUrl = await this.s3Service.getObjectUrl(lesson.lessonUrl);
+       const lessonUrl = lesson.lessonUrl || 'lessons/defaults/video.mp4'
+       lesson.lessonUrl = await this.s3Service.getObjectUrl(lessonUrl);
        return lesson;
     }   
 

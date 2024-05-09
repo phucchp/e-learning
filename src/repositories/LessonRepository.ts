@@ -4,6 +4,7 @@ import { ILessonRepository } from "./interfaces/ILessonRepository";
 import { BaseRepository } from "./BaseRepository";
 import { Note } from "../models/Note";
 import { Remind } from "../models/Remind";
+import { Comment } from "../models/Comment";
 
 @Service()
 export class LessonRepository extends BaseRepository<Lesson> implements ILessonRepository{
@@ -17,6 +18,17 @@ export class LessonRepository extends BaseRepository<Lesson> implements ILessonR
 			where: {
                 id: lessonId
             },
+			include: [
+                {
+                    model: Note,
+                },
+				{
+                    model: Comment,
+                },
+				{
+                    model: Remind,
+                },
+			],
             attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] },
 		});
 	}

@@ -13,6 +13,8 @@ import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
 import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
 import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
+import { UserService } from './UserService';
+import { IUserService } from './interfaces/IUserService';
 
 @Service()
 export class ReviewService implements IReviewService {
@@ -25,6 +27,9 @@ export class ReviewService implements IReviewService {
 
     @Inject(() => EnrollmentRepository)
 	private enrollmentRepository!: IEnrollmentRepository;
+
+    @Inject(() => UserService)
+	private userService!: IUserService;
     
     async getReviews(req: Request): Promise<{ rows: Review[]; count: number }> {
         let { rating, userId, courseId,sort, sortType , page, pageSize} = req.query;
@@ -64,7 +69,9 @@ export class ReviewService implements IReviewService {
         });
 
         if(!enrollmentCourse){
-            throw new NotEnoughAuthority('User must enrollment course to be rating');
+            if (!this.userService.isAdmin(userId)) {
+                throw new NotEnoughAuthority('User must enrollment course to be rating');
+            }
         }
 
         const reviewInstance = await this.reviewRepository.findOneByCondition({
