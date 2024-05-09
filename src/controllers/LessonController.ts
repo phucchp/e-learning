@@ -219,8 +219,23 @@ export class LessonController{
     //=================== RESOURCE FOR LESSON ===============================
     getResource = async (req: Request, res: Response) => {
         const resourceId = req.params.resourceId;
+        const userId = req.payload.userId;
         // Check user is admin or is instructor owner this course or user enrollment course
+        // Check user is enrollment course
         const resource = await this.resourceService.getResource(Number(resourceId));
+        const course = await this.courseService.getCourseByLessonId(resource.lessonId);
+        if(!course){ // Check course is exist
+            throw new NotFound('Course not found!');
+        }
+
+        if(
+            !await this.enrollmentService.isUserEnrollmentCourse(userId, course.id) // User is not enrollment course
+            && !await this.userService.isAdmin(userId) // User is not admin
+            && course.instructorId !== userId // User is not instructor owner this course
+        ){
+            throw new NotEnoughAuthority('User is not enrollment course!');
+        }
+
         return res.status(200).json({
             message: "Successful",
             data: resource
@@ -239,12 +254,42 @@ export class LessonController{
     createResource = async (req: Request, res: Response) => {
         const lessonId = req.body.lessonId;
         const name = req.body.name;
-        const newResource = await this.resourceService.createResource(name, lessonId);
+        const userId = req.payload.userId;
+        const course = await this.courseService.getCourseByLessonId(lessonId);
+        if(!course){ // Check course is exist
+            throw new NotFound('Course not found!');
+        }
+
+        if(
+            !await this.userService.isAdmin(userId) // User is not admin
+            && course.instructorId !== userId // User is not instructor owner this course
+        ){
+            throw new NotEnoughAuthority('User is not enrollment course!');
+        }
+        const newResource = await this.resourceService.createResource(lessonId, name);
+        return res.status(200).json({
+            message: "Successful",
+            data: newResource
+        });
     }
 
     deleteResource = async (req: Request, res: Response) => {
         const resourceId = req.params.resourceId;
-        const resource = await this.resourceService.deleteResource(Number(resourceId));
+        const userId = req.payload.userId;
+        const resource = await this.resourceService.getResource(Number(resourceId));
+        const course = await this.courseService.getCourseByLessonId(resource.lessonId);
+        if(!course){ // Check course is exist
+            throw new NotFound('Course not found!');
+        }
+
+        if(
+            !await this.userService.isAdmin(userId) // User is not admin
+            && course.instructorId !== userId // User is not instructor owner this course
+        ){
+            throw new NotEnoughAuthority('User is not enrollment course!');
+        }
+
+        await this.resourceService.deleteResource(Number(resourceId));
         return res.status(200).json({
             message: "Successful"
         });

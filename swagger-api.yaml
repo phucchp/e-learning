@@ -822,8 +822,8 @@ paths:
           description: Enter subtitleId
           required: true
           schema:
-            type: string
-            default: '1'
+            type: number
+            default: 1
       responses:
         '200':
           description: successful operation
@@ -855,6 +855,96 @@ paths:
             application/json:
               example:
                 message: successfully
+      security:
+        - bearerAuth: []
+  /lessons/{lessonId}/resources:
+    get:
+      tags:
+        - lesson
+      summary: Get all resource of lesson
+      parameters:
+        - name: lessonId
+          in: path
+          description: Enter lessonId
+          required: true
+          schema:
+            type: number
+            default: '1'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get resource of lesson
+      security:
+        - bearerAuth: []
+  /lessons/resources/{resourceId}:
+    get:
+      tags:
+        - lesson
+      summary: Get all resource of lesson
+      parameters:
+        - name: resourceId
+          in: path
+          description: Enter resourceId
+          required: true
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - lesson
+      summary: Deletes a resource of lesson by resourceId
+      parameters:
+        - name: resourceId
+          in: path
+          description: resourceId to delete
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        '200':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /lessons/resources:
+    post:
+      tags:
+        - lesson
+      summary: Add new resource for lessons
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: "code.zip"
+                lessonId:
+                  type: number
+                  default: 1
       security:
         - bearerAuth: []
   /categories:

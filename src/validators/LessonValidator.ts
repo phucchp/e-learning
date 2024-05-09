@@ -45,13 +45,31 @@ export const validateGetSubtitle = [
 
 export const validateGetPresignUrlUpdateSubtitle = [
     param('subtitleId').notEmpty().withMessage('subtitleId is required').isInt({min:1}).withMessage('subtitleId must be an number')
-]
+];
 
 export const validateAddSubtitle = [
     param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
     body('languageId').notEmpty().withMessage('languageId is required').isInt({min:1}).withMessage('languageId must be an number')
-]
+];
 
 export const validateDeleteSubtitle = [
     param('subtitleId').notEmpty().withMessage('subtitleId is required').isInt({min:1}).withMessage('subtitleId must be an number')
-]
+];
+
+// RESOURCE
+export const validateGetAllResource = [
+    param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number')
+];
+
+export const validateGetResource = [
+    param('resourceId').notEmpty().withMessage('resourceId is required').isInt({min:1}).withMessage('resourceId must be an number')
+];
+
+export const validateCreateResource = [
+    body('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+    body('name').notEmpty().withMessage('name is required').isString().withMessage('name must be an string').trim()
+];
+
+export const validateDeleteResource = [
+    param('resourceId').notEmpty().withMessage('resourceId is required').isInt({min:1}).withMessage('resourceId must be an number')
+];

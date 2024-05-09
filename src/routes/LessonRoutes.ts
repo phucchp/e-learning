@@ -1,6 +1,6 @@
 import { LessonController } from "../controllers/LessonController";
 import { auth, authInstructor, authUser } from "../middlewares/AuthMiddleware";
-import { validateCreateLessons, validateGetLesson, validateDeleteLesson,validateUpdateLesson, validateGetUrlUploadVideo, validateGetSubtitle, validateGetPresignUrlUpdateSubtitle, validateAddSubtitle, validateDeleteSubtitle  } from "../validators/LessonValidator";
+import { validateCreateLessons, validateGetLesson, validateDeleteLesson,validateUpdateLesson, validateGetUrlUploadVideo, validateGetSubtitle, validateGetPresignUrlUpdateSubtitle, validateAddSubtitle, validateDeleteSubtitle, validateCreateResource, validateDeleteResource, validateGetAllResource, validateGetResource  } from "../validators/LessonValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
 
@@ -21,7 +21,10 @@ class LessonRoutes extends BaseRoutes {
 		this.router.post('/:lessonId/subtitles', auth, authInstructor, validateAddSubtitle, validate, this.controller.addSubtitle);
 		this.router.delete('/subtitles/:subtitleId', auth, authInstructor, validateDeleteSubtitle, validate, this.controller.deleteSubtitle);
 		// Resource for lesson
-		
+		this.router.get('/:lessonId/resources', validateGetAllResource, validate, this.controller.getAllResourceOfLesson);
+		this.router.get('/resources/:resourceId', validateGetResource, validate, auth, this.controller.getResource);
+		this.router.post('/resources/', auth, validateCreateResource, validate, this.controller.createResource);
+		this.router.delete('/resources/:resourceId', auth, validateDeleteResource, validate, this.controller.deleteResource);
 	}
 }
 
