@@ -12,6 +12,8 @@ class CourseRoutes extends BaseRoutes {
 	public routes(): void {
 		this.router.get('/', validateGetCourses, validate, this.controller.getCourses);
 		this.router.get('/:courseId', authUser, validateGetCourse, validate, this.controller.getCourse);
+		this.router.get('/:courseId/presigned-url-to-upload-poster', auth, authInstructor, this.controller.getPresignedUrlToUploadPoster);
+		this.router.get('/:courseId/clear-cache-poster', auth, authInstructor, this.controller.clearCachePoster);
 		this.router.get('/:courseId/reviews', this.controller.getReviewsOfCourse);
 		this.router.put('/:courseId', auth, authInstructor, validateUpdateCourse, validate, this.controller.updateCourse);
 		this.router.post('/', auth, authInstructor, validateCreateCourse, validate, this.controller.createCourse);

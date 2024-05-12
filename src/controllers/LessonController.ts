@@ -104,7 +104,7 @@ export class LessonController{
         const userId = req.payload.userId;
         const lessonId = Number(req.query.lessonId);
         const course = await this.courseService.getCourseByLessonId(lessonId);
-        if(course.instructorId !== userId || !await this.userService.isAdmin(userId)){
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
             throw new NotEnoughAuthority('User is not owner course or user is not admin!');
         }
 

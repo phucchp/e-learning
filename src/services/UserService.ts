@@ -115,7 +115,6 @@ export class UserService implements IUserService {
             await this.profileRepository.updateInstance(profile);
             url = await this.s3Service.generatePresignedUrlUpdate(profile.avatar, 'image/jpeg');
         }
-        url = await this.s3Service.generatePresignedUrlUpdate('ok.jpg', 'image/jpeg');
 
         return url;
     }
