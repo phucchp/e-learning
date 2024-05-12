@@ -38,6 +38,8 @@ export class PaymentController{
         }
         const paymentNotCheckout = await this.paymentService.getPaymentNotCheckout(userId);
         if(!paymentNotCheckout) {
+            console.log('Ok');
+            console.log(courseIds);
             const {jsonResponse, httpStatusCode} = await this.paypalService.createOrder(userId, courseIds);
             return res.status(200).json(jsonResponse);
         }
