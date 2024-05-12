@@ -492,7 +492,7 @@ export class CourseService implements ICourseService {
     async getCoursesByCourseIds(courseIds: number[]): Promise<Course[]> {
         return await this.courseRepository.getAll({
             where: {
-                courseId: {
+                id: {
 					[Op.in]:courseIds
 				}
             }
