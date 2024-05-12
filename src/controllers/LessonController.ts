@@ -102,10 +102,10 @@ export class LessonController{
 
     getLinkUpdateVideo = async (req: Request, res: Response) => {
         const userId = req.payload.userId;
-        const lessonId = Number(req.params.lessonId);
+        const lessonId = Number(req.query.lessonId);
         const course = await this.courseService.getCourseByLessonId(lessonId);
-        if(course.instructorId !== userId){
-            throw new NotEnoughAuthority('User is not enrollment course!');
+        if(course.instructorId !== userId || !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
         }
 
         const url = await this.lessonService.getLinkUpdateVideoLesson(lessonId);

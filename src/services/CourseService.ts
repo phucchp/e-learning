@@ -412,7 +412,6 @@ export class CourseService implements ICourseService {
             // Return error if user already favorited course
             throw new DuplicateError('The user already favorited the course before.');
         }
-        console.log('ok');
         await this.favoriteRepository.create({
             courseId: course.id,
             userId: userId

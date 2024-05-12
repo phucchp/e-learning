@@ -39,6 +39,8 @@ export class PaypalService {
     @Inject(() => Mail)
 	private mail!: Mail;
 
+    private CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+
     /**
     * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
     * @see https://developer.paypal.com/api/rest/authentication/
@@ -78,6 +80,7 @@ export class PaypalService {
         // Viết 1 hàm tính tổng tiền + tạo mảng items từ list course_id từ client gửi lên
         // Viết hàm tạo payment and payment details
         const {totalPrice, items} = await this.courseService.createDataCourseForPayment(courseIds);
+        console.log(`Total price: ${totalPrice}`);
         const accessToken = await this.generateAccessToken();
         const { PAYPAL_BASE_API, CLIENT_URL } = process.env;
         if(!PAYPAL_BASE_API) {
@@ -107,7 +110,7 @@ export class PaypalService {
             landing_page: 'LOGIN',
             user_action: 'PAY_NOW',
             return_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill',
-            cancel_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill/cancel',
+            cancel_url: CLIENT_URL+'/bill/cancel' || 'http://localhost:3000/bill/cancel',
         },
         };
         

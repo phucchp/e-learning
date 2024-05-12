@@ -7,16 +7,20 @@ import { ICourseService } from "../services/interfaces/ICourseService";
 import { EnrollmentService } from "../services/EnrollmentService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
 import { NotEnoughAuthority } from "../utils/CustomError";
+import { UserService } from "../services/UserService";
+import { IUserService } from "../services/interfaces/IUserService";
 
 export class CommentController{
 	private commentService: ICommentService;
 	private courseService: ICourseService;
 	private enrollmentService: IEnrollmentService;
+	private userService: IUserService;
 
 	constructor() {
 		this.commentService = Container.get(CommentService);
 		this.courseService = Container.get(CourseService);
 		this.enrollmentService = Container.get(EnrollmentService);
+		this.userService = Container.get(UserService);
 	}
 
     createComment = async (req: Request, res: Response) => {
@@ -25,7 +29,12 @@ export class CommentController{
         // Check user is enrolled course
         const course = await this.courseService.getCourseByLessonId(lessonId);
         if (!await this.enrollmentService.isUserEnrollmentCourse(userId, course.id)) {
-            throw new NotEnoughAuthority('User is not enrolled course, can not comment!');
+            if(
+                !await this.userService.isAdmin(userId) // User is not admin
+                && course.instructorId !== userId // User is not instructor owner this course
+            ) {
+                throw new NotEnoughAuthority('User is not enrolled course, can not comment!');
+            }
         }
         const comment = await this.commentService.createComment(userId, lessonId, parentId, content);
         return res.status(200).json({
