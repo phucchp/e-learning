@@ -107,7 +107,7 @@ export class PaypalService {
             landing_page: 'LOGIN',
             user_action: 'PAY_NOW',
             return_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill',
-            cancel_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill/cancel',
+            cancel_url: CLIENT_URL+'/bill/cancel' || 'http://localhost:3000/bill/cancel',
         },
         };
         
