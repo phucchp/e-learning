@@ -14,6 +14,8 @@ import { EnrollmentService } from './EnrollmentService';
 import { UserService } from './UserService';
 import { IUserService } from './interfaces/IUserService';
 import Mail from '../utils/Mail';
+import { CartService } from './CartService';
+import { ICartService } from './interfaces/ICartService';
 
 @Service()
 export class PaypalService {
@@ -35,6 +37,9 @@ export class PaypalService {
 
     @Inject(() => UserService)
 	private userService!: IUserService;
+
+    @Inject(() => CartService)
+	private cartService!: ICartService;
 
     @Inject(() => Mail)
 	private mail!: Mail;
@@ -198,6 +203,12 @@ export class PaypalService {
                 const user = await this.userService.getUserInformation(payment.userId);
                 const courses = await this.courseService.getCoursesByCourseIds(courseIds);
                 await this.mail.sendBill(user, courses, paymentDetails); 
+                // Clear cart user
+                const courseIdsString: string[] =[];
+                for (const course of courses) {
+                    courseIdsString.push(course.courseId);
+                }
+                await this.cartService.deleteCoursesFromCart(payment.userId, courseIdsString);
                 return payment;
             }
         }
