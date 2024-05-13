@@ -10,6 +10,8 @@ import { Op } from 'sequelize';
 import { NotFound } from "../utils/CustomError";
 import { Profile } from "../models/Profile";
 import { EWallet } from "../models/EWallet";
+import { Enrollment } from "../models/Enrollment";
+import { Review } from "../models/Review";
 
 @Service()
 export class UserRepository extends BaseRepository<User> implements IUserRepository{
@@ -187,4 +189,47 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 		return user;
 	}
 
+	/**
+	 * Get data user for recommend
+	 * @param userId 
+	 * @returns 
+	 */
+	async  getDataUserForRecommended(userId: number): Promise<User>{
+		const user = await this.model.findOne({
+			where: {
+				id: userId
+			},
+			attributes: { exclude: ['password'] },
+			include:[
+				{
+					model: Course,
+					as: 'favorites',
+					attributes: ['id', 'courseId'] ,
+					through: {
+						attributes: []
+					},
+				},
+				{
+					model: Course,
+					as: 'carts',
+					attributes: ['id', 'courseId'] ,
+					through: {
+						attributes: []
+					},
+				},
+				{
+					model: Enrollment
+				},
+				{
+					model: Review
+				}
+			]
+		});
+
+		if(!user) {
+			throw new NotFound('User not found');
+		}
+		return user;
+	}
 }
+

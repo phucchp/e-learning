@@ -33,6 +33,11 @@ class UserRoutes extends BaseRoutes {
 		 */
 		this.router.get('/:userId', auth, authAdmin, validateGetUser, validate, this.controller.getUserDetail);
 		this.router.get('/', auth, authAdmin, validateGetUsers, validate, this.controller.getUsers);
+		/**
+		 * Recommend
+		 */
+		this.router.get('/courses/recommend-courses', this.controller.recommendCourse);
+
 	}
 }
 

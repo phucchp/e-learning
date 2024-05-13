@@ -12,6 +12,7 @@ import { ICourseService } from "../services/interfaces/ICourseService";
 import { HandleS3 } from "../services/utils/HandleS3";
 import { ProcessingService } from "../services/ProcessingSerivce";
 import { IProcessingService } from "../services/interfaces/IProcessingService";
+import { RecommenderSystem } from "../services/RecommenderSystem";
 
 export class UserController{
 	private userService: IUserService;
@@ -20,6 +21,7 @@ export class UserController{
     private courseService: ICourseService;
     private processingService: IProcessingService;
     private handleS3: HandleS3;
+    private recommendSystem: RecommenderSystem;
 
 	constructor() {
 		this.userService = Container.get(UserService);
@@ -28,6 +30,7 @@ export class UserController{
 		this.courseService = Container.get(CourseService);
 		this.handleS3 = Container.get(HandleS3);
 		this.processingService = Container.get(ProcessingService);
+		this.recommendSystem = Container.get(RecommenderSystem);
 	}
     
     //--------------CART------------------//
@@ -272,6 +275,13 @@ export class UserController{
         return res.status(200).json({
             message: "Successful",
             data: processing
+        });
+    }
+
+    recommendCourse = async (req: Request, res: Response) => {
+        const data = await this.recommendSystem.test();
+        return res.status(200).json({
+            data
         });
     }
 }

@@ -18,7 +18,8 @@ export class CartRepository extends BaseRepository<Cart> implements ICartReposit
 				courseId: {
 					[Op.in]:courseIds
 				}
-			}
+			},
+			force: true
 		});
 	}
 }

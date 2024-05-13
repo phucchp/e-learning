@@ -53,6 +53,9 @@ export class CourseService implements ICourseService {
     @Inject(() => HandleS3)
 	private handleS3!: HandleS3;
 
+    @Inject(() => S3Service)
+	private s3Service!: S3Service;
+
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
     private VIDEO_DURATION_MEDIUM = 6;
@@ -489,7 +492,7 @@ export class CourseService implements ICourseService {
     async getCoursesByCourseIds(courseIds: number[]): Promise<Course[]> {
         return await this.courseRepository.getAll({
             where: {
-                courseId: {
+                id: {
 					[Op.in]:courseIds
 				}
             }
@@ -511,6 +514,31 @@ export class CourseService implements ICourseService {
         }
 
         return lessonIds;
+    }
+
+    async getPresignedUrlToUploadPoster(courseId: string): Promise<string> {
+        let course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.posterUrl) {
+            course.posterUrl = `course/${course.id}/poster.jpg`;
+        }
+
+        return await this,this.s3Service.generatePresignedUrlUpdate(course.posterUrl, 'image/jpeg');
+    }
+
+    async clearCachePoster(courseId: string): Promise<void> {
+        let course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.posterUrl) {
+            throw new NotFound('No poster to clear');
+        }
+        return await this.s3Service.clearCacheCloudFront(course.posterUrl);
     }
 
 }

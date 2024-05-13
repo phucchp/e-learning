@@ -9,4 +9,5 @@ export interface IUserRepository extends BaseRepositoryInterface<User> {
     getListInstructors(page: number, pageSize: number): Promise<{ rows: User[]; count: number; }>;
     getUsers(options: any): Promise<{ rows: User[]; count: number; }>
     getUser(userId: number): Promise<User>;
+    getDataUserForRecommended(userId: number): Promise<User>;
 }

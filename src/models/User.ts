@@ -13,6 +13,7 @@ import { Lesson } from './Lesson';
 import { EWallet } from './EWallet';
 import { Remind } from './Remind';
 import { Question } from './Question';
+import { InstructorPayment } from './InstructorPayment';
 
 @Table({
   tableName: 'users',
@@ -123,6 +124,9 @@ export class User extends Model<User> {
 
     @HasMany(() => Question)
     questions!: Question[];
+
+    @HasMany(() => InstructorPayment)
+    instructorPayments!: InstructorPayment[];
 
     @DeletedAt
     deletedAt?: Date;

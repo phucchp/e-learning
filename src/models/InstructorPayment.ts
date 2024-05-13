@@ -35,7 +35,7 @@ export class InstructorPayment extends Model<InstructorPayment> {
     @Column({
       type: DataType.INTEGER,
     })
-    discountPercentage!: number;
+    discountPercentage!: number; // Phần trăm mà admin chiết khấu lại từ tháng đó
 
     @AllowNull(false)
     @Default('PENDING')
@@ -81,6 +81,9 @@ export class InstructorPayment extends Model<InstructorPayment> {
     })
     isTransfer!: boolean;
 
+    @BelongsTo(() => User)
+    user!: User;
+    
     @DeletedAt
     deletedAt?: Date;
   
