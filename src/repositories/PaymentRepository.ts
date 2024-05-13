@@ -54,4 +54,24 @@ export class PaymentRepository extends BaseRepository<Payment> implements IPayme
 		});
 	}
 
+	async getAllPaymentOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }> {
+		return await this.model.findAndCountAll({
+			where : {
+				userId: userId
+			},
+			attributes: { exclude: ['id','userId', 'updatedAt', 'deletedAt'] },
+			include: [
+                {
+                    model: PaymentDetail,
+                    attributes: { exclude: ['id','isPaidToInstructor', 'updatedAt', 'deletedAt'] },
+					include: [
+						{
+							model: Course,
+							attributes: ['courseId', 'title', 'price', 'discount'],
+						},
+					]
+                },
+			]
+		});
+	}
 }

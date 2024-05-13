@@ -44,11 +44,37 @@ export class ResourceService implements IResourceService {
             throw new DuplicateError('Resource already exists');
         }
 
-        return await this.resourceRepository.create({
+        const newResource = await this.resourceRepository.create({
             lessonId: lessonId,
             name: name,
             url: `lessons/${lessonId}/resources/${name}`
         });
+        // txt -> text/plain
+        // pdf application/pdf
+        // zip application/zip
+        const parts = name.split('.');
+        const extension = parts[parts.length - 1];
+        let contentType = 'application/pdf';
+        if (extension === 'pdf') {
+            contentType = 'application/pdf';
+        }
+        if (extension === 'txt') {
+            contentType = 'application/txt';
+        }
+        if (extension === 'zip') {
+            contentType = 'application/zip';
+        }
+        if (extension === 'xlxs') {
+            contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        }
+        if (extension === 'docx') {
+            contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+        if (extension === 'pptx') {
+            contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        }
+        newResource.setDataValue('url', await this.s3Service.generatePresignedUrlUpdate(newResource.url, contentType));
+        return newResource;
     }
 
     async updateResource(resourceId: number): Promise<Resource> {

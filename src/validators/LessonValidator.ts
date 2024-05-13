@@ -67,7 +67,19 @@ export const validateGetResource = [
 
 export const validateCreateResource = [
     body('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
-    body('name').notEmpty().withMessage('name is required').isString().withMessage('name must be an string').trim()
+    body('name')
+        .notEmpty().withMessage('name is required')
+        .isString().withMessage('name must be a string')
+        .custom(value => {
+            // Kiểm tra xem name có phải là một trong các đuôi file được cho hay không
+            const validExtensions = ['.pdf', '.docx', '.zip', '.xlsx', '.txt', '.pptx'];
+            const extension = value.slice(value.lastIndexOf('.'));
+            if (!validExtensions.includes(extension)) {
+                throw new Error('Invalid file extension');
+            }
+            return true;
+        })
+        .trim()
 ];
 
 export const validateDeleteResource = [
