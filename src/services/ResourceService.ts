@@ -49,7 +49,22 @@ export class ResourceService implements IResourceService {
             name: name,
             url: `lessons/${lessonId}/resources/${name}`
         });
-        newResource.setDataValue('url', await this.s3Service.getObjectUrl(newResource.url));
+        // txt -> text/plain
+        // pdf application/pdf
+        // zip application/zip
+        const parts = name.split('.');
+        const extension = parts[parts.length - 1];
+        let contentType = 'application/pdf';
+        if (extension === 'pdf') {
+            contentType = 'application/pdf';
+        }
+        if (extension === 'txt') {
+            contentType = 'application/pdf';
+        }
+        if (extension === 'zip') {
+            contentType = 'application/zip';
+        }
+        newResource.setDataValue('url', await this.s3Service.generatePresignedUrlUpdate(newResource.url, contentType));
         return newResource;
     }
 
