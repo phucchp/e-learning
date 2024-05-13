@@ -19,4 +19,6 @@ export interface ICourseService {
     createDataCourseForPayment(courseIds: string[]): Promise<any>;
     getCoursesByCourseIds(courseIds: number[]): Promise<Course[]>;
     getLessonIdsOfCourse(courseId: string): Promise<number[]>;
+    getPresignedUrlToUploadPoster(courseId: string): Promise<string>;
+    clearCachePoster(courseId: string): Promise<void>;
 }

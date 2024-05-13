@@ -135,7 +135,7 @@ export class Mail {
 			totalPrice: paymentDetail.purchase_units[0].amount.value
 		};
 		const htmlContent = compiledTemplate(templateData);
-		return await this.sendEmail('phucchp@gmail.com', 'Invoice', htmlContent);
+		return await this.sendEmail(user.email, 'Invoice', htmlContent);
 	}
 }
 

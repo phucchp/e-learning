@@ -14,6 +14,8 @@ import { EnrollmentService } from './EnrollmentService';
 import { UserService } from './UserService';
 import { IUserService } from './interfaces/IUserService';
 import Mail from '../utils/Mail';
+import { CartService } from './CartService';
+import { ICartService } from './interfaces/ICartService';
 
 @Service()
 export class PaypalService {
@@ -36,8 +38,13 @@ export class PaypalService {
     @Inject(() => UserService)
 	private userService!: IUserService;
 
+    @Inject(() => CartService)
+	private cartService!: ICartService;
+
     @Inject(() => Mail)
 	private mail!: Mail;
+
+    private CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
     /**
     * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
@@ -78,6 +85,7 @@ export class PaypalService {
         // Viết 1 hàm tính tổng tiền + tạo mảng items từ list course_id từ client gửi lên
         // Viết hàm tạo payment and payment details
         const {totalPrice, items} = await this.courseService.createDataCourseForPayment(courseIds);
+        console.log(`Total price: ${totalPrice}`);
         const accessToken = await this.generateAccessToken();
         const { PAYPAL_BASE_API, CLIENT_URL } = process.env;
         if(!PAYPAL_BASE_API) {
@@ -107,7 +115,7 @@ export class PaypalService {
             landing_page: 'LOGIN',
             user_action: 'PAY_NOW',
             return_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill',
-            cancel_url: CLIENT_URL+'/bill' || 'http://localhost:3000/bill/cancel',
+            cancel_url: CLIENT_URL+'/bill/cancel' || 'http://localhost:3000/bill/cancel',
         },
         };
         
@@ -195,6 +203,12 @@ export class PaypalService {
                 const user = await this.userService.getUserInformation(payment.userId);
                 const courses = await this.courseService.getCoursesByCourseIds(courseIds);
                 await this.mail.sendBill(user, courses, paymentDetails); 
+                // Clear cart user
+                const courseIdsString: string[] =[];
+                for (const course of courses) {
+                    courseIdsString.push(course.courseId);
+                }
+                await this.cartService.deleteCoursesFromCart(payment.userId, courseIdsString);
                 return payment;
             }
         }
