@@ -59,10 +59,19 @@ export class ResourceService implements IResourceService {
             contentType = 'application/pdf';
         }
         if (extension === 'txt') {
-            contentType = 'application/pdf';
+            contentType = 'application/txt';
         }
         if (extension === 'zip') {
             contentType = 'application/zip';
+        }
+        if (extension === 'xlxs') {
+            contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        }
+        if (extension === 'docx') {
+            contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+        if (extension === 'pptx') {
+            contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
         }
         newResource.setDataValue('url', await this.s3Service.generatePresignedUrlUpdate(newResource.url, contentType));
         return newResource;
