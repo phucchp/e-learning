@@ -1889,6 +1889,22 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
+  /users/payments:
+    get:
+      tags:
+        - user
+      summary: Get payment history of user
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
   /users/favorite-courses:
     get:
           tags:
