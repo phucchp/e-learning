@@ -933,7 +933,7 @@ paths:
     get:
       tags:
         - lesson
-      summary: Get all resource of lesson
+      summary: Get presign-url to upload resource
       parameters:
         - name: resourceId
           in: path

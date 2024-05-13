@@ -44,11 +44,13 @@ export class ResourceService implements IResourceService {
             throw new DuplicateError('Resource already exists');
         }
 
-        return await this.resourceRepository.create({
+        const newResource = await this.resourceRepository.create({
             lessonId: lessonId,
             name: name,
             url: `lessons/${lessonId}/resources/${name}`
         });
+        newResource.setDataValue('url', await this.s3Service.getObjectUrl(newResource.url));
+        return newResource;
     }
 
     async updateResource(resourceId: number): Promise<Resource> {
