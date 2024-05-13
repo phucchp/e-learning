@@ -19,5 +19,22 @@ const languageIdExists = async (courseIds: string[]) => {
 };
 
 export const validateCreatePayment = [
-    body('courseIds').notEmpty().withMessage('courseIds is required').isArray({min:1}).custom(languageIdExists),
-]
+  body('courseIds').notEmpty().withMessage('courseIds is required').isArray({min:1}).custom(languageIdExists)
+];
+
+export const validateCaptureOrder = [
+  body('orderID').notEmpty().withMessage('orderID is required')
+];
+
+export const validateGetInstructorPayment = [
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
+  query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
+  query('sort').optional().isIn(['id', 'instructorId', 'amount','createdAt']).withMessage('Invalid sort parameter'),
+  query('sortType').optional().isIn(['ASC', 'DESC']).withMessage('Invalid sortType parameter'),
+  query('instructorId').optional().isInt({ min: 1 }).withMessage('instructorId must be an integer greater than or equal to 1'),
+  query('payoutBatchId').trim().optional().isString().withMessage('payoutBatchId must be a string'),
+  query('payForMonth').optional().isInt({ min: 1 }).withMessage('payForMonth must be an integer greater than or equal to 1'),
+  query('payForYear').optional().isInt({ min: 1 }).withMessage('payForYear must be an integer greater than or equal to 1'),
+  query('receiver').trim().optional().isString().withMessage('receiver must be a string'),
+  query('isTransfer').optional().isBoolean().withMessage('isTransfer must be a boolean'),
+];

@@ -20,7 +20,7 @@ export class InstructorPaymentService implements IInstructorPaymentService {
         // Sort: id, instructorId, amount, time create
         // Filter by : instructorId, payoutBatchId, transactionStatus, Month + year,  receiver, isTransfer
         const whereCondition: any = {};
-        let { search, instructorId, payoutBatchId, transactionStatus,month, year, receiver, isTransfer, sort,sortType , page, pageSize} = req.query;
+        let { search, instructorId, payoutBatchId, transactionStatus,payForYear, payForMonth, receiver, isTransfer, sort,sortType , page, pageSize} = req.query;
         if(instructorId){
             whereCondition['instructorId'] = {[Op.eq]: instructorId};
         }
@@ -33,12 +33,12 @@ export class InstructorPaymentService implements IInstructorPaymentService {
             whereCondition['transactionStatus'] = {[Op.eq]: transactionStatus};
         }
 
-        if(month){
-            whereCondition['payForMonth'] = {[Op.eq]: month};
+        if(payForMonth){
+            whereCondition['payForMonth'] = {[Op.eq]: payForMonth};
         }
 
-        if(year){
-            whereCondition['payForYear'] = {[Op.eq]: year};
+        if(payForYear){
+            whereCondition['payForYear'] = {[Op.eq]: payForYear};
         }
 
         if(receiver){
