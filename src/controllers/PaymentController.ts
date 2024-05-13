@@ -6,16 +6,20 @@ import { PaymentService } from "../services/PaymentService";
 import { IPaymentService } from "../services/interfaces/IPaymentService";
 import { CourseService } from "../services/CourseService";
 import { ICourseService } from "../services/interfaces/ICourseService";
+import { InstructorPaymentService } from "../services/InstructorPaymentService";
+import { IInstructorPaymentService } from "../services/interfaces/IInstructorPaymentService";
 
 export class PaymentController{
 	private paypalService: PaypalService;
 	private paymentService: IPaymentService;
 	private courseService: ICourseService;
+    private instructorPaymentService: IInstructorPaymentService;
 
 	constructor() {
 		this.paypalService = Container.get(PaypalService);
 		this.paymentService = Container.get(PaymentService);
 		this.courseService = Container.get(CourseService);
+		this.instructorPaymentService = Container.get(InstructorPaymentService);
 	}
 
     /**
@@ -78,6 +82,17 @@ export class PaymentController{
         })        
     }
 
+    /**
+     * API update processing course for user
+     */
+    getInstructorPayment = async (req: Request, res: Response) => {
+        const data = await this.instructorPaymentService.getInstructorPayments(req);
+        return res.status(200).json({
+            message: "Successful",
+            data: data
+        });
+    }
+    
     test = async (req: Request, res: Response) => {
         const data= await this.paymentService.paymentMonthlyRevenueForInstructor();
         return res.status(200).json(data);
