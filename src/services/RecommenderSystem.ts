@@ -296,4 +296,33 @@ export class RecommenderSystem {
             .sort((a, b) => b[1] - a[1]);
     }
 
+    // RECOMMEND BASED ON LIST COURSEIDS
+    async getClientRateMap(courseIds: number[]){
+        const rateMap = new Map<number, number>(); // Mỗi khoá học sẽ có 1 điểm số duy nhất
+        for(const courseId of courseIds) {
+            rateMap.set(courseId, this.viewedPoint);
+        }
+
+        return rateMap;
+    }
+
+    /**
+     * Get courseIds recommendations based on courseIds from client
+     */
+    async getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds: number[]) {
+        // Step 1 : Create full matrix between course, category and level
+        // Step 2 : Get user data (include : course favorite, rating and course in cart) -> User rate map
+        // Step 3 : Create matrix weights of user based on user rate map in Step 2
+        // Step 4 : Create User Profile (Vector weight)
+        // Step 5 : Get the restMatrix and calculate recommend matrix
+        const matrix = await this.createMatrix();
+        const userRateMap : Map<number, number> = await this.getClientRateMap(courseIds);
+        const restMatrix = await this.getTheRestMatrix(matrix, Array.from(userRateMap.keys()));
+        const matrixWeight = await this.getUserRateMatrixWeight(matrix, userRateMap);
+        let vectorWeight = await this.sumColumns(matrixWeight);
+        vectorWeight = await this.normalizeArray(vectorWeight);
+        const matrixRecommend = await this.getUserMatrixRecommend(restMatrix, vectorWeight);
+        const courseIdsArr: number[] = matrixRecommend.map(([key]) => key);
+        return courseIdsArr;
+    }
 }

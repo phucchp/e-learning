@@ -205,4 +205,13 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
         return courses;
     }
 
+    async getIdByCourseIdsString(courseIdsString: string[]): Promise<Course[]> {
+        const courses = await this.model.findAll({
+            attributes: ['id', 'courseId'],
+            where: {
+                courseId: courseIdsString
+            }
+        });
+        return courses;
+    }
 }

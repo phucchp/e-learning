@@ -192,6 +192,18 @@ export class CourseController{
         const userId = req.payload.userId;
         const page = Number(req.query.page) || 1;
         const pageSize = Number(req.query.pageSize) || 10;
+        if (!userId) {
+            // Recommend popolar courses
+            const {rows, count} = await this.courseService.getPopularCourse(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popolar courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
         const {rows, count} = await this.courseService.getCoursesRecommend(userId,page,pageSize);
         return res.status(200).json({
             message: "Successful",
@@ -200,5 +212,45 @@ export class CourseController{
             pageSize: pageSize,
             data: rows
         });
+    }
+
+    getRecommendCourseClient  = async (req: Request, res: Response) => {
+        // Parse courseIds from query parameter as string
+        const courseIdsString: string | undefined = req.query.courseIds as string;
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        // Initialize courseIds array
+        let courseIds: string[] = [];
+
+        // Check if courseIdsString is defined and not empty
+        if (courseIdsString && courseIdsString.trim() !== '') {
+            // Split the string by comma and trim each element
+            courseIds = courseIdsString.split(',').map(id => id.trim());
+        }
+        
+        if(courseIds.length > 0) {
+            // Get courseIds number from courseIdsString
+            const courseIdsNumber = await this.courseService.getIdByCourseIdsString(courseIds);
+            const {rows, count} = await this.courseService.getCourseIdsRecommendForClient(courseIdsNumber, page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }else{
+            // Recommend popolar courses
+            const {rows, count} = await this.courseService.getPopularCourse(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popolar courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
+        
     }
 }

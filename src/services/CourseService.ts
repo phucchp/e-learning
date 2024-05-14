@@ -552,5 +552,35 @@ export class CourseService implements ICourseService {
         rows = await this.handleS3.getResourceCourses(rows);
         return {rows, count};
     }
+
+    async getCourseIdsRecommendForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    async getPopularCourse(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>  {
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 10,
+            sortType: 'DESC',
+            sort :  'totalStudents'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    }
+
+    async getIdByCourseIdsString(courseIdsString: string[]): Promise<number[]> {
+        const courses = await this.courseRepository.getIdByCourseIdsString(courseIdsString);
+        let courseIdsNumber : number[] = [];
+        for (const course of courses) {
+            courseIdsNumber.push(course.id);
+        }
+
+        return courseIdsNumber;
+    }
     
 }

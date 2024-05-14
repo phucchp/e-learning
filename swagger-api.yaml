@@ -688,6 +688,46 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
+  /courses/clients/recommend-courses:
+    get:
+      tags:
+        - course
+      summary: Get courses recommend based on courseIds from client
+      description: Get courses recommend based on courseIds from client
+      parameters:
+        - name: courseIds
+          in: query
+          description: List courseIds (string)
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: 'id1,id2,id3'
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
   /lessons/{lessonId}:
     get:
       tags:
