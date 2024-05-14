@@ -27,11 +27,18 @@ export class ResourceService implements IResourceService {
     }
 
     async getAllResourceOfLesson(lessonId: number): Promise<Resource[]> {
-        return await this.resourceRepository.getAll({
+        const resources = await this.resourceRepository.getAll({
             where: {
                 lessonId: lessonId
             }
         });
+        for (const resource of resources) {
+            if(resource.url) {
+                resource.setDataValue('url', await this.s3Service.getObjectUrl(resource.url));
+            }
+        }
+
+        return resources;
     }
 
     async createResource(lessonId: number, name: string): Promise<Resource> {
