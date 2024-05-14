@@ -21,8 +21,8 @@ class CourseRoutes extends BaseRoutes {
 		this.router.post('/:courseId/topics/', auth, authInstructor, validateCreateTopic, validate, this.controller.createTopic);
 		this.router.put('/topics/:topicId', auth, authInstructor, validateUpdateTopic, validate, this.controller.updateTopic);
 		this.router.delete('/topics/:topicId', auth, authInstructor, validateDeleteTopic, validate, this.controller.deleteTopic);
-		this.router.get('/users/recommend-courses', authUser, this.controller.getRecommendCourse);
-		this.router.get('/users/recommend-courses-based-on-click', this.controller.getRecommendCourseClient);
+		this.router.get('/recommends/recommend-courses', authUser, this.controller.getRecommendCourse);
+		this.router.get('/recommends/recommend-courses-based-on-click', this.controller.getRecommendCourseClient);
 	}
 }
 
