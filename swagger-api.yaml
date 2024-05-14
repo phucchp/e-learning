@@ -688,7 +688,7 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
-  /courses/clients/recommend-courses:
+  /courses/users/recommend-courses-based-on-click:
     get:
       tags:
         - course
