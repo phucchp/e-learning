@@ -292,4 +292,19 @@ export class PaymentService implements IPaymentService {
         })
     }
 
+    async getAllPaymentsOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }> {
+        const emailRegex = /[\w.-]+@[a-zA-Z-]+\.[a-zA-Z]{2,}/;
+
+        const {rows, count} = await this.paymentRepository.getAllPaymentOfUser(userId);
+        for(const row of rows) {
+            const orderInfor = row.orderInfor;
+            let emailMatch = orderInfor.match(emailRegex);
+            let email = '';
+            if (emailMatch) {
+                email = emailMatch[0];
+            }
+            row.setDataValue('orderInfor', email);
+        }
+        return {rows, count};
+    }
 }

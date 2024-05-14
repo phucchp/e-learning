@@ -11,6 +11,7 @@ import { Op } from 'sequelize';
 import { CourseService } from './CourseService';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
+import { HandleS3 } from './utils/HandleS3';
 
 @Service()
 export class EnrollmentService implements IEnrollmentService {
@@ -24,6 +25,9 @@ export class EnrollmentService implements IEnrollmentService {
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
 
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
+    
     async getEnrollmentCourses(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: Enrollment[]; count: number; }> {
         const userId = req.payload.userId;
         let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
@@ -67,7 +71,12 @@ export class EnrollmentService implements IEnrollmentService {
             sortType: sortType || 'ASC',
             sort : sort || 'createdAt'
         }
-        return await this.enrollmentRepository.getEnrollmentCourses(userId, options);
+        const {rows, count} = await this.enrollmentRepository.getEnrollmentCourses(userId, options);
+        for (const row of rows) {
+            row.setDataValue('course', await this.handleS3.getResourceCourse(row.course));
+        }
+
+        return {rows, count};
     }
 
     /**

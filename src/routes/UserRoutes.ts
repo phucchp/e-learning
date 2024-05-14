@@ -28,6 +28,7 @@ class UserRoutes extends BaseRoutes {
 		this.router.post('/processing',auth, validateAddProcessing, validate, this.controller.addProcessing);
 		this.router.put('/processing',auth, validateUpdateProcessing, validate, this.controller.updateProcessing);
 		this.router.get('/newest-processing',auth, validateGetNewestProcessing, validate, this.controller.getNewestProcessing);
+		this.router.get('/payments',auth, this.controller.getAllPaymentOfUser);
 		/**
 		 * API for admin
 		 */

@@ -22,4 +22,5 @@ export interface IPaymentService {
     getPaymentNotCheckoutInformation(userId: number): Promise<Payment | null>;
     getPaymentByTransactionId(transactionId: string): Promise<Payment| null>;
     paymentMonthlyRevenueForInstructor(): Promise<any>;
+    getAllPaymentsOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }>;
 }

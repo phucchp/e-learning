@@ -5,5 +5,6 @@ import { Model, ModelCtor } from 'sequelize-typescript';
 export interface IPaymentRepository extends BaseRepositoryInterface<Payment> {
     getPaymentNotCheckoutInformation(userId: number): Promise<Payment| null>;
     getPaymentByTransactionId(transactionId: string): Promise<Payment| null>;
-    getPaymentOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }>
+    getPaymentOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }>;
+    getAllPaymentOfUser(userId: number): Promise<{ rows: Payment[]; count: number; }>;
 }

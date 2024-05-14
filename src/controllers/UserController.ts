@@ -13,6 +13,8 @@ import { HandleS3 } from "../services/utils/HandleS3";
 import { ProcessingService } from "../services/ProcessingSerivce";
 import { IProcessingService } from "../services/interfaces/IProcessingService";
 import { RecommenderSystem } from "../services/RecommenderSystem";
+import { IPaymentService } from "../services/interfaces/IPaymentService";
+import { PaymentService } from "../services/PaymentService";
 
 export class UserController{
 	private userService: IUserService;
@@ -22,6 +24,7 @@ export class UserController{
     private processingService: IProcessingService;
     private handleS3: HandleS3;
     private recommendSystem: RecommenderSystem;
+    private paymentService: IPaymentService;
 
 	constructor() {
 		this.userService = Container.get(UserService);
@@ -31,6 +34,7 @@ export class UserController{
 		this.handleS3 = Container.get(HandleS3);
 		this.processingService = Container.get(ProcessingService);
 		this.recommendSystem = Container.get(RecommenderSystem);
+		this.paymentService = Container.get(PaymentService);
 	}
     
     //--------------CART------------------//
@@ -282,6 +286,16 @@ export class UserController{
         const data = await this.recommendSystem.test();
         return res.status(200).json({
             data
+        });
+    }
+
+    getAllPaymentOfUser = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const {rows, count} = await this.paymentService.getAllPaymentsOfUser(userId);
+        return res.status(200).json({
+            message:"Successful",
+            totalCount: count,
+            data: rows
         });
     }
 }
