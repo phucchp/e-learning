@@ -22,4 +22,7 @@ export interface ICourseService {
     getPresignedUrlToUploadPoster(courseId: string): Promise<string>;
     clearCachePoster(courseId: string): Promise<void>;
     getCoursesRecommend(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
+    getCourseIdsRecommendForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
+    getIdByCourseIdsString(courseIdsString: string[]): Promise<number[]>;
+    getPopularCourse(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>;
 }
