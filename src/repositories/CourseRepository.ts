@@ -11,6 +11,7 @@ import { Topic } from "../models/Topic";
 import { Lesson } from "../models/Lesson";
 import { Review } from "../models/Review";
 import { NotFound } from "../utils/CustomError";
+import { Op } from 'sequelize';
 
 @Service()
 export class CourseRepository extends BaseRepository<Course> implements ICourseRepository{
@@ -164,6 +165,44 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
         }
 
         return course;
+    }
+
+    async getCoursesRecommend(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const offset = (page - 1) * pageSize;
+        const courses = await this.model.findAndCountAll({
+            attributes: { exclude: ['id', 'updatedAt', 'deletedAt'] },
+            where: {
+                id:courseIds
+            },
+            include: [
+                {
+                    model: Language,
+                    attributes: { exclude: ['id','createdAt', 'updatedAt', 'deletedAt'] },
+                },
+                {
+                    model: Level,
+                    attributes: { exclude: ['id','createdAt', 'updatedAt', 'deletedAt'] },
+                },
+                {
+                    model: Category,
+                    attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'deletedAt'] },
+                },
+                {
+                    model: User,
+                    as: 'instructor', // Alias của BelongsTo
+                    attributes: ['userName'],
+                    include: [
+                        {
+                            model: Profile,
+                            attributes: ['fullName','firstName', 'lastName', 'avatar'],
+                        },
+                    ],
+                },
+            ],
+            limit: pageSize,
+            offset: offset,
+        });
+        return courses;
     }
 
 }

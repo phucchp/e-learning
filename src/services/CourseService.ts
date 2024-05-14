@@ -25,6 +25,7 @@ import { IFavoriteRepository } from '../repositories/interfaces/IFavoriteReposit
 import { Favorite } from '../models/Favorite';
 import { IoTRoboRunner } from 'aws-sdk';
 import { HandleS3 } from './utils/HandleS3';
+import { RecommenderSystem } from './RecommenderSystem';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -49,6 +50,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => FavoriteRepository)
 	private favoriteRepository!: IFavoriteRepository;
+
+    @Inject(() => RecommenderSystem)
+	private recommendSystem!: RecommenderSystem;
 
     @Inject(() => HandleS3)
 	private handleS3!: HandleS3;
@@ -541,4 +545,12 @@ export class CourseService implements ICourseService {
         return await this.s3Service.clearCacheCloudFront(course.posterUrl);
     }
 
+    async getCoursesRecommend(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommend(userId);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+    
 }
