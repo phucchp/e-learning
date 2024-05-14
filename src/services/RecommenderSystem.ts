@@ -23,7 +23,7 @@ interface Row {
 }
 
 interface Matrix {
-    [key: string]: Row; // Định dạng cụ thể của các hàng trong ma trận
+    [key: number]: Row; // Định dạng cụ thể của các hàng trong ma trận
 }
 @Service()
 export class RecommenderSystem {
@@ -46,13 +46,33 @@ export class RecommenderSystem {
     private inCartPoint = 3;
 
     async test(): Promise<any> {
-        return await this.getUserData(146);
+        return await this.getCourseIdsRecommend(146);
+    }
+
+    /**
+     * Main function
+     */
+    async getCourseIdsRecommend(userId: number) {
+        // Step 1 : Create full matrix between course, category and level
+        // Step 2 : Get user data (include : course favorite, rating and course in cart) -> User rate map
+        // Step 3 : Create matrix weights of user based on user rate map in Step 2
+        // Step 4 : Create User Profile (Vector weight)
+        // Step 5 : Get the restMatrix and calculate recommend matrix
+        const matrix = await this.createMatrix();
+        const userRateMap : Map<number, number> = await this.getUserData(userId);
+        const restMatrix = await this.getTheRestMatrix(matrix, Array.from(userRateMap.keys()));
+        const matrixWeight = await this.getUserRateMatrixWeight(matrix, userRateMap);
+        let vectorWeight = await this.sumColumns(matrixWeight);
+        vectorWeight = await this.normalizeArray(vectorWeight);
+        const matrixRecommend = await this.getUserMatrixRecommend(restMatrix, vectorWeight);
+        const courseIdsArr: number[] = matrixRecommend.map(([key]) => key);
+        return courseIdsArr;
     }
     
     /**
      * Create full matrix between courses and categories
      */
-    public async createMatrix(): Promise<Matrix> {
+    async createMatrix(): Promise<Matrix> {
         const matrix: number[][] = [];
         const matrixRcm : Matrix = {};
         const dataRows : Row = {};
@@ -94,13 +114,19 @@ export class RecommenderSystem {
             const courseId = course.getDataValue('id');
             const levelId = course.getDataValue('levelId');
             const categoryId = course.getDataValue('categoryId');
-            matrixRcm[courseId][levelId] = 1;
+            matrixRcm[courseId][levelId] = 0.2;
             matrixRcm[courseId][categoryArray[categoryId]] = 1;
         }
         return matrixRcm;
     }
 
-    async getUserData(userId: number) {
+    /**
+     * Get user data for create matrix recommend
+     * Include : courses that user reviewed, favorite , enrolled, add to cart
+     * @param userId 
+     * @returns 
+     */
+    async getUserData(userId: number): Promise<Map<number, number>> {
         // Dựa vào các khoá học đã mua, hoặc yêu thích, hoặc đánh giá(Review, favorites, enrollments, carts)
         // Khoá học đã mua : 2 điểm
         // Khoá học đã đánh giá : theo điểm đã đánh gía
@@ -123,6 +149,151 @@ export class RecommenderSystem {
             userRateMap.set(review.getDataValue('courseId'), review.getDataValue('rating'));
         }
 
-        return Array.from(userRateMap);
+        return userRateMap;
     }
+
+    /**
+     * Get the rest matrix from the matrix and movieIds
+     * Function will remove course with courseId in courseIds array 
+     */
+    public async getTheRestMatrix(matrix: Matrix, courseIds: number[]): Promise<Matrix> {
+        const restMatrix: Matrix = {};
+        const excludedCourseIdsSet = new Set(courseIds);
+
+        for (const rowKey in matrix) {
+            const row = matrix[rowKey];
+            // const rowKey = Object.keys(row)[0]; // Lấy key của hàng
+            const rowId = parseInt(rowKey, 10);
+        
+            // Check if courseId not in set -> push to matrix
+            if (!excludedCourseIdsSet.has(rowId)) {
+                restMatrix[rowKey] = row;
+            }
+        }
+        return restMatrix;
+    }
+
+    /**
+     * Get user matrix weights
+     * @param matrix 
+     * @param userRateMap 
+     * @returns 
+     */
+    public async getUserRateMatrixWeight(matrix: Matrix, userRateMap: Map<number, number>): Promise<Matrix>
+    {
+        const matrixWeight: Matrix = {};
+        userRateMap.forEach((value, key)=>{
+            const multiplier = value;
+            let row =matrix[key];
+            const weightedRow: Row = {};
+            for (const colKey in row) {
+                if (row.hasOwnProperty(colKey)) {
+                    weightedRow[colKey] = row[colKey] * value;
+                }
+            }
+            matrixWeight[key] = weightedRow;
+            
+        });
+        // console.log(this.sumColumns(matrixWeight));
+        return matrixWeight;
+    }
+
+    /**
+     * matrix normalization ( devide the total )
+     * 
+     * @param array 
+     * @returns number[]
+     */
+    private normalizeArray(array: Row): Row {
+        const values = Object.values(array);
+        const sum = values.reduce((acc, value) => acc + value, 0);
+        // console.log(`SUM VALUES: ${sum}`);
+        // Create a new object to hold the normalized values
+        const normalizedRow: Row = {};
+    
+        for (const key in array) {
+            if (array.hasOwnProperty(key)) {
+                normalizedRow[key] = array[key] / sum;
+            }
+        }
+    
+        return normalizedRow;
+    }
+
+    /**
+     * Sum colum, output is a vector normalized
+     * 
+     * @param matrixWeight 
+     * @returns number[]
+     */
+    private sumColumns(matrixWeight: Matrix): Row {
+        
+        // Khởi tạo mảng result với giá trị 0 cho mỗi cột
+        const results: Row = Object.keys({...matrixWeight[1]}).reduce((acc, key) => {
+            acc[key] = 0;
+            return acc;
+        }, {} as Row);
+        // Cộng giá trị của mỗi cột từ mỗi đối tượng trong mảng
+        for (const rowKey in matrixWeight) {
+            if (matrixWeight.hasOwnProperty(rowKey)) {
+                const row: Row = matrixWeight[rowKey];
+
+                for (const colKey in row) {
+                    results[colKey] += Number(row[colKey]);
+                }
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Multiply the rest movies matrix by the user weight matrix
+     * 
+     * @param matrix the rest matrix (without movies favorite of user, movies user rated, movies user watched)
+     * @param userWeight vector user weight matrix (by genres)
+     * @returns [number, number][]
+     */
+    public getUserMatrixRecommend(matrix: Matrix, userWeight: Row): [number, number][] {
+        const recommendedMatrix: Matrix = {};
+
+        for (const rowKey in matrix) {
+            if (matrix.hasOwnProperty(rowKey)) {
+                const row = matrix[rowKey];
+                const multipliedRow: Row = {};
+
+                for (const colKey in row) {
+                    if (row.hasOwnProperty(colKey)) {
+                        multipliedRow[colKey] = row[colKey] * (userWeight[colKey] || 0);
+                    }
+                }
+
+                recommendedMatrix[Number(rowKey)] = multipliedRow;
+            }
+        }
+        // console.log(recommendedMatrix);
+
+        const sumByKey: { [key: number]: number } = {};
+
+        for (const rowKey in recommendedMatrix) {
+            if (recommendedMatrix.hasOwnProperty(rowKey)) {
+                const row = recommendedMatrix[Number(rowKey)];
+
+                sumByKey[Number(rowKey)] = Object.values(row).reduce((acc, value) => acc + value, 0);
+            }
+        }
+        // for (const key in sumByKey) {
+        //     if (sumByKey.hasOwnProperty(key)) {
+        //         console.log(`Row ${key}: ${sumByKey[key]}`);
+        //     }
+        // }
+
+        return this.sortArrayByValue(sumByKey);
+    }
+
+    private sortArrayByValue(sumByKey: { [key: number]: number }): [number, number][] {
+        return Object.entries(sumByKey)
+            .map(([key, value]) => [Number(key), value] as [number, number])
+            .sort((a, b) => b[1] - a[1]);
+    }
+
 }

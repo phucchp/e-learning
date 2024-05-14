@@ -187,4 +187,18 @@ export class CourseController{
             data: link
         });
     }
+
+    getRecommendCourse  = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        const {rows, count} = await this.courseService.getCoursesRecommend(userId,page,pageSize);
+        return res.status(200).json({
+            message: "Successful",
+            totalCount: count,
+            page: page,
+            pageSize: pageSize,
+            data: rows
+        });
+    }
 }

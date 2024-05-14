@@ -21,4 +21,5 @@ export interface ICourseService {
     getLessonIdsOfCourse(courseId: string): Promise<number[]>;
     getPresignedUrlToUploadPoster(courseId: string): Promise<string>;
     clearCachePoster(courseId: string): Promise<void>;
+    getCoursesRecommend(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
 }
