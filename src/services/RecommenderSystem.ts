@@ -100,7 +100,13 @@ export class RecommenderSystem {
         return matrixRcm;
     }
 
-    async getUserData(userId: number) {
+    /**
+     * Get user data for create matrix recommend
+     * Include : courses that user reviewed, favorite , enrolled, add to cart
+     * @param userId 
+     * @returns 
+     */
+    async getUserData(userId: number): Promise<Map<number, number>> {
         // Dựa vào các khoá học đã mua, hoặc yêu thích, hoặc đánh giá(Review, favorites, enrollments, carts)
         // Khoá học đã mua : 2 điểm
         // Khoá học đã đánh giá : theo điểm đã đánh gía
@@ -123,6 +129,6 @@ export class RecommenderSystem {
             userRateMap.set(review.getDataValue('courseId'), review.getDataValue('rating'));
         }
 
-        return Array.from(userRateMap);
+        return userRateMap;
     }
 }
