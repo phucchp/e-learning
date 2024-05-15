@@ -11,6 +11,7 @@ import { UserService } from "../services/UserService";
 import { IUserService } from "../services/interfaces/IUserService";
 import { CartService } from "../services/CartService";
 import { ICartService } from "../services/interfaces/ICartService";
+import { TFIDFService } from "../services/TFIDFService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -18,6 +19,7 @@ export class CourseController{
 	private topicService: ITopicService;
 	private userService: IUserService;
 	private cartService: ICartService;
+	private tfidfService: TFIDFService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -25,6 +27,7 @@ export class CourseController{
 		this.topicService = Container.get(TopicService);
 		this.userService = Container.get(UserService);
 		this.cartService = Container.get(CartService);
+		this.tfidfService = Container.get(TFIDFService);
 
 	}
 
@@ -251,6 +254,12 @@ export class CourseController{
                 data: rows
             });
         }
-        
+    }
+
+    tfidf = async (req: Request, res: Response) => {
+        const data = await this.tfidfService.getDataDocumentFromCourses();
+        return res.status(200).json({
+            data
+        });
     }
 }

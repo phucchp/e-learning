@@ -7,6 +7,7 @@ import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
 import { Course } from '../models/Course';
 import _ from 'lodash';
+import { Op } from 'sequelize';
 
 interface ImportantTerm {
     term: string;
@@ -26,10 +27,32 @@ export class TFIDFService {
 
     async getDataDocumentFromCourses() {
         const courses: Course[] =  await this.courseRepository.getAll({
-            attributes: ['id','courseId', 'title', 'introduction']
+            where : {
+                id: {
+                    [Op.lte]: 100
+                }
+            },
+            attributes: ['id','courseId', 'title', 'introduction', 'learnsDescription']
         });
 
-        
+        const corpus = [];
+        for (const course of courses) {
+            let data = course.title + ' ' + course.introduction+ ' '+ course.learnsDescription;
+            data = this.cleanString(data);
+            corpus.push(data.split(' '));
+        }
+
+        const topN = 10; // Số lượng từ quan trọng nhất cần lấy ra
+        const importantTerms = this.getImportantTerms(corpus, topN);
+        importantTerms.forEach((docInfo, index) => {
+            console.log(`Course ${index + 1}:`);
+            console.log('Các từ quan trọng:');
+            docInfo.importantTerms.forEach(termInfo => {
+                console.log(`- ${termInfo.term}: ${termInfo.value}`);
+            });
+            console.log('------------------------');
+        });
+        return importantTerms;
     }
 
     /**
@@ -38,14 +61,17 @@ export class TFIDFService {
      * @returns 
      */
     private cleanString(input: string): string {
+        // Replace newline characters with spaces
+        let cleaned = input.replace(/\n/g, ' ');
+
         // Remove HTML tags
         // This regular expression matches any HTML tags (e.g., <tag> or </tag>)
-        let cleaned = input.replace(/<\/?[^>]+(>|$)/g, "");
+        cleaned = input.replace(/<\/?[^>]+(>|$)/g, "");
     
         // Remove special characters
         // This regular expression matches any character that is not a word character (alphanumeric and underscore) or whitespace
         cleaned = cleaned.replace(/[^\w\s]/gi, "");
-    
+        cleaned = input.replace(/\n/g, ' ');
         return cleaned;
     }
 
@@ -94,7 +120,7 @@ export class TFIDFService {
     private calculateTfIdfForDocument(document: string[], corpus: string[][]): Record<string, number> {
         const tfidfValues: Record<string, number> = {};
         const uniqueTerms = _.uniq(document);
-        uniqueTerms.forEach(term => {
+        uniqueTerms.forEach((term: string) => {
             tfidfValues[term] = this.tfidf(term, document, corpus);
         });
         return tfidfValues;
