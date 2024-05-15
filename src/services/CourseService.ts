@@ -120,7 +120,7 @@ export class CourseService implements ICourseService {
             whereCondition[Op.or] = [
                 { title: { [Op.iLike]: `%${search}%` } },
                 { description: { [Op.iLike]: `%${search}%` } },
-                { learnsDescription: { [Op.iLike]: `%${search}%` } },
+                // { learnsDescription: { [Op.iLike]: `%${search}%` } },
             ];
         }
 

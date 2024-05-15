@@ -1,6 +1,6 @@
 import { CourseController } from "../controllers/CourseController";
 import { auth, authInstructor, authUser } from "../middlewares/AuthMiddleware";
-import { validateGetCourse, validateGetCourses, validateUpdateCourse, validateCreateCourse, validateCreateTopic, validateDeleteTopic, validateUpdateTopic } from "../validators/CourseValidator";
+import { validateGetCourse, validateGetCourses, validateUpdateCourse, validateCreateCourse, validateCreateTopic, validateDeleteTopic, validateUpdateTopic, validateGetQuestion } from "../validators/CourseValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
 
@@ -21,8 +21,11 @@ class CourseRoutes extends BaseRoutes {
 		this.router.post('/:courseId/topics/', auth, authInstructor, validateCreateTopic, validate, this.controller.createTopic);
 		this.router.put('/topics/:topicId', auth, authInstructor, validateUpdateTopic, validate, this.controller.updateTopic);
 		this.router.delete('/topics/:topicId', auth, authInstructor, validateDeleteTopic, validate, this.controller.deleteTopic);
-		this.router.get('/users/recommend-courses', authUser, this.controller.getRecommendCourse);
-		this.router.get('/clients/recommend-courses', this.controller.getRecommendCourseClient);
+		this.router.get('/topics/:topicId/questions', auth, validateGetQuestion, validate, this.controller.getAllQuestionOfTopic);
+		this.router.get('/recommends/recommend-courses', authUser, this.controller.getRecommendCourse);
+		this.router.get('/recommends/recommend-courses-based-on-click', this.controller.getRecommendCourseClient);
+		this.router.get('/tfidf/test', this.controller.tfidf);
+		this.router.post('/topics/qa', this.controller.createQA);
 	}
 }
 

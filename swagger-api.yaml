@@ -656,7 +656,28 @@ paths:
                 message: successfully
       security:
         - bearerAuth: []
-  /courses/users/recommend-courses:
+  /courses/topics/{topicId}/questions:
+    get:
+      tags:
+        - course
+      summary: Get all questions and answers of Topic
+      parameters:
+        - name: topicId
+          in: path
+          description: topicId of topic
+          required: true
+          schema:
+            type: number
+      responses:
+        '204':
+          description: successfully
+          content:
+            application/json:
+              example:
+                message: successfully
+      security:
+        - bearerAuth: []
+  /courses/recommends/recommend-courses:
     get:
       tags:
         - course
@@ -688,7 +709,7 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
-  /courses/clients/recommend-courses:
+  /courses/recommends/recommend-courses-based-on-click:
     get:
       tags:
         - course
