@@ -95,3 +95,7 @@ export const validateUpdateProfile = [
   body('lastName').optional().isString().withMessage('lastName must be a string').trim().isLength({ min: 1, max: 255 }).withMessage('length of lastName must be min:1 and max:255'),
   body('description').optional().isString().withMessage('description must be a string').trim()
 ]
+
+export const validateGetQuestion = [
+  param('topicId').notEmpty().isInt({min: 1}).withMessage('topicId must be a integer number and must be greater than 1') 
+]

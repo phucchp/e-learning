@@ -13,4 +13,13 @@ export class AnswerRepository extends BaseRepository<Answer> implements IAnswerR
     async createInBulks(data:any[]): Promise<Answer[]> {
         return await this.model.bulkCreate(data);
     } 
+
+    async deleteAnswerByQuestionId(questionId: number): Promise<number> {
+        return await this.model.destroy({
+            where: {
+                questionId: questionId 
+            } ,
+            force : true
+        });
+    } 
 }

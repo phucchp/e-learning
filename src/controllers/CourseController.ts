@@ -12,6 +12,8 @@ import { IUserService } from "../services/interfaces/IUserService";
 import { CartService } from "../services/CartService";
 import { ICartService } from "../services/interfaces/ICartService";
 import { TFIDFService } from "../services/TFIDFService";
+import { QAService } from "../services/QAService";
+import { IQAService } from "../services/interfaces/IQAService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -20,6 +22,7 @@ export class CourseController{
 	private userService: IUserService;
 	private cartService: ICartService;
 	private tfidfService: TFIDFService;
+	private qaService: IQAService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -28,7 +31,7 @@ export class CourseController{
 		this.userService = Container.get(UserService);
 		this.cartService = Container.get(CartService);
 		this.tfidfService = Container.get(TFIDFService);
-
+		this.qaService = Container.get(QAService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
@@ -262,4 +265,24 @@ export class CourseController{
             data
         });
     }
+    
+    // ==========================QUESTION & ANSWER======================================
+    createQA = async (req: Request, res: Response) => {
+        const data = req.body.data;
+        console.log(data);
+        for (const question of data.questions) {
+            console.log(question.question_text);
+        }
+    }
+
+    getAllQuestionOfTopic = async (req: Request, res: Response) => {
+        const topicId = req.params.topicId;
+        const {rows, count} = await this.qaService.getAllQuestionOfTopic(Number(topicId));
+        return res.status(200).json({
+            message: "Successful",
+            totalCount: count,
+            data:rows
+        })
+    }
+
 }
