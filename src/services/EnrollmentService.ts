@@ -12,6 +12,9 @@ import { CourseService } from './CourseService';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
 import { HandleS3 } from './utils/HandleS3';
+import { CourseRepository } from '../repositories/CourseRepository';
+import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
+import { ICourseService } from './interfaces/ICourseService';
 
 @Service()
 export class EnrollmentService implements IEnrollmentService {
@@ -21,6 +24,9 @@ export class EnrollmentService implements IEnrollmentService {
 
     @Inject(() => CourseService)
 	private crouseService!: CourseService;
+
+    @Inject(() => CourseRepository)
+	private crouseRepository!: ICourseRepository;
 
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
@@ -97,6 +103,12 @@ export class EnrollmentService implements IEnrollmentService {
             throw new BadRequestError('User already enrollment course!');
         }
 
+        // Update total student in course
+        const course = await this.crouseRepository.findById(courseId);
+        if(course) {
+            course.totalStudents = course.totalStudents + 1;
+            await this.crouseRepository.updateInstance(course);
+        }
         return await this.enrollmentRepository.create({
             userId:userId,
             courseId:courseId
