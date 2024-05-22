@@ -119,7 +119,7 @@ export class CourseService implements ICourseService {
         if(search){
             whereCondition[Op.or] = [
                 { title: { [Op.iLike]: `%${search}%` } },
-                { description: { [Op.iLike]: `%${search}%` } },
+                // { description: { [Op.iLike]: `%${search}%` } },
                 // { learnsDescription: { [Op.iLike]: `%${search}%` } },
             ];
         }
@@ -581,6 +581,12 @@ export class CourseService implements ICourseService {
         }
 
         return courseIdsNumber;
+    }
+
+    async getCourseByCourseIds(courseIdsString: string[]): Promise<{ rows: Course[]; count: number}> {
+        const data = await this.courseRepository.getCoursesByCourseIds(courseIdsString);
+        data.rows = await this.handleS3.getResourceCourses(data.rows);
+        return data;
     }
     
 }
