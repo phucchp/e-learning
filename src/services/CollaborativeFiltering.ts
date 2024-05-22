@@ -4,17 +4,6 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import { ContentNotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
-import { CourseRepository } from '../repositories/CourseRepository';
-import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
-import { Course } from '../models/Course';
-import { Level } from '../models/Level';
-import { CategoryRepository } from '../repositories/CategoryRepository';
-import { LevelRepository } from '../repositories/LevelRepository';
-import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
-import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';
-import { Category } from '../models/Category';
-import { UserRepository } from '../repositories/UserRepository';
-import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
 import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
 
@@ -100,42 +89,64 @@ export class CollaborativeFiltering {
 
     async getUserSimilarityWights(userId: number) {
         const {matrix, uniqueUserIds, uniqueCourseIds} = await this.createMatrix();
+        // console.log(matrix);
+        // console.log(`UserId: ${userId}`)
+        // console.log(`user unique id: ${Array.from(uniqueUserIds)}`);
+        // console.log(`course unique id: ${Array.from(uniqueCourseIds)}`);
+
         const similarityWights : Row = {};
         const matrixUserRate : Matrix = {};
         const restMatrix: Matrix = {};
         const dataRowRest : Row = {};
         const dataRowUserRate : Row = {};
+        const userVectorRate: Row = {};
+        const userVectorRest: Row = {};
         // user vector
         const userVector: Row = matrix[userId];
         if(!userVector) {
             return null;
         }
         uniqueUserIds.delete(userId);
-
+        // Init restMatrix and userRateMatrix
         for(const key in userVector) {
             if (userVector[key] === 0) {
                 dataRowRest[key] = 0;
+            } else{
+                dataRowUserRate[key] = 0;
+                userVectorRate[key] = userVector[key];
+            }
+        }
+        // Init matrix, all row = 0
+        for (const key of uniqueUserIds) {
+            restMatrix[key] = {...dataRowRest}; // Copy dataRows
+            matrixUserRate[key] = {...dataRowUserRate}; // Copy dataRows
+        }
+        // Init value for restMatrix and userRateMatrix
+        for(const key in userVector) {
+            if (userVector[key] === 0) {
                 for(const id of uniqueUserIds) {
                     restMatrix[id][key] =  matrix[id][key];
                 }
             } else{
-                dataRowUserRate[key] = 0;
                 for(const id of uniqueUserIds) {
                     matrixUserRate[id][key] =  matrix[id][key];
                 }
             }
         }
+        // console.log('===REST MATRIX===');
+        // console.log(restMatrix);
+        // console.log(matrixUserRate);
 
         // Tính toán độ tương tự
         // Calculate similarity between userId with another users
         for (const id of uniqueUserIds) {
-            similarityWights[id] = this.cosineSimilarity(this.rowToArray(matrixUserRate[id]), this.rowToArray(userVector));
+            similarityWights[id] = this.cosineSimilarity(this.rowToArray(matrixUserRate[id]), this.rowToArray(userVectorRate));
         }
         const restMatrixWeights: Matrix = {};
         // Nhân độ tương tự với rest matrix
         for(const rowKey in restMatrix) {
-            if (matrix.hasOwnProperty(rowKey)) {
-                const row: Row = matrix[rowKey];
+            if (restMatrix.hasOwnProperty(rowKey)) {
+                const row: Row = restMatrix[rowKey];
                 const multipliedRow: Row = {};
 
                 for (const colKey in row) {
@@ -147,11 +158,13 @@ export class CollaborativeFiltering {
                 restMatrixWeights[Number(rowKey)] = multipliedRow;
             }
         }
+        // console.log('===REST MATRIX WITH WEIGHT===');
+        // console.log(restMatrixWeights);
         const sumWeightSimilarity: Row = {...dataRowRest};
         const sumWeightCourses: Row = {...dataRowRest};
         const recommendMatrix: Row = {};
         for(const rowKey in restMatrix) {
-            const row: Row = matrix[rowKey];
+            const row: Row = restMatrix[rowKey];
             for (const colKey in row) {
                 if (row[colKey] === 0) {
                     sumWeightCourses[colKey] += row[colKey];
@@ -161,13 +174,30 @@ export class CollaborativeFiltering {
                 }
             }
         }
+        // console.log(sumWeightCourses);
+        // console.log(sumWeightSimilarity);
 
         for(const key in sumWeightSimilarity) {
             recommendMatrix[key] = sumWeightSimilarity[key] * sumWeightCourses[key];
         }
+        // console.log('RESULTS');
+        // console.log(recommendMatrix);
 
         // Sort matrix
+        const sortMatrix = this.sortArrayByValue(recommendMatrix);
+        // console.log('RESULTS SORT');
+        // console.log(sortMatrix);
+        const courseIdsArr: number[] = sortMatrix.map(([key]) => key);
+        // console.log(courseIdsArr);
 
+        return courseIdsArr;
+
+    }
+
+    private sortArrayByValue(sumByKey: { [key: number]: number }): [number, number][] {
+        return Object.entries(sumByKey)
+            .map(([key, value]) => [Number(key), value] as [number, number])
+            .sort((a, b) => b[1] - a[1]);
     }
 
     private rowToArray(row: Row) {

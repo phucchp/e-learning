@@ -250,7 +250,7 @@ export class CourseController{
             const {rows, count} = await this.courseService.getPopularCourse(page, pageSize);
             return res.status(200).json({
                 message: "Successful",
-                note: "Recommended popolar courses",
+                note: "Recommended popular courses",
                 totalCount: count,
                 page: page,
                 pageSize: pageSize,
@@ -283,6 +283,44 @@ export class CourseController{
             totalCount: count,
             data:rows
         })
+    }
+
+    getCoursesRecommendBasedOnCollaborativeFiltering = async (req: Request, res: Response) => {
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 15;
+        const userId = req.payload.userId;
+        if(!userId) {
+            const {rows, count} = await this.courseService.getPopularCourseByRating(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popular courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
+        
+        const results = await this.courseService.getCoursesRecommendBasedOnCollaborativeFiltering(10,1,10);
+        if(!results) {
+            const {rows, count} = await this.courseService.getPopularCourseByRating(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popular courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
+
+        return res.status(200).json({
+            message: "Successful",
+            totalCount: results.count,
+            page: page,
+            pageSize: pageSize,
+            data: results.rows
+        });
     }
 
 }

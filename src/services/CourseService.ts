@@ -26,6 +26,7 @@ import { Favorite } from '../models/Favorite';
 import { IoTRoboRunner } from 'aws-sdk';
 import { HandleS3 } from './utils/HandleS3';
 import { RecommenderSystem } from './RecommenderSystem';
+import { CollaborativeFiltering } from './CollaborativeFiltering';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -59,6 +60,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => S3Service)
 	private s3Service!: S3Service;
+
+    @Inject(() => CollaborativeFiltering)
+	private collaborativeFiltering!: CollaborativeFiltering;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
@@ -561,12 +565,36 @@ export class CourseService implements ICourseService {
         return {rows, count};
     }
 
+    /**
+     * Get popular course by total Students
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
     async getPopularCourse(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>  {
         const options = {
             page: page || 1,
-            pageSize: pageSize || 10,
+            pageSize: pageSize || 20,
             sortType: 'DESC',
             sort :  'totalStudents'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    }
+
+        /**
+     * Get popular course by average rating
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
+    async getPopularCourseByRating(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>  {
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 20,
+            sortType: 'DESC',
+            sort :  'averageRating'
         }
         let courses = await this.courseRepository.getCourses(options);
         courses.rows = await this.handleS3.getResourceCourses(courses.rows);
@@ -583,4 +611,13 @@ export class CourseService implements ICourseService {
         return courseIdsNumber;
     }
     
+    async getCoursesRecommendBasedOnCollaborativeFiltering(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}|null> {
+        const courseIdsRecommend = await this.collaborativeFiltering.getUserSimilarityWights(userId);
+        if(!courseIdsRecommend) {
+            return null;
+        }
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
 }
