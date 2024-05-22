@@ -214,4 +214,39 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
         });
         return courses;
     }
+
+    async getCoursesByCourseIds(courseIds: string[]): Promise<{ rows: Course[]; count: number}> {
+        const courses = await this.model.findAndCountAll({
+            attributes: { exclude: ['id', 'updatedAt', 'deletedAt'] },
+            where: {
+                courseId: courseIds
+            },
+            include: [
+                {
+                    model: Language,
+                    attributes: { exclude: ['id','createdAt', 'updatedAt', 'deletedAt'] },
+                },
+                {
+                    model: Level,
+                    attributes: { exclude: ['id','createdAt', 'updatedAt', 'deletedAt'] },
+                },
+                {
+                    model: Category,
+                    attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'deletedAt'] },
+                },
+                {
+                    model: User,
+                    as: 'instructor', // Alias của BelongsTo
+                    attributes: ['userName'],
+                    include: [
+                        {
+                            model: Profile,
+                            attributes: ['fullName','firstName', 'lastName', 'avatar'],
+                        },
+                    ],
+                },
+            ],
+        });
+        return courses;
+    }
 }

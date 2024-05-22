@@ -322,5 +322,27 @@ export class CourseController{
             data: results.rows
         });
     }
+    
+    getCoursesByCourseIds = async (req: Request, res: Response) => {
+        // Parse courseIds from query parameter as string
+        const courseIdsString: string | undefined = req.query.courseIds as string;
+        // Initialize courseIds array
+        let courseIds: string[] = [];
+
+        // Check if courseIdsString is defined and not empty
+        if (courseIdsString && courseIdsString.trim() !== '') {
+            // Split the string by comma and trim each element
+            courseIds = courseIdsString.split(',').map(id => id.trim());
+        }
+
+        if(courseIds.length > 0) {
+            const {rows, count} = await this.courseService.getCourseByCourseIds(courseIds);
+            return res.status(200).json({
+                message: "Successful",
+                totalCount: count,
+                data:rows
+            });
+        }
+    }
 
 }
