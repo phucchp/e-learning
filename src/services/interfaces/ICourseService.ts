@@ -25,5 +25,7 @@ export interface ICourseService {
     getCourseIdsRecommendForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
     getIdByCourseIdsString(courseIdsString: string[]): Promise<number[]>;
     getPopularCourse(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>;
+    getCoursesRecommendBasedOnCollaborativeFiltering(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number} | null>;
+    getPopularCourseByRating(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>;
     getCourseByCourseIds(courseIdsString: string[]): Promise<{ rows: Course[]; count: number}>;
 }
