@@ -749,6 +749,32 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
+  /courses/others/get-courses-by-courseIds:
+    get:
+      tags:
+        - course
+      summary: Get courses recommend based on courseIds from client
+      description: Get courses recommend based on courseIds from client
+      parameters:
+        - name: courseIds
+          in: query
+          description: List courseIds (string)
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: 'id1,id2,id3'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
   /lessons/{lessonId}:
     get:
       tags:
