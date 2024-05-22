@@ -268,11 +268,11 @@ export class CourseController{
     
     // ==========================QUESTION & ANSWER======================================
     createQA = async (req: Request, res: Response) => {
-        const data = req.body.data;
-        console.log(data);
-        for (const question of data.questions) {
-            console.log(question.question_text);
-        }
+        const data = await this.qaService.createQA(req);
+        return res.status(200).json({
+            message: "Successful",
+            data: data
+        });
     }
 
     getAllQuestionOfTopic = async (req: Request, res: Response) => {

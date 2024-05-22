@@ -27,9 +27,28 @@ export class QAService implements IQAService {
 
     async createQA(req: Request): Promise<Question[]> {
         const questions = req.body.questions;
-        const userId = req.payload.userId;
+        const userId = 1;
         const topicId = req.body.topicId;
         const newQuestions: Question[] = [];
+        let isValid = true;
+        // check all question is Valid
+        for(const question of questions) {
+            if (!question.question_text) {
+                throw new BadRequestError(`Question invalid!, \n Invalid in question : "${question.question_text}"`);
+            }
+            let isCorrectAnswer = false;
+            let numberAnswer = 0;
+            for(const answer of question.answers) {
+                if(answer.is_correct === true) {
+                    isCorrectAnswer = true;
+                }
+                numberAnswer = numberAnswer + 1;
+            }
+            if(isCorrectAnswer === false || numberAnswer < 2) {
+                throw new BadRequestError(`Invalid answer: There must be at least 1 correct answer and at least 2 answers for each question, Invalid in question : "${question.question_text}"`);
+            }
+        }
+
         for(const question of questions) {
             // Create question
             const newQuestion: Question = await this.questionRepository.create({
