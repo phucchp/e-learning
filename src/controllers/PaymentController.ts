@@ -47,6 +47,11 @@ export class PaymentController{
         await this.paymentService.cancelOrder(userId);
         // Nếu tiếp tục order, get paymentID để trả về cho user tiếp tục dùng id đó thanh toán với paypal
         // check id paypal còn dùng được hay không, nếu được thì trả về, ko dc thì tao order mới dựa vào các thông tin trong order cũ
+        const paymentNotCheckout2 = await this.paymentService.getPaymentNotCheckout(userId);
+        if(!paymentNotCheckout2) {
+            const {jsonResponse, httpStatusCode} = await this.paypalService.createOrder(userId, courseIds);
+            return res.status(200).json(jsonResponse);
+        }
         const {jsonResponse, httpStatusCode} = await this.paypalService.reCreateOrder(userId);
         return res.status(200).json(jsonResponse);
     }
