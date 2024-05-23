@@ -26,7 +26,7 @@ class CourseRoutes extends BaseRoutes {
 		this.router.get('/recommends/collaborative-filtering',authUser, this.controller.getCoursesRecommendBasedOnCollaborativeFiltering);
 		this.router.get('/tfidf/test', this.controller.tfidf);
 		this.router.post('/topics/:topicId/questions-answers',auth, this.controller.createQA);
-		this.router.delete('/topics/:topicId/questions/:questionId',auth, this.controller.deleteQuestions);
+		this.router.delete('/topics/:topicId/questions/:questionId',auth, this.controller.deleteQuestion);
 		this.router.get('/topics/:topicId/questions', auth, validateGetQuestion, validate, this.controller.getAllQuestionOfTopic);
 		this.router.get('/others/get-courses-by-courseIds' , this.controller.getCoursesByCourseIds);
 	}
