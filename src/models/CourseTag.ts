@@ -4,7 +4,7 @@ import { Course } from './Course';
 import { Tag } from './Tag';
 
 @Table({
-  tableName: 'CourseTags',
+  tableName: 'course_tags',
   timestamps: true,
   paranoid: true,
   underscored: true, // Use naming convention snake_case
