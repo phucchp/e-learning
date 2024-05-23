@@ -759,4 +759,14 @@ export class CourseService implements ICourseService {
             courseIdCount: courseIdCount
         };
     }
+
+    async getCourseByInputUser(query: string): Promise<any> {
+        const tags = await this.tagRepository.getAll();
+        const tagsName = [];
+        for(const tag of tags) {
+            tagsName.push(tag.name);
+        }
+        const tagsForQuery = this.findTagsInText(query, tagsName);
+        return tagsForQuery;
+    }
 }

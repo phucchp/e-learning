@@ -421,9 +421,28 @@ export class CourseController{
     }
 
     getRecommendCourseBasedOnTags  = async (req: Request, res: Response) => {
-        await this.courseService.getCoursesRecommendBasedOnTags(1,1,10);
+        const userId = req.payload.userId;
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        if (!userId) {
+            // Recommend popolar courses
+            const {rows, count} = await this.courseService.getPopularCourse(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popolar courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
+        const {rows, count} = await this.courseService.getCoursesRecommendBasedOnTags(userId,page,pageSize);
         return res.status(200).json({
-            message: "OK"
+            message: "Successful",
+            totalCount: count,
+            page: page,
+            pageSize: pageSize,
+            data: rows
         });
     }
 
@@ -433,5 +452,12 @@ export class CourseController{
             results
         });
     }
+
+    getCoursesForAiRecommend = async (req: Request, res: Response) => {
+        const query= req.query.query || 'devops';
+        const rs = await this.courseService.getCourseByInputUser(query.toString());
+        return res.status(200).json(rs);
+    }
+
 
 }
