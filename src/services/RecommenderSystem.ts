@@ -66,7 +66,8 @@ export class RecommenderSystem {
         vectorWeight = await this.normalizeArray(vectorWeight);
         const matrixRecommend = await this.getUserMatrixRecommend(restMatrix, vectorWeight);
         const courseIdsArr: number[] = matrixRecommend.map(([key]) => key);
-        return courseIdsArr;
+        const first100Elements = courseIdsArr.slice(0, 50);
+        return first100Elements;
     }
     
     /**
@@ -323,6 +324,7 @@ export class RecommenderSystem {
         vectorWeight = await this.normalizeArray(vectorWeight);
         const matrixRecommend = await this.getUserMatrixRecommend(restMatrix, vectorWeight);
         const courseIdsArr: number[] = matrixRecommend.map(([key]) => key);
-        return courseIdsArr;
+        const first100Elements = courseIdsArr.slice(0, 50);
+        return first100Elements;
     }
 }

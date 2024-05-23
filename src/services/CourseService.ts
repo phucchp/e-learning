@@ -596,6 +596,7 @@ export class CourseService implements ICourseService {
 
     async getCourseIdsRecommendForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
         const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
+        console.log(courseIdsRecommend.length);
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
 
         rows = await this.handleS3.getResourceCourses(rows);
@@ -604,6 +605,7 @@ export class CourseService implements ICourseService {
 
     async getCourseIdsRecommendBasedOnTagsForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
         const courseIdsRecommend = await this.contentBasedRecommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
+
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
 
         rows = await this.handleS3.getResourceCourses(rows);

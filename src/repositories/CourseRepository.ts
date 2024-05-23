@@ -205,7 +205,7 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
 					[
 					  Sequelize.literal(
 						`CASE ${courseIds
-						  .map((id, index) => `WHEN Course.id = ${id} THEN ${index}`)
+						  .map((id, index) => `WHEN "Course"."id" = ${id} THEN ${index}`)
 						  .join(' ')}
 						END`
 					  )
