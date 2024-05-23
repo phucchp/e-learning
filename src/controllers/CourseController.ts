@@ -74,6 +74,7 @@ export class CourseController{
                 isCourseFavorite,
                 percentCompleteCourse,
                 isAddedToCart,
+                isUserEnrollmentCourse,
                 course,
             },
             groupReview: groupReview.rows
