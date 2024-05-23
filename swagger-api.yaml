@@ -656,18 +656,87 @@ paths:
                 message: successfully
       security:
         - bearerAuth: []
+  /courses/topics/{topicId}/questions-answers:
+    post:
+      tags:
+        - course
+      summary: Submit questions and answers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topicId:
+                  type: integer
+                  example: 13470
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question_text:
+                        type: string
+                        example: "What is the capital of France?"
+                      answers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            choice_text:
+                              type: string
+                              example: "Berlin"
+                            is_correct:
+                              type: boolean
+                              example: false
+                          required:
+                            - choice_text
+              required:
+                - topicId
+                - questions
+      responses:
+        '200':
+          description: Questions submitted successfully
+        '400':
+          description: Invalid request
+      security:
+        - bearerAuth: []
   /courses/topics/{topicId}/questions:
     get:
       tags:
         - course
-      summary: Get all questions and answers of Topic
+      summary: Get all questions of topic
       parameters:
         - name: topicId
           in: path
-          description: topicId of topic
+          description: topicId to get
           required: true
           schema:
-            type: number
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+  /courses/topics/{topicId}/questions/{questionId}:
+    delete:
+      tags:
+        - course
+      summary: Deletes a question of topic
+      parameters:
+        - name: topicId
+          in: path
+          description: topicId to delete
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: successfully

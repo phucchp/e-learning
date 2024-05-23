@@ -14,6 +14,8 @@ import { ICartService } from "../services/interfaces/ICartService";
 import { TFIDFService } from "../services/TFIDFService";
 import { QAService } from "../services/QAService";
 import { IQAService } from "../services/interfaces/IQAService";
+import { EnrollmentService } from "../services/EnrollmentService";
+import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -23,6 +25,7 @@ export class CourseController{
 	private cartService: ICartService;
 	private tfidfService: TFIDFService;
 	private qaService: IQAService;
+	private enrollmentService: IEnrollmentService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -32,6 +35,7 @@ export class CourseController{
 		this.cartService = Container.get(CartService);
 		this.tfidfService = Container.get(TFIDFService);
 		this.qaService = Container.get(QAService);
+		this.enrollmentService = Container.get(EnrollmentService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
@@ -268,6 +272,13 @@ export class CourseController{
     
     // ==========================QUESTION & ANSWER======================================
     createQA = async (req: Request, res: Response) => {
+        // Check role isAdmin or isInstructor
+        const topicId = Number(req.params.topicId);
+        const userId = req.payload.userId;
+        const course = await this.courseService.getCourseByTopicId(topicId);
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
         const data = await this.qaService.createQA(req);
         return res.status(200).json({
             message: "Successful",
@@ -275,8 +286,32 @@ export class CourseController{
         });
     }
 
+    deleteQuestion = async (req: Request, res: Response) => {
+        const questionId = req.params.questionId;
+        const userId = req.payload.userId;
+        // Check role isAdmin or isInstructor
+        const topicId = Number(req.params.topicId);
+        const course = await this.courseService.getCourseByTopicId(topicId);
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
+        const data = await this.qaService.deleteQuestion(Number(questionId));
+        return res.status(200).json({
+            message: "Successful",
+        });
+    }
+
     getAllQuestionOfTopic = async (req: Request, res: Response) => {
         const topicId = req.params.topicId;
+        const userId  = req.payload.userId;
+        // check user is enrollment course
+        const course = await this.courseService.getCourseByTopicId(Number(topicId));
+        if(course.instructorId !== userId 
+            && !await this.userService.isAdmin(userId)
+            && !await this.enrollmentService.isUserEnrollmentCourse(userId, course.id) // User is not enrollment course
+        ){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
         const {rows, count} = await this.qaService.getAllQuestionOfTopic(Number(topicId));
         return res.status(200).json({
             message: "Successful",

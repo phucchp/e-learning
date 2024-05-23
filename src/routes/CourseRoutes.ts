@@ -21,12 +21,13 @@ class CourseRoutes extends BaseRoutes {
 		this.router.post('/:courseId/topics/', auth, authInstructor, validateCreateTopic, validate, this.controller.createTopic);
 		this.router.put('/topics/:topicId', auth, authInstructor, validateUpdateTopic, validate, this.controller.updateTopic);
 		this.router.delete('/topics/:topicId', auth, authInstructor, validateDeleteTopic, validate, this.controller.deleteTopic);
-		this.router.get('/topics/:topicId/questions', auth, validateGetQuestion, validate, this.controller.getAllQuestionOfTopic);
 		this.router.get('/recommends/recommend-courses', authUser, this.controller.getRecommendCourse);
 		this.router.get('/recommends/recommend-courses-based-on-click', this.controller.getRecommendCourseClient);
 		this.router.get('/recommends/collaborative-filtering',authUser, this.controller.getCoursesRecommendBasedOnCollaborativeFiltering);
 		this.router.get('/tfidf/test', this.controller.tfidf);
-		this.router.post('/topics/questions-answers', this.controller.createQA);
+		this.router.post('/topics/:topicId/questions-answers',auth, this.controller.createQA);
+		this.router.delete('/topics/:topicId/questions/:questionId',auth, this.controller.deleteQuestions);
+		this.router.get('/topics/:topicId/questions', auth, validateGetQuestion, validate, this.controller.getAllQuestionOfTopic);
 		this.router.get('/others/get-courses-by-courseIds' , this.controller.getCoursesByCourseIds);
 	}
 }

@@ -28,7 +28,7 @@ export class QAService implements IQAService {
     async createQA(req: Request): Promise<Question[]> {
         const questions = req.body.questions;
         const userId = 1;
-        const topicId = req.body.topicId;
+        const topicId = Number(req.params.topicId);
         const newQuestions: Question[] = [];
         let isValid = true;
         // check all question is Valid
