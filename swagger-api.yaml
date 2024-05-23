@@ -778,6 +778,38 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
+  /courses/recommends/recommends/recommend-courses-based-on-tags:
+    get:
+      tags:
+        - course
+      summary: Get courses recommend for users
+      description: Get courses recommend for users using content based
+      parameters:
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 15
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
   /courses/recommends/collaborative-filtering:
     get:
       tags:
@@ -810,7 +842,7 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
-  /courses/recommends/recommend-courses-based-on-click:
+  /courses/recommends/v1/recommend-courses-based-on-click:
     get:
       tags:
         - course
@@ -865,6 +897,31 @@ paths:
           schema:
             type: string
             default: 'id1,id2,id3'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+  /courses/recommends/get-courses-by-query:
+    get:
+      tags:
+        - course
+      summary: Get courses by query user
+      parameters:
+        - name: query
+          in: query
+          description: Input user
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: 'Can you recommend me some courses about hacking?'
       responses:
         '200':
           description: successful operation
