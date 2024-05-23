@@ -61,18 +61,20 @@ export class CourseController{
         let isCourseFavorite = false;
         let percentCompleteCourse = null;
         let isAddedToCart = false;
+        let isUserEnrollmentCourse = false;
         if(userId) {
             isCourseFavorite = await this.courseService.isCourseFavorite(course.id, userId);
             percentCompleteCourse = await this.userService.getCompletionPercentageCourse(userId, courseId);
             isAddedToCart = await this.cartService.isCourseInCartUser(userId, course.id);
+            isUserEnrollmentCourse = await this.enrollmentService.isUserEnrollmentCourse(userId, course.id)
         }
         return res.status(200).json({
             message: "successfully",
             data: {
-                course,
                 isCourseFavorite,
                 percentCompleteCourse,
-                isAddedToCart
+                isAddedToCart,
+                course,
             },
             groupReview: groupReview.rows
         });
