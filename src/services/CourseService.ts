@@ -27,6 +27,11 @@ import { IoTRoboRunner } from 'aws-sdk';
 import { HandleS3 } from './utils/HandleS3';
 import { RecommenderSystem } from './RecommenderSystem';
 import { CollaborativeFiltering } from './CollaborativeFiltering';
+import { TagRepository } from '../repositories/TagRepository';
+import { ITagRepository } from '../repositories/interfaces/ITagRepository';
+import { CourseTag } from '../models/CourseTag';
+import { CourseTagRepository } from '../repositories/CourseTagRepository';
+import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -54,6 +59,12 @@ export class CourseService implements ICourseService {
 
     @Inject(() => RecommenderSystem)
 	private recommendSystem!: RecommenderSystem;
+
+    @Inject(() => TagRepository)
+	private tagRepository!: ITagRepository;
+
+    @Inject(() => CourseTagRepository)
+	private courseTagRepository!: ICourseTagRepository;
 
     @Inject(() => HandleS3)
 	private handleS3!: HandleS3;
@@ -625,5 +636,91 @@ export class CourseService implements ICourseService {
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
         rows = await this.handleS3.getResourceCourses(rows);
         return {rows, count};
+    }
+
+    private findTagsInText(text: string, tags: string[]): string[] {
+        // Chuyển văn bản sang chữ thường
+        const lowerCaseText = text.toLowerCase();
+        // Lọc ra những tag xuất hiện trong văn bản
+        const foundTags = tags.filter(tag => lowerCaseText.includes(tag.toLowerCase()));
+        return foundTags;
+    }
+
+    async test(req: Request): Promise<any> {
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 15;
+        const results = [];
+        const offset = (page - 1) * pageSize;
+        const courses = await this.courseRepository.getAll({
+            attributes: ['id', 'courseId', 'title', 'introduction', 'learnsDescription'],
+            limit: pageSize,
+            offset: offset,
+        });
+        const tags = await this.tagRepository.getAll();
+        const tagsName = [];
+        for(const tag of tags) {
+            tagsName.push(tag.name);
+        }
+        for(const course of courses) {
+            results.push({
+                id: course.id,
+                courseId: course.courseId,
+                title: course.title,
+                tags: this.findTagsInText(course.title+ course.introduction+' '+ course.learnsDescription,tagsName)
+            });
+        }
+        return results;
+    }
+
+    private async addDataTagsForCourses() {
+
+        const courses = await this.courseRepository.getAll({
+            attributes: ['id', 'courseId', 'title', 'introduction', 'learnsDescription'],
+        });
+
+        const tags = await this.tagRepository.getAll();
+        const tagsName = [];
+        const tagValue: { [key: string]: number } = {};
+        for(const tag of tags) {
+            tagsName.push(tag.name);
+            tagValue[tag.name] = tag.id;
+        }
+
+        const courseTags: any[] = [];
+        for(const course of courses) {
+            // Get all tag of course
+            const tagsOfCourse = this.findTagsInText(course.title+ course.introduction, tagsName);
+            for(const item of tagsOfCourse) {
+                courseTags.push({
+                    tagId: tagValue[item],
+                    courseId: course.id
+                });
+            }
+        }
+        // Create data CourseTag
+        await this.courseTagRepository.createInBulks(courseTags);
+
+
+        const tagIdCount: { [key: number]: number } = {};
+        const courseIdCount: { [key: number]: number } = {};
+
+        courseTags.forEach(item => {
+        if (tagIdCount[item.tagId]) {
+            tagIdCount[item.tagId]++;
+        } else {
+            tagIdCount[item.tagId] = 1;
+        }
+
+        if (courseIdCount[item.courseId]) {
+            courseIdCount[item.courseId]++;
+        } else {
+            courseIdCount[item.courseId] = 1;
+        }
+        });
+        return {
+            totalCourseTag: courseTags.length,
+            tagIdCount: tagIdCount,
+            courseIdCount: courseIdCount
+        };
     }
 }

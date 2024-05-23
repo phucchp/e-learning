@@ -380,4 +380,11 @@ export class CourseController{
         }
     }
 
+    test = async (req: Request, res: Response) => {
+        const results = await this.courseService.test(req);
+        return res.status(200).json({
+            results
+        });
+    }
+
 }

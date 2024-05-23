@@ -28,4 +28,5 @@ export interface ICourseService {
     getCoursesRecommendBasedOnCollaborativeFiltering(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number} | null>;
     getPopularCourseByRating(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>;
     getCourseByCourseIds(courseIdsString: string[]): Promise<{ rows: Course[]; count: number}>;
+    test(req: Request): Promise<any>;
 }
