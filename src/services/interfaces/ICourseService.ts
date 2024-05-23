@@ -29,4 +29,6 @@ export interface ICourseService {
     getPopularCourseByRating(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>;
     getCourseByCourseIds(courseIdsString: string[]): Promise<{ rows: Course[]; count: number}>;
     test(req: Request): Promise<any>;
+    getCoursesRecommendBasedOnTags(userId: number, page: number, pageSize: number): any;
+    getCourseIdsRecommendBasedOnTagsForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>
 }

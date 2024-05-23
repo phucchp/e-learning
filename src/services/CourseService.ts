@@ -32,6 +32,7 @@ import { ITagRepository } from '../repositories/interfaces/ITagRepository';
 import { CourseTag } from '../models/CourseTag';
 import { CourseTagRepository } from '../repositories/CourseTagRepository';
 import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
+import { ContentBasedRecommendSystem } from './ContentBasedRecommendSystem';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -59,6 +60,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => RecommenderSystem)
 	private recommendSystem!: RecommenderSystem;
+
+    @Inject(() => ContentBasedRecommendSystem)
+	private contentBasedRecommendSystem!: ContentBasedRecommendSystem;
 
     @Inject(() => TagRepository)
 	private tagRepository!: ITagRepository;
@@ -560,6 +564,28 @@ export class CourseService implements ICourseService {
         return await this.s3Service.clearCacheCloudFront(course.posterUrl);
     }
 
+    /**
+     * Content based recommend system based on tag of course
+     * @param userId 
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
+    async getCoursesRecommendBasedOnTags(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.contentBasedRecommendSystem.getCourseIdsRecommend(userId);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    /**
+     * Content based recommend system based on category of course
+     * @param userId 
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
     async getCoursesRecommend(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
         const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommend(userId);
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
@@ -570,6 +596,14 @@ export class CourseService implements ICourseService {
 
     async getCourseIdsRecommendForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
         const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    async getCourseIdsRecommendBasedOnTagsForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.contentBasedRecommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
 
         rows = await this.handleS3.getResourceCourses(rows);
