@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { Request, Response } from 'express';
 import { IReviewService } from "../services/interfaces/IReviewService";
 import { ReviewService } from "../services/ReviewService";
-import { NotEnoughAuthority } from "../utils/CustomError";
+import { BadRequestError, NotEnoughAuthority } from "../utils/CustomError";
 import { ITopicService } from "../services/interfaces/ITopicService";
 import { TopicService } from "../services/TopicService";
 import { UserService } from "../services/UserService";
@@ -454,9 +454,16 @@ export class CourseController{
     }
 
     getCoursesForAiRecommend = async (req: Request, res: Response) => {
-        const query= req.query.query || 'devops';
+        const query= req.query.query;
+        if(!query) {
+            throw new BadRequestError('Missing query parameter');
+        }
         const rs = await this.courseService.getCourseByInputUser(query.toString());
-        return res.status(200).json(rs);
+        return res.status(200).json({
+            message: "successfully",
+            totalCount: rs.count,
+            data:rs.rows
+        });
     }
 
 

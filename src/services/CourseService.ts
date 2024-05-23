@@ -767,6 +767,8 @@ export class CourseService implements ICourseService {
             tagsName.push(tag.name);
         }
         const tagsForQuery = this.findTagsInText(query, tagsName);
-        return tagsForQuery;
+        console.log(tagsForQuery);
+        const courses = await this.courseRepository.getCoursesByTags(tagsForQuery);
+        return courses;
     }
 }
