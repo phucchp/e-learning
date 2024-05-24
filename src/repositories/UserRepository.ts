@@ -135,6 +135,9 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 			],
 			limit: pageSize,
             offset: offset,
+			order:[
+				['id', 'DESC']
+			]
 		});
 
 		return results;
