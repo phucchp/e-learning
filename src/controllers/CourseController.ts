@@ -53,6 +53,21 @@ export class CourseController{
         });
     }
 
+    getAllCourseOfInstructor = async (req: Request, res: Response) => {
+        const courses = await this.courseService.getAllCourseOfInstructors(req);
+        const page = req.query.page || 1;
+        const pageSize = Number(req.query.pageSize) || 20;
+        
+        return res.status(200).json({
+            message: "successfully",
+            page: page,
+            pageSize: pageSize,
+            totalCount: courses.count,
+            totalPages:  Math.ceil(courses.count/pageSize),
+            data:courses.rows
+        });
+    }
+
     getCourse = async (req: Request, res: Response) => {
         const courseId = req.params.courseId;
         const course = await this.courseService.getCourse(courseId);
@@ -379,7 +394,7 @@ export class CourseController{
             });
         }
         
-        const results = await this.courseService.getCoursesRecommendBasedOnCollaborativeFiltering(10,1,10);
+        const results = await this.courseService.getCoursesRecommendBasedOnCollaborativeFiltering(userId,page,pageSize);
         if(!results) {
             const {rows, count} = await this.courseService.getPopularCourseByRating(page, pageSize);
             return res.status(200).json({
@@ -469,5 +484,26 @@ export class CourseController{
         });
     }
 
+    addUserEnrollmentCoursesForAdmin = async (req: Request, res: Response) => { 
+        const userId = req.body.userId;
+        const courseIds = req.body.courseIds;
+        const listId: number[] = [];
+        for(const courseId of courseIds) {
+            if(!await this.enrollmentService.isUserEnrollmentCourse(userId, courseId)) {
+                listId.push(courseId);
+            }
+        }
+        await this.enrollmentService.addEnrollmentCourseInBulk(userId, listId);
+        return res.status(200).json({
+            message: "Successful"
+        })
+    }
+
+    getCoursesDebug = async (req: Request, res: Response) => {
+        const courses = await this.courseService.getCourseForDebug(req);
+        return res.status(200).json({
+            courses
+        })
+    }
 
 }

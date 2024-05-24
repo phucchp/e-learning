@@ -32,4 +32,6 @@ export interface ICourseService {
     getCoursesRecommendBasedOnTags(userId: number, page: number, pageSize: number): any;
     getCourseIdsRecommendBasedOnTagsForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
     getCourseByInputUser(query: string): Promise<any>;
+    getAllCourseOfInstructors(req: Request ): Promise<{ rows: Course[]; count: number}>;
+    getCourseForDebug(req: Request): Promise<Course[]>;
 }
