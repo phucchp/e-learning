@@ -12,6 +12,7 @@ class CourseRoutes extends BaseRoutes {
 	public routes(): void {
 		this.router.get('/', validateGetCourses, validate, this.controller.getCourses);
 		this.router.get('/courses-for-instructor', validateGetCourses, validate, this.controller.getAllCourseOfInstructor);
+		this.router.get('/debug/get-courses' , this.controller.getCoursesDebug);
 		this.router.get('/test', this.controller.test);
 		this.router.get('/:courseId', authUser, validateGetCourse, validate, this.controller.getCourse);
 		this.router.get('/:courseId/presigned-url-to-upload-poster', auth, authInstructor, this.controller.getPresignedUrlToUploadPoster);
@@ -34,6 +35,8 @@ class CourseRoutes extends BaseRoutes {
 		this.router.delete('/topics/:topicId/questions/:questionId',auth, this.controller.deleteQuestion);
 		this.router.get('/topics/:topicId/questions', auth, validateGetQuestion, validate, this.controller.getAllQuestionOfTopic);
 		this.router.get('/others/get-courses-by-courseIds' , this.controller.getCoursesByCourseIds);
+		// Admin
+		this.router.post('/enrollments/add-user-enrollment-courses', this.controller.addUserEnrollmentCoursesForAdmin);
 	}
 }
 

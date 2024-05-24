@@ -831,4 +831,14 @@ export class CourseService implements ICourseService {
         const courses = await this.courseRepository.getCoursesByTags(tagsForQuery);
         return courses;
     }
+
+    async getCourseForDebug(req: Request):Promise<Course[]> {
+        const search = req.query.search || '';
+        return await this.courseRepository.getAll({
+            where: {
+                title: { [Op.iLike]: `%${search}%` }
+            },
+            attributes: ['id' ,'title']
+        });
+    }
 }

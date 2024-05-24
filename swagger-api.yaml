@@ -496,6 +496,29 @@ paths:
                 type: array
         '400':
           description: Can not get courses
+  /courses/enrollments/add-user-enrollment-courses: 
+    post:
+      tags:
+        - admin
+      summary: Add new enrollment
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: number
+                  default: 1
+                courseIds:
+                  type: array
+                  items:
+                    type: number
+      security:
+        - bearerAuth: []
   /courses/{courseId}:
     get:
       tags:
