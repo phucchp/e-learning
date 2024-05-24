@@ -191,6 +191,66 @@ export class CourseService implements ICourseService {
         return courses;
     }
 
+    async getAllCourseOfInstructors(req: Request ): Promise<{ rows: Course[]; count: number}> {
+        let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
+        const instructorId = req.payload.userId;
+        const whereCondition: any = {};
+        if(search){
+            whereCondition[Op.or] = [
+                { title: { [Op.iLike]: `%${search}%` } },
+                // { description: { [Op.iLike]: `%${search}%` } },
+                // { learnsDescription: { [Op.iLike]: `%${search}%` } },
+            ];
+        }
+
+        if(category){
+            const categoryDb = await this.categoryRepository.findOneByCondition({categoryId: category});
+            if(!categoryDb){
+                throw new NotFound('Category Not Found!');
+            }
+            whereCondition['categoryId'] = categoryDb.id;
+        }
+
+        if(averageRating){
+            whereCondition['averageRating'] = {[Op.gt]: averageRating};
+        }
+
+        if(languageId){
+            whereCondition['languageId'] = {[Op.eq]: languageId};
+        }
+
+        if(instructorId){
+            whereCondition['instructorId'] = {[Op.eq]: instructorId};
+        }
+
+        if(level){
+            whereCondition['levelId'] = {[Op.eq]: level};
+        }
+
+        if(duration){
+            whereCondition[Op.and] = this.scopeFilterByDuration(duration);
+        }
+
+        if(price){
+            if(price === 'free'){
+                whereCondition['price'] = {[Op.eq]: 0};
+            }else if(price==='paid'){
+                whereCondition['price'] = {[Op.gt]: 0};
+            }
+        }
+
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 10,
+            whereCondition: whereCondition,
+            sortType: sortType || 'ASC',
+            sort : sort || 'createdAt'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    } 
+
     async getCourse(courseId: string): Promise<Course> {
         let course = await this.courseRepository.getCourse(courseId);
         if(!course){
