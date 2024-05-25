@@ -28,4 +28,10 @@ export interface ICourseService {
     getCoursesRecommendBasedOnCollaborativeFiltering(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number} | null>;
     getPopularCourseByRating(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>;
     getCourseByCourseIds(courseIdsString: string[]): Promise<{ rows: Course[]; count: number}>;
+    test(req: Request): Promise<any>;
+    getCoursesRecommendBasedOnTags(userId: number, page: number, pageSize: number): any;
+    getCourseIdsRecommendBasedOnTagsForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
+    getCourseByInputUser(query: string): Promise<any>;
+    getAllCourseOfInstructors(req: Request ): Promise<{ rows: Course[]; count: number}>;
+    getCourseForDebug(req: Request): Promise<Course[]>;
 }

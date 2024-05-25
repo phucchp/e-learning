@@ -11,7 +11,9 @@ import { Topic } from "../models/Topic";
 import { Lesson } from "../models/Lesson";
 import { Review } from "../models/Review";
 import { NotFound } from "../utils/CustomError";
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
+import { Tag } from "../models/Tag";
+import { CourseTag } from "../models/CourseTag";
 
 @Service()
 export class CourseRepository extends BaseRepository<Course> implements ICourseRepository{
@@ -201,6 +203,16 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
             ],
             limit: pageSize,
             offset: offset,
+            order: 
+					[
+					  Sequelize.literal(
+						`CASE ${courseIds
+						  .map((id, index) => `WHEN "Course"."id" = ${id} THEN ${index}`)
+						  .join(' ')}
+						END`
+					  )
+					]
+				  ,
         });
         return courses;
     }
@@ -246,6 +258,28 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                     ],
                 },
             ],
+        });
+        return courses;
+    }
+
+    async getCoursesByTags(tags: string[]):Promise<{ rows: Course[]; count: number}> {
+        const courses = await this.model.findAndCountAll({
+            attributes: ['courseId', 'updatedAt', 'introduction'],
+            include: [
+                {
+                    model: CourseTag,
+                    include: [
+                        {
+                            model: Tag,
+                            where:{
+                                name: tags
+                            }
+                        },
+                    ],
+                },
+               
+            ],
+            limit: 50,
         });
         return courses;
     }

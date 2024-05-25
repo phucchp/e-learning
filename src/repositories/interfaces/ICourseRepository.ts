@@ -9,4 +9,5 @@ export interface ICourseRepository extends BaseRepositoryInterface<Course> {
     getCoursesRecommend(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}>;
     getIdByCourseIdsString(courseIdsString: string[]): Promise<Course[]>;
     getCoursesByCourseIds(courseIds: string[]): Promise<{ rows: Course[]; count: number}>;
+    getCoursesByTags(tags: string[]):Promise<{ rows: Course[]; count: number}> ;
 }

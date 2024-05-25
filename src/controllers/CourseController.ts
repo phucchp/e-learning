@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { Request, Response } from 'express';
 import { IReviewService } from "../services/interfaces/IReviewService";
 import { ReviewService } from "../services/ReviewService";
-import { NotEnoughAuthority } from "../utils/CustomError";
+import { BadRequestError, NotEnoughAuthority } from "../utils/CustomError";
 import { ITopicService } from "../services/interfaces/ITopicService";
 import { TopicService } from "../services/TopicService";
 import { UserService } from "../services/UserService";
@@ -14,6 +14,8 @@ import { ICartService } from "../services/interfaces/ICartService";
 import { TFIDFService } from "../services/TFIDFService";
 import { QAService } from "../services/QAService";
 import { IQAService } from "../services/interfaces/IQAService";
+import { EnrollmentService } from "../services/EnrollmentService";
+import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -23,6 +25,7 @@ export class CourseController{
 	private cartService: ICartService;
 	private tfidfService: TFIDFService;
 	private qaService: IQAService;
+	private enrollmentService: IEnrollmentService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -32,12 +35,28 @@ export class CourseController{
 		this.cartService = Container.get(CartService);
 		this.tfidfService = Container.get(TFIDFService);
 		this.qaService = Container.get(QAService);
+		this.enrollmentService = Container.get(EnrollmentService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
         const courses = await this.courseService.getCourses(req);
         const page = req.query.page || 1;
         const pageSize = Number(req.query.pageSize) || 10;
+        
+        return res.status(200).json({
+            message: "successfully",
+            page: page,
+            pageSize: pageSize,
+            totalCount: courses.count,
+            totalPages:  Math.ceil(courses.count/pageSize),
+            data:courses.rows
+        });
+    }
+
+    getAllCourseOfInstructor = async (req: Request, res: Response) => {
+        const courses = await this.courseService.getAllCourseOfInstructors(req);
+        const page = req.query.page || 1;
+        const pageSize = Number(req.query.pageSize) || 20;
         
         return res.status(200).json({
             message: "successfully",
@@ -57,18 +76,21 @@ export class CourseController{
         let isCourseFavorite = false;
         let percentCompleteCourse = null;
         let isAddedToCart = false;
+        let isUserEnrollmentCourse = false;
         if(userId) {
             isCourseFavorite = await this.courseService.isCourseFavorite(course.id, userId);
             percentCompleteCourse = await this.userService.getCompletionPercentageCourse(userId, courseId);
             isAddedToCart = await this.cartService.isCourseInCartUser(userId, course.id);
+            isUserEnrollmentCourse = await this.enrollmentService.isUserEnrollmentCourse(userId, course.id)
         }
         return res.status(200).json({
             message: "successfully",
             data: {
-                course,
                 isCourseFavorite,
                 percentCompleteCourse,
-                isAddedToCart
+                isAddedToCart,
+                isUserEnrollmentCourse,
+                course,
             },
             groupReview: groupReview.rows
         });
@@ -259,6 +281,46 @@ export class CourseController{
         }
     }
 
+    getRecommendCourseBasedOneTagForClient  = async (req: Request, res: Response) => {
+        // Parse courseIds from query parameter as string
+        const courseIdsString: string | undefined = req.query.courseIds as string;
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        // Initialize courseIds array
+        let courseIds: string[] = [];
+
+        // Check if courseIdsString is defined and not empty
+        if (courseIdsString && courseIdsString.trim() !== '') {
+            // Split the string by comma and trim each element
+            courseIds = courseIdsString.split(',').map(id => id.trim());
+        }
+        
+        if(courseIds.length > 0) {
+            // Get courseIds number from courseIdsString
+            const courseIdsNumber = await this.courseService.getIdByCourseIdsString(courseIds);
+            console.log(courseIdsNumber);
+            const {rows, count} = await this.courseService.getCourseIdsRecommendBasedOnTagsForClient(courseIdsNumber, page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }else{
+            // Recommend popolar courses
+            const {rows, count} = await this.courseService.getPopularCourse(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popular courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
+    }
+
     tfidf = async (req: Request, res: Response) => {
         const data = await this.tfidfService.getDataDocumentFromCourses();
         return res.status(200).json({
@@ -268,15 +330,46 @@ export class CourseController{
     
     // ==========================QUESTION & ANSWER======================================
     createQA = async (req: Request, res: Response) => {
-        const data = req.body.data;
-        console.log(data);
-        for (const question of data.questions) {
-            console.log(question.question_text);
+        // Check role isAdmin or isInstructor
+        const topicId = Number(req.params.topicId);
+        const userId = req.payload.userId;
+        const course = await this.courseService.getCourseByTopicId(topicId);
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
         }
+        const data = await this.qaService.createQA(req);
+        return res.status(200).json({
+            message: "Successful",
+            data: data
+        });
+    }
+
+    deleteQuestion = async (req: Request, res: Response) => {
+        const questionId = req.params.questionId;
+        const userId = req.payload.userId;
+        // Check role isAdmin or isInstructor
+        const topicId = Number(req.params.topicId);
+        const course = await this.courseService.getCourseByTopicId(topicId);
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
+        const data = await this.qaService.deleteQuestion(Number(questionId));
+        return res.status(200).json({
+            message: "Successful",
+        });
     }
 
     getAllQuestionOfTopic = async (req: Request, res: Response) => {
         const topicId = req.params.topicId;
+        const userId  = req.payload.userId;
+        // check user is enrollment course
+        const course = await this.courseService.getCourseByTopicId(Number(topicId));
+        if(course.instructorId !== userId 
+            && !await this.userService.isAdmin(userId)
+            && !await this.enrollmentService.isUserEnrollmentCourse(userId, course.id) // User is not enrollment course
+        ){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
         const {rows, count} = await this.qaService.getAllQuestionOfTopic(Number(topicId));
         return res.status(200).json({
             message: "Successful",
@@ -301,7 +394,7 @@ export class CourseController{
             });
         }
         
-        const results = await this.courseService.getCoursesRecommendBasedOnCollaborativeFiltering(10,1,10);
+        const results = await this.courseService.getCoursesRecommendBasedOnCollaborativeFiltering(userId,page,pageSize);
         if(!results) {
             const {rows, count} = await this.courseService.getPopularCourseByRating(page, pageSize);
             return res.status(200).json({
@@ -343,6 +436,74 @@ export class CourseController{
                 data:rows
             });
         }
+    }
+
+    getRecommendCourseBasedOnTags  = async (req: Request, res: Response) => {
+        const userId = req.payload.userId;
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 10;
+        if (!userId) {
+            // Recommend popolar courses
+            const {rows, count} = await this.courseService.getPopularCourse(page, pageSize);
+            return res.status(200).json({
+                message: "Successful",
+                note: "Recommended popolar courses",
+                totalCount: count,
+                page: page,
+                pageSize: pageSize,
+                data: rows
+            });
+        }
+        const {rows, count} = await this.courseService.getCoursesRecommendBasedOnTags(userId,page,pageSize);
+        return res.status(200).json({
+            message: "Successful",
+            totalCount: count,
+            page: page,
+            pageSize: pageSize,
+            data: rows
+        });
+    }
+
+    test = async (req: Request, res: Response) => {
+        const results = await this.courseService.test(req);
+        return res.status(200).json({
+            results
+        });
+    }
+
+    getCoursesForAiRecommend = async (req: Request, res: Response) => {
+        const query= req.query.query;
+        if(!query) {
+            throw new BadRequestError('Missing query parameter');
+        }
+        const rs = await this.courseService.getCourseByInputUser(query.toString());
+        return res.status(200).json({
+            message: "successfully",
+            totalCount: rs.count,
+            data:rs.rows
+        });
+    }
+
+    addUserEnrollmentCoursesForAdmin = async (req: Request, res: Response) => { 
+        const userId = req.body.userId;
+        const courseIds = req.body.courseIds;
+        const listId: number[] = [];
+        for(const courseId of courseIds) {
+            if(!await this.enrollmentService.isUserEnrollmentCourse(userId, courseId)) {
+                listId.push(courseId);
+            }
+        }
+        await this.enrollmentService.addEnrollmentCourseInBulk(userId, listId);
+        return res.status(200).json({
+            message: "Successful"
+        })
+    }
+
+    getCoursesDebug = async (req: Request, res: Response) => {
+        const courses = await this.courseService.getCourseForDebug(req);
+        return res.status(200).json({
+            courses
+        })
     }
 
 }

@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Unique, Defa
 import { CourseTag } from './CourseTag';
 
 @Table({
-  tableName: 'categories',
+  tableName: 'tags',
   timestamps: true,
   paranoid: true,
   underscored: true, // Sử dụng naming convention snake_case

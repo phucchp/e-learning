@@ -17,22 +17,28 @@ import { ILevelRepository } from '../repositories/interfaces/ILevelRepository';
 import { Category } from '../models/Category';
 import { UserRepository } from '../repositories/UserRepository';
 import { IUserRepository } from '../repositories/interfaces/IUserRepository';
+import { CourseTag } from '../models/CourseTag';
+import { CourseTagRepository } from '../repositories/CourseTagRepository';
+import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
 
 interface Row {
-    [key: string]: number; // Định dạng cụ thể của các giá trị trong hàng
+    [key: number]: number; // Định dạng cụ thể của các giá trị trong hàng
 }
 
 interface Matrix {
     [key: number]: Row; // Định dạng cụ thể của các hàng trong ma trận
 }
 @Service()
-export class RecommenderSystem {
+export class ContentBasedRecommendSystem {
 
     @Inject(() => CourseRepository)
 	private courseRepository!: ICourseRepository;
 
     @Inject(() => LevelRepository)
 	private levelRepository!: ILevelRepository;
+
+    @Inject(() => CourseTagRepository)
+	private courseTagRepository!: ICourseTagRepository;
 
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
@@ -53,13 +59,13 @@ export class RecommenderSystem {
      * Main function
      */
     async getCourseIdsRecommend(userId: number) {
-        // Step 1 : Create full matrix between course, category and level
+        // Step 1 : Create full matrix between course and tag
         // Step 2 : Get user data (include : course favorite, rating and course in cart) -> User rate map
         // Step 3 : Create matrix weights of user based on user rate map in Step 2
         // Step 4 : Create User Profile (Vector weight)
         // Step 5 : Get the restMatrix and calculate recommend matrix
         const matrix = await this.createMatrix();
-        const userRateMap : Map<number, number> = await this.getUserData(userId);
+        const userRateMap : Map<number, number> = await this.getUserData(userId); // {key:CourseId, value: point}
         const restMatrix = await this.getTheRestMatrix(matrix, Array.from(userRateMap.keys()));
         const matrixWeight = await this.getUserRateMatrixWeight(matrix, userRateMap);
         let vectorWeight = await this.sumColumns(matrixWeight);
@@ -67,6 +73,7 @@ export class RecommenderSystem {
         const matrixRecommend = await this.getUserMatrixRecommend(restMatrix, vectorWeight);
         const courseIdsArr: number[] = matrixRecommend.map(([key]) => key);
         const first100Elements = courseIdsArr.slice(0, 50);
+        console.log(first100Elements);
         return first100Elements;
     }
     
@@ -78,46 +85,40 @@ export class RecommenderSystem {
         const matrixRcm : Matrix = {};
         const dataRows : Row = {};
         const categoryArray:string[] = [];
-        const levels: Level[] = await this.levelRepository.getAll({
-            attributes: ['id','levelName']
-        }); // Handle để get từ cache redis ra
-        const categories: Category[] = await this.categoryRepository.getAll({
-            attributes: ['id','categoryId', 'name']
-        });
-        const courses: Course[] =  await this.courseRepository.getAll({
-            attributes: ['id','courseId', 'levelId', 'categoryId']
-        });
+        const courseTags: CourseTag[] = await this.courseTagRepository.getAll(); 
         // Sử dụng Set để lưu trữ các giá trị không trùng nhau
         let uniqueCourseIds = new Set<number>();
-        let uniqueLevelIds = new Set<number>();
-        let uniqueCategoryIds = new Set<string>();
+        let uniqueTagIds = new Set<number>();
         // Lặp qua mảng và thêm giá trị vào Set
-        courses.forEach((course: Course) => {
-            uniqueCourseIds.add(course.getDataValue('id'));
+        courseTags.forEach((courseTag: CourseTag) => {
+            const tagId = courseTag.getDataValue('tagId');
+            const courseId = courseTag.getDataValue('courseId');
+
+            uniqueCourseIds.add(courseId);
+            uniqueTagIds.add(tagId);
+
+            dataRows[tagId] = 0;
         });
-        categories.forEach((category: Category) => {
-            const categoryId = category.getDataValue('categoryId');
-            uniqueCategoryIds.add(categoryId);
-            dataRows[categoryId] = 0;
-            categoryArray[category.id] = categoryId;
-        });
-        levels.forEach((level: Level) => {
-            const levelId = level.getDataValue('id');
-            uniqueLevelIds.add(levelId);
-            dataRows[levelId] = 0;
-        });
+        // console.log('UNIQUE TAG');
+        // console.log(uniqueTagIds);
+        // console.log('UNIQUE COURSEID');
+        // console.log(uniqueCourseIds);
+        // console.log('DATA ROW');
+        // console.log(dataRows);
+
         // Init data matrix (all value = 0)
         for (const id of uniqueCourseIds) {
             matrixRcm[id] = {...dataRows};
         }
+
         // Create data matrix between course, level and category
-        for(const course of courses) {
-            const courseId = course.getDataValue('id');
-            const levelId = course.getDataValue('levelId');
-            const categoryId = course.getDataValue('categoryId');
-            matrixRcm[courseId][levelId] = 0.2;
-            matrixRcm[courseId][categoryArray[categoryId]] = 1;
+        for(const courseTag of courseTags) {
+            const tagId = courseTag.getDataValue('tagId');
+            const courseId = courseTag.getDataValue('courseId');
+            matrixRcm[courseId][tagId] = 1;
         }
+        // console.log(matrixRcm);
+
         return matrixRcm;
     }
 
@@ -146,9 +147,9 @@ export class RecommenderSystem {
             userRateMap.set(item.getDataValue('courseId'), this.enrollmentPoint);
         }
 
-        for (const review of userData.reviews) {
-            userRateMap.set(review.getDataValue('courseId'), review.getDataValue('rating'));
-        }
+        // for (const review of userData.reviews) {
+        //     userRateMap.set(review.getDataValue('courseId'), review.getDataValue('rating'));
+        // }
 
         return userRateMap;
     }
@@ -228,10 +229,16 @@ export class RecommenderSystem {
      * @returns number[]
      */
     private sumColumns(matrixWeight: Matrix): Row {
-        
+        let index = 0;
+        for (const key in matrixWeight) {
+            if(Object.keys(matrixWeight[key]).length !== 0) {
+                index = Number(key);
+                break;
+            }
+        }
         // Khởi tạo mảng result với giá trị 0 cho mỗi cột
-        const results: Row = Object.keys({...matrixWeight[1]}).reduce((acc, key) => {
-            acc[key] = 0;
+        const results: Row = Object.keys({...matrixWeight[index]}).reduce((acc, key) => {
+            acc[Number(key)] = 0;
             return acc;
         }, {} as Row);
         // Cộng giá trị của mỗi cột từ mỗi đối tượng trong mảng
