@@ -13,6 +13,8 @@ import { CourseRepository } from '../repositories/CourseRepository';
 import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
 import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
 import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
+import { UserService } from './UserService';
+import { IUserService } from './interfaces/IUserService';
 
 @Service()
 export class ReviewService implements IReviewService {
@@ -25,6 +27,9 @@ export class ReviewService implements IReviewService {
 
     @Inject(() => EnrollmentRepository)
 	private enrollmentRepository!: IEnrollmentRepository;
+
+    @Inject(() => UserService)
+	private userService!: IUserService;
     
     async getReviews(req: Request): Promise<{ rows: Review[]; count: number }> {
         let { rating, userId, courseId,sort, sortType , page, pageSize} = req.query;
@@ -53,6 +58,26 @@ export class ReviewService implements IReviewService {
         throw new Error('Method not implemented.');
     }
     
+    async updateAverageRatingOfCourse(courseId: number) {
+        const course = await this.courseRepository.findById(courseId);
+        //Get all review of course
+        const reviews = await this.reviewRepository.getAll({
+            courseId:courseId
+        });
+        let averageRating = 0;
+        let totalRating = 0;
+        for(const review of reviews) {
+            averageRating = averageRating + review.rating;
+            totalRating = totalRating + 1;
+        }
+        if(course) {
+            course.averageRating = averageRating/totalRating;
+        }else {
+            throw new ServerError('Error when update average rating of course!');
+        }
+
+    }
+
     async createReview(userId: number, courseId: string, rating: number, review: string): Promise<Review> {
         const course = await this.courseRepository.findOneByCondition({ courseId: courseId });
         if(!course){
@@ -64,7 +89,9 @@ export class ReviewService implements IReviewService {
         });
 
         if(!enrollmentCourse){
-            throw new NotEnoughAuthority('User must enrollment course to be rating');
+            if (!this.userService.isAdmin(userId)) {
+                throw new NotEnoughAuthority('User must enrollment course to be rating');
+            }
         }
 
         const reviewInstance = await this.reviewRepository.findOneByCondition({
@@ -74,12 +101,16 @@ export class ReviewService implements IReviewService {
         if(reviewInstance){
             throw new RecordExistsError('User already review this course before!');
         }
-        return await this.reviewRepository.create({
+        const newReview = await this.reviewRepository.create({
             userId: userId,
             courseId: course.id,
             review: review, 
             rating: rating
         });
+        //Update average rating of course
+        await this.updateAverageRatingOfCourse(course.id);
+
+        return newReview;
     }
     
     async updateReview(userId: number, reviewId: number, rating: number, review: string): Promise<Review> {
@@ -93,10 +124,12 @@ export class ReviewService implements IReviewService {
         reviewInstance.rating = rating;
         reviewInstance.review = review;
 
-        const newReview = await this.reviewRepository.updateInstace(reviewInstance);
+        const newReview = await this.reviewRepository.updateInstance(reviewInstance);
         if(!newReview){
             throw new ServerError('Error updating review, please try again!');
         }
+        //Update average rating of course
+        await this.updateAverageRatingOfCourse(reviewInstance.courseId);
         return newReview;
     }
 
@@ -108,7 +141,9 @@ export class ReviewService implements IReviewService {
         if(review.userId !== userId) {
             throw new NotEnoughAuthority('Not Enough Authority');
         }
-        await this.reviewRepository.deleteInstace(review, true);
+        await this.reviewRepository.deleteInstance(review, true);
+        //Update average rating of course
+        await this.updateAverageRatingOfCourse(review.courseId);
     }
 
     async getReviewsOfCourse(req: Request): Promise<{ rows: Review[]; count: number }> {

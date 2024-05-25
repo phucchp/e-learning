@@ -22,6 +22,7 @@ export class Subtitle extends Model<Subtitle> {
     @AllowNull(false)
     @Column({
       type: DataType.INTEGER,
+      unique: 'compositeIndex'
     })
     lessonId!: number;
 
@@ -34,7 +35,8 @@ export class Subtitle extends Model<Subtitle> {
     @ForeignKey(() => Language)
     @AllowNull(false)
     @Column({
-        type: DataType.INTEGER,
+      type: DataType.INTEGER,
+      unique: 'compositeIndex'
     })
     languageId!: number;
 

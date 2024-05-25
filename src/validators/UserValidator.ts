@@ -26,7 +26,7 @@ export const validateActiveUser = [
     query('token').notEmpty().withMessage('token is required'),
 ]
 
-export const validatChangePassword = [
+export const validateChangePassword = [
     body('oldPassword').notEmpty().withMessage('oldPassword is required'),
     body('newPassword').notEmpty().withMessage('newPassword is required')
     .isStrongPassword({
@@ -39,7 +39,7 @@ export const validatChangePassword = [
     .isLength({min:5, max:100}).withMessage('newPassword must be at least 5 characters and maximum length 100'),
 ]
 
-export const validatChangePasswordUsingToken = [
+export const validateChangePasswordUsingToken = [
     body('token').notEmpty().withMessage('token is required'),
     body('newPassword').notEmpty().withMessage('newPassword is required')
     .isStrongPassword({
@@ -49,9 +49,45 @@ export const validatChangePasswordUsingToken = [
         minUppercase:1,
         minSymbols:1
     }).withMessage('newPassword must be more than 5 characters and at least a number,a Symbols characters, a lowercase and a uppercase')
-    .isLength({min:5, max:100}).withMessage('newPassword must be at least 5 characters and maximum length 100'),
+    .isLength({min:5, max:100}).withMessage('newPassword must be at least 5 characters and maximum length 100')
 ]
 
 export const validateForgotPassword = [
-    body('email').notEmpty().withMessage('email is required'),
+    body('email').notEmpty().withMessage('email is required')
 ]
+
+export const validateGetAccessToken = [
+    body('refreshToken').notEmpty().withMessage('Refresh Token is required').isString().withMessage('Refresh Token must be a string')
+];
+
+export const validateGetUser = [
+    param('userId').notEmpty().withMessage('userId is required').isInt({min: 1}).withMessage('userId Token must be a number')
+];
+
+export const validateGetUsers = [
+    query('roleId').optional().isInt().isIn([1, 2, 3]).withMessage(`Invalid roleId, roleId is one of 1,2,3`),
+    query('isActive').optional().isBoolean().withMessage('isActive is true or false'),
+    query('search').trim().optional().isString().withMessage('Search must be a string'),
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
+    query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1')
+];
+
+export const validateGetPercentCompleteCourse = [
+  query('courseId').notEmpty().isString().withMessage('courseId must be a string').trim(),
+];
+
+export const validateAddProcessing = [
+    body('lessonId').notEmpty().isInt({min:1}).withMessage('lessonId must be a integer number'),
+    body('time').notEmpty().isInt({min:0}).withMessage('lessonId must be a integer number'),
+    body('isDone').notEmpty().isBoolean().withMessage('isDone must be a boolean')
+];
+
+export const validateUpdateProcessing = [
+    body('lessonId').notEmpty().isInt({min:1}).withMessage('lessonId must be a integer number'),
+    body('time').notEmpty().isInt({min:0}).withMessage('lessonId must be a integer number'),
+    body('isDone').notEmpty().isBoolean().withMessage('isDone must be a boolean')
+];
+
+export const validateGetNewestProcessing = [
+    query('courseId').notEmpty().isString().withMessage('courseId must be a string').trim(),
+];

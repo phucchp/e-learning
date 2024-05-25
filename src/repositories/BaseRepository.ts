@@ -62,11 +62,11 @@ class BaseRepository<T extends Model<T>> implements BaseRepositoryInterface<T> {
         return result;
     }
     
-    async deleteInstace(model: T, force: boolean = false): Promise<void> {
+    async deleteInstance(model: T, force: boolean = false): Promise<void> {
 		await model.destroy({ force: force });
 	}
 
-    async updateInstace(instance: T): Promise<T | null> {
+    async updateInstance(instance: T): Promise<T | null> {
         await instance.save();
         return instance;
     }

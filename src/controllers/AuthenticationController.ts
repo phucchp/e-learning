@@ -118,4 +118,20 @@ export class AuthenticationController {
 			message: data,
 		});
 	};
+
+	/**
+	 * Get Access Token by Refresh Token
+	 */
+	getAccessToken = async (req: Request, res: Response) => {
+		const { refreshToken } = req.body;
+		const token = await this.authenticationService.getAccessTokenByRefreshToken(
+			refreshToken
+		);
+		const res_token = { type: 'Bearer', token: token };
+		return res.status(200).json({
+			status: 'Successful',
+			data: res_token,
+		});
+	}
+
 }

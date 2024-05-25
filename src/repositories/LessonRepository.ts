@@ -4,6 +4,7 @@ import { ILessonRepository } from "./interfaces/ILessonRepository";
 import { BaseRepository } from "./BaseRepository";
 import { Note } from "../models/Note";
 import { Remind } from "../models/Remind";
+import { Comment } from "../models/Comment";
 
 @Service()
 export class LessonRepository extends BaseRepository<Lesson> implements ILessonRepository{
@@ -12,11 +13,22 @@ export class LessonRepository extends BaseRepository<Lesson> implements ILessonR
 		super(Lesson);
 	}
 
-	async getLessonDetails(lessonId: number, userId: number): Promise<Lesson|null> {
+	async getLessonDetails(lessonId: number): Promise<Lesson|null> {
 		return await this.model.findOne({
 			where: {
                 id: lessonId
             },
+			include: [
+                {
+                    model: Note,
+                },
+				{
+                    model: Comment,
+                },
+				{
+                    model: Remind,
+                },
+			],
             attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] },
 		});
 	}

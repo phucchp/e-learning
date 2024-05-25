@@ -91,4 +91,17 @@ export class CartService implements ICartService {
         await this.cartRepository.restore(cart);
         return true;
     }
+
+    async isCourseInCartUser(userId: number, courseId: number): Promise<boolean> {
+        const cart = await this.cartRepository.findOneByCondition({
+            userId: userId,
+            courseId: courseId
+        },[], false);
+
+        if(!cart){ // Check course is already in cart
+            return true;
+        }
+        
+        return false;
+    }
 }

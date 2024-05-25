@@ -11,6 +11,10 @@ import { Op } from 'sequelize';
 import { CourseService } from './CourseService';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
+import { HandleS3 } from './utils/HandleS3';
+import { CourseRepository } from '../repositories/CourseRepository';
+import { ICourseRepository } from '../repositories/interfaces/ICourseRepository';
+import { ICourseService } from './interfaces/ICourseService';
 
 @Service()
 export class EnrollmentService implements IEnrollmentService {
@@ -21,9 +25,15 @@ export class EnrollmentService implements IEnrollmentService {
     @Inject(() => CourseService)
 	private crouseService!: CourseService;
 
+    @Inject(() => CourseRepository)
+	private crouseRepository!: ICourseRepository;
+
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
 
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
+    
     async getEnrollmentCourses(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: Enrollment[]; count: number; }> {
         const userId = req.payload.userId;
         let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
@@ -67,7 +77,12 @@ export class EnrollmentService implements IEnrollmentService {
             sortType: sortType || 'ASC',
             sort : sort || 'createdAt'
         }
-        return await this.enrollmentRepository.getEnrollmentCourses(userId, options);
+        const {rows, count} = await this.enrollmentRepository.getEnrollmentCourses(userId, options);
+        for (const row of rows) {
+            row.setDataValue('course', await this.handleS3.getResourceCourse(row.course));
+        }
+
+        return {rows, count};
     }
 
     /**
@@ -88,9 +103,20 @@ export class EnrollmentService implements IEnrollmentService {
             throw new BadRequestError('User already enrollment course!');
         }
 
+        // Update total student in course
+        const course = await this.crouseRepository.findById(courseId);
+        if(course) {
+            course.totalStudents = course.totalStudents + 1;
+            await this.crouseRepository.updateInstance(course);
+        }
         return await this.enrollmentRepository.create({
             userId:userId,
             courseId:courseId
         });
+    }
+
+    async addEnrollmentCourseInBulk(userId: number, courseIds: number[]): Promise<Enrollment[]> {
+        const userCourses = courseIds.map(courseId => ({ userId, courseId }));
+        return await this.enrollmentRepository.createMultiple(userCourses);
     }
 }

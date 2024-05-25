@@ -36,4 +36,52 @@ export const validateUpdateLesson = [
 
 export const validateGetUrlUploadVideo = [
     query('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
-]
+];
+
+export const validateGetSubtitle = [
+    param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+    query('languageCode').notEmpty().withMessage('languageCode is required').isString().withMessage('languageCode must be a string')
+];
+
+export const validateGetPresignUrlUpdateSubtitle = [
+    param('subtitleId').notEmpty().withMessage('subtitleId is required').isInt({min:1}).withMessage('subtitleId must be an number')
+];
+
+export const validateAddSubtitle = [
+    param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+    body('languageId').notEmpty().withMessage('languageId is required').isInt({min:1}).withMessage('languageId must be an number')
+];
+
+export const validateDeleteSubtitle = [
+    param('subtitleId').notEmpty().withMessage('subtitleId is required').isInt({min:1}).withMessage('subtitleId must be an number')
+];
+
+// RESOURCE
+export const validateGetAllResource = [
+    param('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number')
+];
+
+export const validateGetResource = [
+    param('resourceId').notEmpty().withMessage('resourceId is required').isInt({min:1}).withMessage('resourceId must be an number')
+];
+
+export const validateCreateResource = [
+    body('lessonId').notEmpty().withMessage('lessonId is required').isInt({min:1}).withMessage('lessonId must be an number'),
+    body('name')
+        .notEmpty().withMessage('name is required')
+        .isString().withMessage('name must be a string')
+        .custom(value => {
+            // Kiểm tra xem name có phải là một trong các đuôi file được cho hay không
+            const validExtensions = ['.pdf', '.docx', '.zip', '.xlsx', '.txt', '.pptx'];
+            const extension = value.slice(value.lastIndexOf('.'));
+            if (!validExtensions.includes(extension)) {
+                throw new Error('Invalid file extension');
+            }
+            return true;
+        })
+        .trim()
+];
+
+export const validateDeleteResource = [
+    param('resourceId').notEmpty().withMessage('resourceId is required').isInt({min:1}).withMessage('resourceId must be an number')
+];

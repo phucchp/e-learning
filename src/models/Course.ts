@@ -10,6 +10,8 @@ import { Favorite } from './Favorite';
 import { Enrollment } from './Enrollment';
 import { Cart } from './Cart';
 import { Review } from './Review';
+import { PaymentDetail } from './PaymentDetail';
+import { CourseTag } from './CourseTag';
 
 @Table({
   tableName: 'courses',
@@ -122,13 +124,13 @@ export class Course extends Model<Course> {
 
   @Column({
     type: DataType.STRING,
-    get() {
-        const rawValue = this.getDataValue('posterUrl');
-        if(rawValue) {
-          return 
-        }
-        return rawValue ? rawValue.toUpperCase() : null;
-    }
+    // get() {
+    //     const rawValue = this.getDataValue('posterUrl');
+    //     if(rawValue) {
+    //       return 
+    //     }
+    //     return rawValue ? rawValue.toUpperCase() : null;
+    // }
   })
   posterUrl!: string | null;
 
@@ -196,9 +198,15 @@ export class Course extends Model<Course> {
   @HasMany(() => Review)
   reviews!: Review[];
 
+  @HasMany(() => CourseTag)
+  courseTags!: CourseTag[];
+
   @HasMany(() => Enrollment)
   enrollments!: Enrollment[];
 
+  @HasMany(() => PaymentDetail)
+  paymentDetails!: PaymentDetail[];
+  
   @DeletedAt
   deletedAt?: Date;
 

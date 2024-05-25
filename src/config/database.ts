@@ -21,6 +21,12 @@ import { EWallet } from '../models/EWallet';
 import { Resource } from '../models/Resource';
 import { Subtitle } from '../models/Subtitle';
 import { Remind } from '../models/Remind';
+import { Question } from '../models/Question';
+import { Answer } from '../models/Answer';
+import { InstructorPayment } from '../models/InstructorPayment';
+import { CourseTag } from '../models/CourseTag';
+import { Tag } from '../models/Tag';
+
 
 dotenv.config();
 
@@ -37,6 +43,20 @@ class Database {
 	private static instance: Database | null = null;
 
 	private constructor() {
+		// List of environment variables
+        const requiredEnvVariables = [
+			'POSTGRES_DB',
+			'POSTGRES_HOST',
+			'POSTGRES_PORT',
+			'POSTGRES_USER',
+			'POSTGRES_PASSWORD',
+			'POSTGRES_SSL',
+		];
+		// Loop through the list of environment variables and check if they are set or not
+		const missingVariables = requiredEnvVariables.filter(variable => !process.env[variable]);
+		if (missingVariables.length > 0) {
+			throw new Error(`Missing POSTGRESQL DB environment variables: ${missingVariables.join(', ')}`);
+		}
 		this.connectToPostgreSQL();
 	}
 
@@ -88,6 +108,11 @@ class Database {
 			Resource,
 			EWallet,
 			Remind,
+			Question,
+			Answer,
+			InstructorPayment,
+			Tag,
+			CourseTag
 		]);
 
 		await this.sequelize

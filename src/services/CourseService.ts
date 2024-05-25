@@ -24,6 +24,15 @@ import { FavoriteRepository } from '../repositories/FavoriteRepository';
 import { IFavoriteRepository } from '../repositories/interfaces/IFavoriteRepository';
 import { Favorite } from '../models/Favorite';
 import { IoTRoboRunner } from 'aws-sdk';
+import { HandleS3 } from './utils/HandleS3';
+import { RecommenderSystem } from './RecommenderSystem';
+import { CollaborativeFiltering } from './CollaborativeFiltering';
+import { TagRepository } from '../repositories/TagRepository';
+import { ITagRepository } from '../repositories/interfaces/ITagRepository';
+import { CourseTag } from '../models/CourseTag';
+import { CourseTagRepository } from '../repositories/CourseTagRepository';
+import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
+import { ContentBasedRecommendSystem } from './ContentBasedRecommendSystem';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -49,8 +58,26 @@ export class CourseService implements ICourseService {
     @Inject(() => FavoriteRepository)
 	private favoriteRepository!: IFavoriteRepository;
 
+    @Inject(() => RecommenderSystem)
+	private recommendSystem!: RecommenderSystem;
+
+    @Inject(() => ContentBasedRecommendSystem)
+	private contentBasedRecommendSystem!: ContentBasedRecommendSystem;
+
+    @Inject(() => TagRepository)
+	private tagRepository!: ITagRepository;
+
+    @Inject(() => CourseTagRepository)
+	private courseTagRepository!: ICourseTagRepository;
+
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
+
     @Inject(() => S3Service)
 	private s3Service!: S3Service;
+
+    @Inject(() => CollaborativeFiltering)
+	private collaborativeFiltering!: CollaborativeFiltering;
 
     private VIDEO_DURATION_EXTRA_SHORT = 1;
     private VIDEO_DURATION_SHORT = 3;
@@ -106,13 +133,13 @@ export class CourseService implements ICourseService {
     }
 
     async getCourses(req: Request): Promise<{ rows: Course[]; count: number}> {
-        let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
+        let { search, category, averageRating, languageId, instructorId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
         const whereCondition: any = {};
         if(search){
             whereCondition[Op.or] = [
                 { title: { [Op.iLike]: `%${search}%` } },
-                { description: { [Op.iLike]: `%${search}%` } },
-                { learnsDescription: { [Op.iLike]: `%${search}%` } },
+                // { description: { [Op.iLike]: `%${search}%` } },
+                // { learnsDescription: { [Op.iLike]: `%${search}%` } },
             ];
         }
 
@@ -130,6 +157,10 @@ export class CourseService implements ICourseService {
 
         if(languageId){
             whereCondition['languageId'] = {[Op.eq]: languageId};
+        }
+
+        if(instructorId){
+            whereCondition['instructorId'] = {[Op.eq]: instructorId};
         }
 
         if(level){
@@ -155,15 +186,94 @@ export class CourseService implements ICourseService {
             sortType: sortType || 'ASC',
             sort : sort || 'createdAt'
         }
-        const courses = await this.courseRepository.getCourses(options);
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
         return courses;
     }
 
+    async getAllCourseOfInstructors(req: Request ): Promise<{ rows: Course[]; count: number}> {
+        let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
+        const instructorId = req.payload.userId;
+        const whereCondition: any = {};
+        if(search){
+            whereCondition[Op.or] = [
+                { title: { [Op.iLike]: `%${search}%` } },
+                // { description: { [Op.iLike]: `%${search}%` } },
+                // { learnsDescription: { [Op.iLike]: `%${search}%` } },
+            ];
+        }
+
+        if(category){
+            const categoryDb = await this.categoryRepository.findOneByCondition({categoryId: category});
+            if(!categoryDb){
+                throw new NotFound('Category Not Found!');
+            }
+            whereCondition['categoryId'] = categoryDb.id;
+        }
+
+        if(averageRating){
+            whereCondition['averageRating'] = {[Op.gt]: averageRating};
+        }
+
+        if(languageId){
+            whereCondition['languageId'] = {[Op.eq]: languageId};
+        }
+
+        if(instructorId){
+            whereCondition['instructorId'] = {[Op.eq]: instructorId};
+        }
+
+        if(level){
+            whereCondition['levelId'] = {[Op.eq]: level};
+        }
+
+        if(duration){
+            whereCondition[Op.and] = this.scopeFilterByDuration(duration);
+        }
+
+        if(price){
+            if(price === 'free'){
+                whereCondition['price'] = {[Op.eq]: 0};
+            }else if(price==='paid'){
+                whereCondition['price'] = {[Op.gt]: 0};
+            }
+        }
+
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 10,
+            whereCondition: whereCondition,
+            sortType: sortType || 'ASC',
+            sort : sort || 'createdAt'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    } 
+
     async getCourse(courseId: string): Promise<Course> {
-        const course = await this.courseRepository.getCourse(courseId);
+        let course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
         }
+        // Get resource S3 for course
+        course = await this.handleS3.getResourceCourse(course);
+        // Get link avatar instructor of course
+        if (course.getDataValue('instructor')) {
+            const profile = course.getDataValue('instructor').getDataValue('profile');
+            if (profile) {
+                course.instructor.setDataValue('profile', await this.handleS3.getAvatarUser(profile));
+            }
+        }
+        // Get link avatar user review course
+        if (course.getDataValue('reviews')) {
+            for(const review of course.reviews) {
+                if (review.getDataValue('user').getDataValue('profile')) {
+                    review.user.setDataValue('profile', await this.handleS3.getAvatarUser(review.user.profile));
+                }
+            }
+        }
+
         return course;
     }
 
@@ -275,7 +385,7 @@ export class CourseService implements ICourseService {
         }
 
         const userId = Number(req.payload.userId);
-        const newCourse = this.courseRepository.create({
+        const newCourse = await this.courseRepository.create({
             title: title,
             introduction: introduction,
             description: description,
@@ -329,7 +439,7 @@ export class CourseService implements ICourseService {
 
         const topic = await this.topicRepository.findById(topicId);
         if(!topic) {
-            throw new ServerError('Server error: Can not find topic of lesson');
+            throw new NotFound('Topic not found!');
         }
 
         const course = await this.courseRepository.findById(topic.courseId);
@@ -350,7 +460,7 @@ export class CourseService implements ICourseService {
         const favorite = await this.favoriteRepository.findOneByCondition({
             courseId: courseId,
             userId: userId
-        }, true);
+        },[], true);
         if(!favorite){
             return false;
         }
@@ -366,9 +476,9 @@ export class CourseService implements ICourseService {
      */
     async isUserOwnerCourse(courseId: number, userId: number): Promise<boolean> {
         const course = await this.courseRepository.findOneByCondition({
-            courseId: courseId,
+            id: courseId,
             instructorId: userId
-        }, true);
+        });
         if(!course){
             return false;
         }
@@ -378,7 +488,6 @@ export class CourseService implements ICourseService {
     async addCourseFavorite(courseId: string, userId: number): Promise<boolean> {
         const course  = await this.courseRepository.findOneByCondition({
             courseId: courseId,
-            active: true
         });
         // Check course is exist
         if(!course){
@@ -389,7 +498,6 @@ export class CourseService implements ICourseService {
             // Return error if user already favorited course
             throw new DuplicateError('The user already favorited the course before.');
         }
-
         await this.favoriteRepository.create({
             courseId: course.id,
             userId: userId
@@ -401,7 +509,6 @@ export class CourseService implements ICourseService {
     async deleteCourseFavorite(courseId: string, userId: number): Promise<boolean> {
         const course  = await this.courseRepository.findOneByCondition({
             courseId: courseId,
-            active: true
         });
         // Check course is exist
         if(!course){
@@ -417,11 +524,321 @@ export class CourseService implements ICourseService {
             throw new NotFound('The user is not favorited the course before.');
         }
         
-        await this.favoriteRepository.deleteInstace(favorite);
+        await this.favoriteRepository.deleteInstance(favorite);
         return true;
     }
 
     async getCoursesFavorite(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<{ rows: Favorite[]; count: number; }> {
         throw Error("Method not implemented");
+    }
+
+    /**
+     * Using create data for payment with paypal
+     * @param courseIds 
+     * @returns 
+     */
+    async createDataCourseForPayment(courseIds: string[]): Promise<{totalPrice: number; items: any[]}> {
+        const items = [];
+        let totalPrice = 0;
+        const courses = await this.courseRepository.getAll({
+            where: {
+                courseId: {
+					[Op.in]:courseIds
+				}
+            }
+        });
+
+        for(const course of courses) {
+            const price = course.price - course.price * course.discount/100;
+            totalPrice += parseFloat(price.toFixed(2));
+            items.push({
+                name : course.id.toString(),
+                quantity: '1',
+                unit_amount: {
+                    currency_code: "USD",
+                    value: price.toFixed(2),
+                }
+            });
+        }
+
+        return {
+            totalPrice: totalPrice,
+            items: items
+        };
+    }
+
+    /**
+     * Get list courses by courseIds
+     * @param courseIds 
+     * @returns 
+     */
+    async getCoursesByCourseIds(courseIds: number[]): Promise<Course[]> {
+        return await this.courseRepository.getAll({
+            where: {
+                id: {
+					[Op.in]:courseIds
+				}
+            }
+        });
+    }
+
+    /**
+     * Get list lessonIds of Course
+     * @param courseId 
+     * @returns 
+     */
+    async getLessonIdsOfCourse(courseId: string): Promise<number[]> {
+        const course = await this.courseRepository.getAllLessonOfCourse(courseId);
+        const lessonIds: number[] = [];
+        for (const topic of course.topics) {
+            for(const lesson of topic.lessons) {
+                lessonIds.push(lesson.id);
+            }
+        }
+
+        return lessonIds;
+    }
+
+    async getPresignedUrlToUploadPoster(courseId: string): Promise<string> {
+        let course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.posterUrl) {
+            course.posterUrl = `course/${course.id}/poster.jpg`;
+        }
+
+        return await this,this.s3Service.generatePresignedUrlUpdate(course.posterUrl, 'image/jpeg');
+    }
+
+    async clearCachePoster(courseId: string): Promise<void> {
+        let course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.posterUrl) {
+            throw new NotFound('No poster to clear');
+        }
+        return await this.s3Service.clearCacheCloudFront(course.posterUrl);
+    }
+
+    /**
+     * Content based recommend system based on tag of course
+     * @param userId 
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
+    async getCoursesRecommendBasedOnTags(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.contentBasedRecommendSystem.getCourseIdsRecommend(userId);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    /**
+     * Content based recommend system based on category of course
+     * @param userId 
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
+    async getCoursesRecommend(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommend(userId);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    async getCourseIdsRecommendForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.recommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
+        console.log(courseIdsRecommend.length);
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    async getCourseIdsRecommendBasedOnTagsForClient(courseIds: number[], page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
+        const courseIdsRecommend = await this.contentBasedRecommendSystem.getCourseIdsRecommendBasedOnCourseIdsFromClient(courseIds);
+
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    /**
+     * Get popular course by total Students
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
+    async getPopularCourse(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>  {
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 20,
+            sortType: 'DESC',
+            sort :  'totalStudents'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    }
+
+        /**
+     * Get popular course by average rating
+     * @param page 
+     * @param pageSize 
+     * @returns 
+     */
+    async getPopularCourseByRating(page: number, pageSize: number):  Promise<{ rows: Course[]; count: number}>  {
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 20,
+            sortType: 'DESC',
+            sort :  'averageRating'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    }
+
+    async getIdByCourseIdsString(courseIdsString: string[]): Promise<number[]> {
+        const courses = await this.courseRepository.getIdByCourseIdsString(courseIdsString);
+        let courseIdsNumber : number[] = [];
+        for (const course of courses) {
+            courseIdsNumber.push(course.id);
+        }
+
+        return courseIdsNumber;
+    }
+
+    async getCourseByCourseIds(courseIdsString: string[]): Promise<{ rows: Course[]; count: number}> {
+        const data = await this.courseRepository.getCoursesByCourseIds(courseIdsString);
+        data.rows = await this.handleS3.getResourceCourses(data.rows);
+        return data;
+    }
+    
+    async getCoursesRecommendBasedOnCollaborativeFiltering(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}|null> {
+        const courseIdsRecommend = await this.collaborativeFiltering.getUserSimilarityWights(userId);
+        if(!courseIdsRecommend) {
+            return null;
+        }
+        let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
+        rows = await this.handleS3.getResourceCourses(rows);
+        return {rows, count};
+    }
+
+    private findTagsInText(text: string, tags: string[]): string[] {
+        // Chuyển văn bản sang chữ thường
+        const lowerCaseText = text.toLowerCase();
+        // Lọc ra những tag xuất hiện trong văn bản
+        const foundTags = tags.filter(tag => lowerCaseText.includes(tag.toLowerCase()));
+        return foundTags;
+    }
+
+    async test(req: Request): Promise<any> {
+        const page = Number(req.query.page) || 1;
+        const pageSize = Number(req.query.pageSize) || 15;
+        const results = [];
+        const offset = (page - 1) * pageSize;
+        const courses = await this.courseRepository.getAll({
+            attributes: ['id', 'courseId', 'title', 'introduction', 'learnsDescription'],
+            limit: pageSize,
+            offset: offset,
+        });
+        const tags = await this.tagRepository.getAll();
+        const tagsName = [];
+        for(const tag of tags) {
+            tagsName.push(tag.name);
+        }
+        for(const course of courses) {
+            results.push({
+                id: course.id,
+                courseId: course.courseId,
+                title: course.title,
+                tags: this.findTagsInText(course.title+ course.introduction+' '+ course.learnsDescription,tagsName)
+            });
+        }
+        return results;
+    }
+
+    private async addDataTagsForCourses() {
+
+        const courses = await this.courseRepository.getAll({
+            attributes: ['id', 'courseId', 'title', 'introduction', 'learnsDescription'],
+        });
+
+        const tags = await this.tagRepository.getAll();
+        const tagsName = [];
+        const tagValue: { [key: string]: number } = {};
+        for(const tag of tags) {
+            tagsName.push(tag.name);
+            tagValue[tag.name] = tag.id;
+        }
+
+        const courseTags: any[] = [];
+        for(const course of courses) {
+            // Get all tag of course
+            const tagsOfCourse = this.findTagsInText(course.title+ course.introduction, tagsName);
+            for(const item of tagsOfCourse) {
+                courseTags.push({
+                    tagId: tagValue[item],
+                    courseId: course.id
+                });
+            }
+        }
+        // Create data CourseTag
+        await this.courseTagRepository.createInBulks(courseTags);
+
+
+        const tagIdCount: { [key: number]: number } = {};
+        const courseIdCount: { [key: number]: number } = {};
+
+        courseTags.forEach(item => {
+        if (tagIdCount[item.tagId]) {
+            tagIdCount[item.tagId]++;
+        } else {
+            tagIdCount[item.tagId] = 1;
+        }
+
+        if (courseIdCount[item.courseId]) {
+            courseIdCount[item.courseId]++;
+        } else {
+            courseIdCount[item.courseId] = 1;
+        }
+        });
+        return {
+            totalCourseTag: courseTags.length,
+            tagIdCount: tagIdCount,
+            courseIdCount: courseIdCount
+        };
+    }
+
+    async getCourseByInputUser(query: string): Promise<any> {
+        const tags = await this.tagRepository.getAll();
+        const tagsName = [];
+        for(const tag of tags) {
+            tagsName.push(tag.name);
+        }
+        const tagsForQuery = this.findTagsInText(query, tagsName);
+        console.log(tagsForQuery);
+        const courses = await this.courseRepository.getCoursesByTags(tagsForQuery);
+        return courses;
+    }
+
+    async getCourseForDebug(req: Request):Promise<Course[]> {
+        const search = req.query.search || '';
+        return await this.courseRepository.getAll({
+            where: {
+                title: { [Op.iLike]: `%${search}%` }
+            },
+            attributes: ['id' ,'title']
+        });
     }
 }

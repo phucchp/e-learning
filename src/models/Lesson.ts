@@ -7,6 +7,7 @@ import { Resource } from './Resource';
 import { Processing } from './Processing';
 import { User } from './User';
 import { Remind } from './Remind';
+import { Comment } from './Comment';
 
 @Table({
   tableName: 'lessons',
@@ -25,7 +26,7 @@ export class Lesson extends Model<Lesson> {
 
   @AllowNull(false)
   @Column({
-    type: DataType.STRING(150),
+    type: DataType.STRING,
   })
   title!: string;
 
@@ -69,6 +70,9 @@ export class Lesson extends Model<Lesson> {
 
   @HasMany(() => Remind)
   reminds!: Remind[];
+
+  @HasMany(() => Comment)
+  comments!: Comment[];
 
   @DeletedAt
   deletedAt?: Date;

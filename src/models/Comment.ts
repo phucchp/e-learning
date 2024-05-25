@@ -52,6 +52,9 @@ export class Comment extends Model<Comment> {
     @BelongsTo(() => User)
     user!: User;
 
+    @BelongsTo(() => Lesson)
+    lesson!: Lesson;
+
     @DeletedAt
     deletedAt?: Date;
 
