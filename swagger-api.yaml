@@ -929,7 +929,7 @@ paths:
           description: Can not get courses
       security:
         - bearerAuth: []
-  /courses/recommends/recommends/recommend-courses-based-on-tags:
+  /courses/recommends/recommend-courses-based-on-tags:
     get:
       tags:
         - course

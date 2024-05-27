@@ -72,8 +72,8 @@ export class ContentBasedRecommendSystem {
         vectorWeight = await this.normalizeArray(vectorWeight);
         const matrixRecommend = await this.getUserMatrixRecommend(restMatrix, vectorWeight);
         const courseIdsArr: number[] = matrixRecommend.map(([key]) => key);
-        console.log(courseIdsArr);
         const first100Elements = courseIdsArr.slice(0, 50);
+        console.log(first100Elements);
         return first100Elements;
     }
     
