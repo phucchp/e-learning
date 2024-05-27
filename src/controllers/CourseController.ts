@@ -16,6 +16,10 @@ import { QAService } from "../services/QAService";
 import { IQAService } from "../services/interfaces/IQAService";
 import { EnrollmentService } from "../services/EnrollmentService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
+import { LevelService } from "../services/LevelService";
+import { ILevelService } from "../services/interfaces/ILevelService";
+import { ILanguageService } from "../services/interfaces/ILanguageService";
+import { LanguageService } from "../services/LanguageService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -26,6 +30,8 @@ export class CourseController{
 	private tfidfService: TFIDFService;
 	private qaService: IQAService;
 	private enrollmentService: IEnrollmentService;
+	private levelService: ILevelService;
+	private languageService: ILanguageService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -36,6 +42,8 @@ export class CourseController{
 		this.tfidfService = Container.get(TFIDFService);
 		this.qaService = Container.get(QAService);
 		this.enrollmentService = Container.get(EnrollmentService);
+		this.levelService = Container.get(LevelService);
+		this.languageService = Container.get(LanguageService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
@@ -504,6 +512,30 @@ export class CourseController{
         return res.status(200).json({
             courses
         })
+    }
+
+    getAllFilterFoSearchCourse = async (req: Request, res: Response) => {
+        const levels = await this.levelService.getLevels();
+        const languages = await this.languageService.getLanguages();
+        const ratings = [
+            3, 3.5, 4, 4.5
+        ];
+
+        const videoDurations = [
+            'extraShort', 'short', 'medium', 'long', 'extraLong'
+        ];
+
+        const prices = [
+            'paid', 'free'
+        ];
+
+        return res.status(200).json({
+            levels,
+            languages,
+            ratings,
+            videoDurations,
+            prices
+        });
     }
 
 }
