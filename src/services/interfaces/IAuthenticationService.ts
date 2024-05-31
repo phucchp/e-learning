@@ -1,6 +1,6 @@
 export interface IAuthenticationService {
 	login(email: string, password: string): Promise<any>;
-	// loginAdmin(username: string, password: string): Promise<string>;
+	loginAdmin(username: string, password: string): Promise<string>;
 	register(
 		email: string,
 		username: string,

@@ -66,6 +66,32 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+  /auth/admin/login:
+    post:
+      summary: Admin login
+      tags:
+        - authentication
+      requestBody:
+        description: User credentials for login
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: "admin@gmail.com"
+                password:
+                  type: string
+                  default: "123456"
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
   /auth/register:
     post:
       summary: User registration

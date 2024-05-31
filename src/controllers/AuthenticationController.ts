@@ -29,6 +29,20 @@ export class AuthenticationController {
 	};
 
 	/**
+	 * API login for admin
+	 */
+	loginAdmin = async (req: Request, res: Response) => {
+		const { email, password } = req.body;
+		const token = await this.authenticationService.loginAdmin(email, password);
+		const res_token = { type: 'Bearer', token: token };
+		return res.status(200).json({
+			status: 'Ok!',
+			message: 'Successfully login!',
+			result: res_token,
+		});
+	};
+
+	/**
 	 * Register new account for user
 	 */
     register = async (req: Request, res: Response) => {
