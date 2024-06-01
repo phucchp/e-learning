@@ -517,14 +517,14 @@ export class CourseService implements ICourseService {
         const favorite = await this.favoriteRepository.findOneByCondition({
             courseId: course.id,
             userId: userId
-        }, true);
+        });
 
         if(!favorite){
             // Return error if user is not favorited course
             throw new NotFound('The user is not favorited the course before.');
         }
         
-        await this.favoriteRepository.deleteInstance(favorite);
+        await this.favoriteRepository.deleteInstance(favorite, true);
         return true;
     }
 

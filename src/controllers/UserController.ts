@@ -91,7 +91,7 @@ export class UserController{
     deleteCourseFavorite = async (req: Request, res: Response) => {
         const userId = req.payload.userId;
         const courseId = req.body.courseId;
-        await this.courseService.deleteCourseFavorite(userId, courseId);
+        await this.courseService.deleteCourseFavorite(courseId, userId);
         return res.status(200).json({
             message : "Successful",
         })
