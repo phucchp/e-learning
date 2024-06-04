@@ -669,14 +669,16 @@ export class CourseService implements ICourseService {
     }
 
     async getPresignedUrlToUploadPoster(courseId: string): Promise<string> {
-        let course = await this.courseRepository.getCourse(courseId);
+        const course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
         }
 
         if(!course.posterUrl) {
-            course.posterUrl = `course/${course.id}/poster.jpg`;
+            course.posterUrl = `courses/${course.id}/poster.jpg`;
+            await this.courseRepository.updateInstance(course);
         }
+
 
         return await this,this.s3Service.generatePresignedUrlUpdate(course.posterUrl, 'image/jpeg');
     }
