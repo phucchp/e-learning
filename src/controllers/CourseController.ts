@@ -20,6 +20,7 @@ import { LevelService } from "../services/LevelService";
 import { ILevelService } from "../services/interfaces/ILevelService";
 import { ILanguageService } from "../services/interfaces/ILanguageService";
 import { LanguageService } from "../services/LanguageService";
+import { ElasticsearchService } from "../services/ElasticsearchService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -32,6 +33,7 @@ export class CourseController{
 	private enrollmentService: IEnrollmentService;
 	private levelService: ILevelService;
 	private languageService: ILanguageService;
+	private eleasticService: ElasticsearchService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -44,6 +46,7 @@ export class CourseController{
 		this.enrollmentService = Container.get(EnrollmentService);
 		this.levelService = Container.get(LevelService);
 		this.languageService = Container.get(LanguageService);
+		this.eleasticService = Container.get(ElasticsearchService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
@@ -538,4 +541,13 @@ export class CourseController{
         });
     }
 
+    getCourseByElasticsearch = async (req: Request, res: Response) => {
+        await this.eleasticService.checkConnection();
+    }
+
+    searchCourses = async (req: Request, res: Response) => {
+        const { query, page, size } = req.query;
+        const results = await this.eleasticService.searchCourses(query as string, parseInt(page as string) || 1, parseInt(size as string) || 10);
+        return res.status(200).json(results);
+    }
 }
