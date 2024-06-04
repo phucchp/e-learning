@@ -2586,7 +2586,7 @@ paths:
               schema:
                 type: number
                 default: 1
-          summary: Get list instructor
+          summary: Get instructor information details
           responses:
             '200':
               description: Successful

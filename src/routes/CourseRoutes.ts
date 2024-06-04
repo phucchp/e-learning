@@ -11,7 +11,7 @@ class CourseRoutes extends BaseRoutes {
 	}
 	public routes(): void {
 		this.router.get('/', validateGetCourses, validate, this.controller.getCourses);
-		this.router.get('/courses-for-instructor', validateGetCourses, validate, this.controller.getAllCourseOfInstructor);
+		this.router.get('/courses-for-instructor', auth, authInstructor, validateGetCourses, validate, this.controller.getAllCourseOfInstructor);
 		this.router.get('/filters', this.controller.getAllFilterFoSearchCourse);
 		this.router.get('/debug/get-courses' , this.controller.getCoursesDebug);
 		this.router.get('/test', this.controller.test);
