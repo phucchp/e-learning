@@ -35,4 +35,6 @@ export interface ICourseService {
     getAllCourseOfInstructors(req: Request ): Promise<{ rows: Course[]; count: number}>;
     getAllCourseOfInstructorsForUser(req: Request, instructorId: number ): Promise<{ rows: Course[]; count: number}>
     getCourseForDebug(req: Request): Promise<Course[]>;
+    getPresignedUrlToUploadTrailer(courseId: string): Promise<string>;
+    clearCacheTrailer(courseId: string): Promise<void>;
 }

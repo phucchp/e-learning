@@ -683,6 +683,21 @@ export class CourseService implements ICourseService {
         return await this,this.s3Service.generatePresignedUrlUpdate(course.posterUrl, 'image/jpeg');
     }
 
+    async getPresignedUrlToUploadTrailer(courseId: string): Promise<string> {
+        const course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.trailerUrl) {
+            course.trailerUrl = `courses/${course.id}/trailer.mp4`;
+            await this.courseRepository.updateInstance(course);
+        }
+
+
+        return await this,this.s3Service.generatePresignedUrlUpdate(course.trailerUrl, 'video/mp4');
+    }
+
     async clearCachePoster(courseId: string): Promise<void> {
         let course = await this.courseRepository.getCourse(courseId);
         if(!course){
@@ -693,6 +708,18 @@ export class CourseService implements ICourseService {
             throw new NotFound('No poster to clear');
         }
         return await this.s3Service.clearCacheCloudFront(course.posterUrl);
+    }
+
+    async clearCacheTrailer(courseId: string): Promise<void> {
+        let course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.trailerUrl) {
+            throw new NotFound('No poster to clear');
+        }
+        return await this.s3Service.clearCacheCloudFront(course.trailerUrl);
     }
 
     /**
