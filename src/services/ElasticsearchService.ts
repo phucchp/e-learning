@@ -8,12 +8,16 @@ import { Client } from '@elastic/elasticsearch';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SearchRequest } from '@elastic/elasticsearch/lib/api/types';
+import { S3Service } from './S3Service';
 
 @Service()
 export class ElasticsearchService {
 
     @Inject(() => CourseRepository)
 	private courseRepository!: ICourseRepository;
+
+    @Inject(() => S3Service)
+	private s3Service!: S3Service;
 
     private static elasticClient: Client;
     private ES_NODE: string;
@@ -327,7 +331,11 @@ export class ElasticsearchService {
         // return body;
         try {
             const response = await ElasticsearchService.elasticClient.search(body);
-
+            const courses = response.hits.hits;
+            for(const course of courses) {
+                const source = course._source as { posterUrl: string }; // Adjust the type as needed
+                source.posterUrl = await this.s3Service.getObjectUrl(source.posterUrl);
+            }
             return response;
         } catch (error) {
             console.error('Elasticsearch search error:', error);
