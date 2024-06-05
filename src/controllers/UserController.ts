@@ -153,9 +153,11 @@ export class UserController{
     getInstructorDetail = async (req: Request, res: Response) => {
         const instructorId  = Number(req.params.instructorId);
         const profile = await this.userService.getInstructorDetail(instructorId);
+        const courses = await this.courseService.getAllCourseOfInstructorsForUser(req, instructorId);
         return res.status(200).json({
             message: "Successful",
-            data: profile
+            data: profile,
+            courses: courses
         });
     }
 
