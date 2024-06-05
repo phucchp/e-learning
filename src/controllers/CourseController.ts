@@ -33,7 +33,7 @@ export class CourseController{
 	private enrollmentService: IEnrollmentService;
 	private levelService: ILevelService;
 	private languageService: ILanguageService;
-	private eleasticService: ElasticsearchService;
+	private elasticsearchService: ElasticsearchService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -46,7 +46,7 @@ export class CourseController{
 		this.enrollmentService = Container.get(EnrollmentService);
 		this.levelService = Container.get(LevelService);
 		this.languageService = Container.get(LanguageService);
-		this.eleasticService = Container.get(ElasticsearchService);
+		this.elasticsearchService = Container.get(ElasticsearchService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
@@ -542,12 +542,29 @@ export class CourseController{
     }
 
     getCourseByElasticsearch = async (req: Request, res: Response) => {
-        await this.eleasticService.checkConnection();
+        await this.elasticsearchService.checkConnection();
     }
 
     searchCourses = async (req: Request, res: Response) => {
         const { query, page, size } = req.query;
-        const results = await this.eleasticService.searchCourses(query as string, parseInt(page as string) || 1, parseInt(size as string) || 10);
+        // querySearch: string,
+        // languages?: string[],
+        // levels?: string[],
+        // price?: string[],
+        // durations?: string[],
+        // page: number = 1,
+        // pageSize: number = 10,
+        // sortField: string = 'averageRating',
+        // sortOrder: string ='desc'
+        const results = await this.elasticsearchService.searchCourses(
+            query?.toString() || '',
+            [],
+            [],
+            [],
+            [],
+            1,
+            10
+        );
         return res.status(200).json(results);
     }
 }
