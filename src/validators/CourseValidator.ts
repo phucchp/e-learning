@@ -26,6 +26,19 @@ export const validateGetCourses = [
     query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
 ];
 
+export const validateGetCoursesElasticsearch = [
+  query('search').trim().optional().isString().withMessage('Search must be a string'),
+  query('averageRating').optional().isFloat({ min: 0.0, max: 5.0 }).withMessage('Average rating must be a float between 0.0 and 5.0'),
+  query('languages').optional().isArray().withMessage('languages must must be an array'),
+  query('levels').optional().isArray().isIn(['Beginner', 'Intermediate', 'Advanced', 'All']).withMessage(`Invalid levels, levels is one of 'Beginner', 'Intermediate', 'Advanced'`),
+  query('durations').optional().isArray().isIn(['extraShort', 'short', 'medium', 'long', 'extraLong']).withMessage(`Invalid duration, duration is one of 'extraShort', 'short', 'medium', 'long', 'extraLong'`),
+  query('sortField').optional().isIn(['price', 'duration', 'averageRating', 'totalStudents', 'createdAt']).withMessage('Invalid sortField parameter'),
+  query('sortOrder').optional().isIn(['ASC', 'DESC']).withMessage('Invalid sortOrder parameter'),
+  query('price').optional().isIn(['free', 'paid']).withMessage('Invalid price parameter, price is free or paid'),
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
+  query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
+];
+
 export const validateGetCourse = [
     param('courseId').notEmpty().isString().withMessage('courseId must be a string').trim(),
 ]

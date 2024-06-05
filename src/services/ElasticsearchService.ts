@@ -89,7 +89,8 @@ export class ElasticsearchService {
             page: number = 1,
             pageSize: number = 10,
             sortField: string = 'averageRating',
-            sortOrder: string ='desc'
+            sortOrder: string ='desc',
+            averageRating?: number,
         ) {
             
         const from = (page - 1) * pageSize;
@@ -106,12 +107,18 @@ export class ElasticsearchService {
         };
         // Init query
         if (querySearch && querySearch != '') {
+            // query.bool.must.push({
+            //     match: {
+            //         title: {
+            //             query: querySearch,
+            //             operator: "AND"
+            //         }
+            //     }
+            // });
             query.bool.must.push({
-                match: {
-                    title: {
-                        query: querySearch,
-                        operator: "AND"
-                    }
+                multi_match: {
+                  query: querySearch,
+                  fields: ["title", "introduction"]
                 }
             });
         } else {
@@ -207,7 +214,7 @@ export class ElasticsearchService {
         }
 
         if (price && price.length > 0) { // Validate price is 'Paid' or 'Free'
-            if (price.length === 1 && price[0] === "Paid") {
+            if (price.length === 1 && price[0] === "paid") {
                 query.bool.filter.push({
                     range: {
                         price: {
@@ -215,7 +222,7 @@ export class ElasticsearchService {
                         }
                     }
                 });
-            } else if (price.length === 1 && price[0] === "Free") {
+            } else if (price.length === 1 && price[0] === "free") {
                 query.bool.filter.push({
                     range: {
                         price: {
@@ -224,6 +231,16 @@ export class ElasticsearchService {
                     }
                 });
             }
+        }
+
+        if(averageRating) {
+            query.bool.filter.push({
+                range: {
+                    averageRating: {
+                        gte: averageRating
+                    }
+                }
+            });
         }
 
 
@@ -239,6 +256,14 @@ export class ElasticsearchService {
             ],
             from,
             size,
+            highlight: {
+                pre_tags: ["<strong>"],
+                post_tags: ["</strong>"],
+                fields: {
+                  title: {},
+                  introduction: {}
+                }
+            },
             aggs: {
                 language: {
                     nested: {
@@ -299,7 +324,7 @@ export class ElasticsearchService {
                 }
             }
         };
-        return body;
+        // return body;
         try {
             const response = await ElasticsearchService.elasticClient.search(body);
 

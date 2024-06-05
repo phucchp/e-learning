@@ -1,6 +1,6 @@
 import { CourseController } from "../controllers/CourseController";
 import { auth, authInstructor, authUser } from "../middlewares/AuthMiddleware";
-import { validateGetCourse, validateGetCourses, validateUpdateCourse, validateCreateCourse, validateCreateTopic, validateDeleteTopic, validateUpdateTopic, validateGetQuestion } from "../validators/CourseValidator";
+import { validateGetCourse,validateGetCoursesElasticsearch, validateGetCourses, validateUpdateCourse, validateCreateCourse, validateCreateTopic, validateDeleteTopic, validateUpdateTopic, validateGetQuestion } from "../validators/CourseValidator";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
 
@@ -11,7 +11,7 @@ class CourseRoutes extends BaseRoutes {
 	}
 	public routes(): void {
 		this.router.get('/', validateGetCourses, validate, this.controller.getCourses);
-		this.router.get('/elasticSearch', this.controller.searchCourses);
+		this.router.get('/elasticSearch', validateGetCoursesElasticsearch, validate, this.controller.searchCourses);
 		this.router.get('/courses-for-instructor', validateGetCourses, validate, this.controller.getAllCourseOfInstructor);
 		this.router.get('/filters', this.controller.getAllFilterFoSearchCourse);
 		this.router.get('/debug/get-courses' , this.controller.getCoursesDebug);

@@ -546,7 +546,44 @@ export class CourseController{
     }
 
     searchCourses = async (req: Request, res: Response) => {
-        const { query, page, size } = req.query;
+        const search = req.query.search;
+        const page = Number(req.query.page) || 1;
+        const size = Number(req.query.pageSize) || 15;
+
+        let languages = req.query.languages;
+        let levels = req.query.levels;
+        let prices = req.query.prices;
+        let durations = req.query.durations;
+
+        let languagesArr: string[] = [];
+        let levelsArr: string[] = [];
+        let pricesArr: string[] = [];
+        let durationsArr: string[] = [];
+
+        if(languages && Array.isArray(languages)) {
+            for(const language of languages) {
+                languagesArr.push(language.toString());
+            }
+        }
+
+        if(levels && Array.isArray(levels)) {
+            for(const level of levels) {
+                levelsArr.push(level.toString());
+            }
+        }
+
+        if(prices && Array.isArray(prices)) {
+            for(const price of prices) {
+                pricesArr.push(price.toString());
+            }
+        }
+
+        if(durations && Array.isArray(durations)) {
+            for(const duration of durations) {
+                durationsArr.push(duration.toString());
+            }
+        }
+
         // querySearch: string,
         // languages?: string[],
         // levels?: string[],
@@ -554,16 +591,16 @@ export class CourseController{
         // durations?: string[],
         // page: number = 1,
         // pageSize: number = 10,
-        // sortField: string = 'averageRating',
-        // sortOrder: string ='desc'
+        const sortField = req.query.sortField?.toString() || 'averageRating';
+        const sortOrder = req.query.sortOrder?.toString() || 'desc';
         const results = await this.elasticsearchService.searchCourses(
-            query?.toString() || '',
-            [],
-            [],
-            [],
-            [],
-            1,
-            10
+            search?.toString() || '',
+            languagesArr,
+            levelsArr,
+            pricesArr,
+            durationsArr,
+            page,
+            size
         );
         return res.status(200).json(results);
     }
