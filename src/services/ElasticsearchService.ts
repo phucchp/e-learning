@@ -141,7 +141,7 @@ export class ElasticsearchService {
                     path: "language",
                     query: {
                         terms: {
-                            "language.name.keyword": languages
+                            "language.id": languages
                         }
                     }
                 }
