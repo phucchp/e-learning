@@ -103,9 +103,13 @@ export class ElasticsearchService {
             bool: {
                 must: [
                     
-                ],
-                filter: [
-                    
+                ]
+            }
+        };
+        const post_filter: any = {
+            bool: {
+                filter:[
+
                 ]
             }
         };
@@ -132,7 +136,7 @@ export class ElasticsearchService {
         }
 
         if (languages && languages.length > 0) {
-            query.bool.must.push({
+            post_filter.bool.filter.push({
                 nested: {
                     path: "language",
                     query: {
@@ -145,7 +149,7 @@ export class ElasticsearchService {
         }
 
         if (levels && levels.length > 0) {
-            query.bool.must.push({
+            post_filter.bool.filter.push({
                 nested: {
                     path: "level",
                     query: {
@@ -210,7 +214,7 @@ export class ElasticsearchService {
                     });
                 }
             }
-            query.bool.filter.push({
+            post_filter.bool.filter.push({
                 bool : {
                     should: should
                 }
@@ -219,7 +223,7 @@ export class ElasticsearchService {
 
         if (price && price.length > 0) { // Validate price is 'Paid' or 'Free'
             if (price.length === 1 && price[0] === "paid") {
-                query.bool.filter.push({
+                post_filter.bool.filter.push({
                     range: {
                         price: {
                             gte: 0.001,
@@ -227,7 +231,7 @@ export class ElasticsearchService {
                     }
                 });
             } else if (price.length === 1 && price[0] === "free") {
-                query.bool.filter.push({
+                post_filter.bool.filter.push({
                     range: {
                         price: {
                             lte: 0.001
@@ -238,7 +242,7 @@ export class ElasticsearchService {
         }
 
         if(averageRating) {
-            query.bool.filter.push({
+            post_filter.bool.filter.push({
                 range: {
                     averageRating: {
                         gte: averageRating
@@ -251,6 +255,7 @@ export class ElasticsearchService {
         const body = {
             index: 'courses',
             query: query,
+            post_filter: post_filter,
             sort: [
                 {
                     [sortField]: {
