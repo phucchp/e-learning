@@ -14,6 +14,7 @@ import { NotFound } from "../utils/CustomError";
 import { Op, Sequelize } from 'sequelize';
 import { Tag } from "../models/Tag";
 import { CourseTag } from "../models/CourseTag";
+import { Resource } from "../models/Resource";
 
 @Service()
 export class CourseRepository extends BaseRepository<Course> implements ICourseRepository{
@@ -128,6 +129,12 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                         {
                             model: Lesson,
                             attributes: ['id' ,'title', 'duration', 'isPreview'],
+                            include: [
+                                {
+                                    model: Resource,
+                                    attributes: ['url' , 'deletedAt'],
+                                },
+                            ],
                         },
                     ],
                 }
