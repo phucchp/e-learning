@@ -3,12 +3,15 @@ import { ICategoryService } from "../services/interfaces/ICategoryService";
 import Container from 'typedi';
 import { Request, Response } from 'express';
 import { NotFound } from "../utils/CustomError";
+import { HandleS3 } from "../services/utils/HandleS3";
 
 export class CategoryController{
 	private categoryService: ICategoryService;
+	private handleS3: HandleS3;
 
 	constructor() {
 		this.categoryService = Container.get(CategoryService);
+		this.handleS3 = Container.get(HandleS3);
 	}
 
     getCategories = async (req: Request, res: Response) => {
@@ -49,4 +52,16 @@ export class CategoryController{
             data: category
         });
     }
+
+    getCourseByCategory = async (req: Request, res: Response) => {
+        const categories = await this.categoryService.getCourseByCategory();
+        for(const category of categories) {
+            category.setDataValue('courses', await this.handleS3.getResourceCourses(category.courses));
+        }
+        return res.status(200).json({
+            message: "success",
+            data: categories
+        });
+    }
+
 }

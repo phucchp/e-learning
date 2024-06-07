@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 
 @Service()
 export class CategoryService implements ICategoryService {
+    
 
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
@@ -30,6 +31,18 @@ export class CategoryService implements ICategoryService {
 
     async getAll(): Promise<Category[]> {
         const categories = await this.categoryRepository.getAll();
+        return categories;
+    }
+
+    async getCourseByCategory(): Promise<Category[]> {
+        const categories = await this.categoryRepository.getCourseByCategory();
+        // Sort categories by the number of courses
+        categories.sort((a, b) => {
+            const aCourseCount = a.courses ? a.courses.length : 0;
+            const bCourseCount = b.courses ? b.courses.length : 0;
+            return bCourseCount - aCourseCount;
+        });
+
         return categories;
     }
 

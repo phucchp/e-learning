@@ -27,7 +27,7 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
         const {page, pageSize, whereCondition, sort, sortType} = options;
         const offset = (page - 1) * pageSize;
         const courses = await this.model.findAndCountAll({
-            attributes: { exclude: ['id', 'updatedAt', 'deletedAt'] },
+            attributes: { exclude: ['id','trailerUrl', 'updatedAt', 'deletedAt'] },
             where: whereCondition,
             include: [
                 {

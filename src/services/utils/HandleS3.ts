@@ -19,10 +19,10 @@ export class HandleS3 {
 	async getResourceCourses(courses: Course[]): Promise<Course[]> {
         for(const course of courses) {
             let posterUrl = course.getDataValue('posterUrl') || 'courses/defaults/poster.jpg';
-			if ('trailerUrl' in course) {
-				let trailerUrl = course.getDataValue('trailerUrl') || 'courses/defaults/trailer.mp4';
-				course.setDataValue('trailerUrl', await this.s3Service.getObjectUrl(trailerUrl));
-			}
+			// if ('trailerUrl' in course) {
+			// 	let trailerUrl = course.getDataValue('trailerUrl') || 'courses/defaults/trailer.mp4';
+			// 	course.setDataValue('trailerUrl', await this.s3Service.getObjectUrl(trailerUrl));
+			// }
 			
             course.setDataValue('posterUrl', await this.s3Service.getObjectUrl(posterUrl));
 
