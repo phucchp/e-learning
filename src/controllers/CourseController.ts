@@ -227,6 +227,44 @@ export class CourseController{
         });
     }
 
+    clearCacheTrailer = async (req: Request, res: Response) => {
+        const courseId = req.params.courseId;
+        const userId = req.payload.userId;
+        if (!courseId) {
+            return res.status(400).json({
+                message: "courseId is required!",
+            });
+        }
+        const course = await this.courseService.getCourse(courseId)
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
+
+        await this.courseService.clearCacheTrailer(courseId.toString());
+        return res.status(200).json({
+            message: "Successful",
+        });
+    }
+
+    getPresignedUrlToUploadTrailer = async (req: Request, res: Response) => {
+        const courseId = req.params.courseId;
+        const userId = req.payload.userId;
+        if (!courseId) {
+            return res.status(400).json({
+                message: "courseId is required!",
+            });
+        }
+        const course = await this.courseService.getCourse(courseId)
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
+        const link = await this.courseService.getPresignedUrlToUploadTrailer(courseId.toString());
+        return res.status(200).json({
+            message: "Successful",
+            data: link
+        });
+    }
+
     getRecommendCourse  = async (req: Request, res: Response) => {
         const userId = req.payload.userId;
         const page = Number(req.query.page) || 1;

@@ -36,12 +36,16 @@ export class LessonController{
         const lessonId = Number(req.params.lessonId);
         // Get lesson
         const lesson = await this.lessonService.getLesson(lessonId);
+        const subtitleLanguageOfLesson = await this.subtitleService.getAllSubtitleLangCodeOfLesson(lessonId);
 
         // Return lesson if it allow preview
         if(lesson.isPreview) {
             return res.status(200).json({
                 message: "Successful",
-                data: lesson
+                data: {
+                    subtitleLanguageOfLesson: subtitleLanguageOfLesson,
+                    lesson: lesson
+                }
             });
         }
 
@@ -59,7 +63,6 @@ export class LessonController{
             throw new NotEnoughAuthority('User is not enrollment course!');
         }
 
-        const subtitleLanguageOfLesson = await this.subtitleService.getAllSubtitleLangCodeOfLesson(lessonId);
         return res.status(200).json({
             message: "Successful",
             data: {

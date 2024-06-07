@@ -12,13 +12,15 @@ class CourseRoutes extends BaseRoutes {
 	public routes(): void {
 		this.router.get('/', validateGetCourses, validate, this.controller.getCourses);
 		this.router.get('/elasticsearch', validateGetCoursesElasticsearch, validate, this.controller.searchCourses);
-		this.router.get('/courses-for-instructor', validateGetCourses, validate, this.controller.getAllCourseOfInstructor);
+		this.router.get('/courses-for-instructor', auth, authInstructor, validateGetCourses, validate, this.controller.getAllCourseOfInstructor);
 		this.router.get('/filters', this.controller.getAllFilterFoSearchCourse);
 		this.router.get('/debug/get-courses' , this.controller.getCoursesDebug);
 		this.router.get('/test', this.controller.test);
 		this.router.get('/:courseId', authUser, validateGetCourse, validate, this.controller.getCourse);
 		this.router.get('/:courseId/presigned-url-to-upload-poster', auth, authInstructor, this.controller.getPresignedUrlToUploadPoster);
+		this.router.get('/:courseId/presigned-url-to-upload-trailer', auth, authInstructor, this.controller.getPresignedUrlToUploadTrailer);
 		this.router.get('/:courseId/clear-cache-poster', auth, authInstructor, this.controller.clearCachePoster);
+		this.router.get('/:courseId/clear-cache-trailer', auth, authInstructor, this.controller.clearCacheTrailer);
 		this.router.get('/:courseId/reviews', this.controller.getReviewsOfCourse);
 		this.router.put('/:courseId', auth, authInstructor, validateUpdateCourse, validate, this.controller.updateCourse);
 		this.router.post('/', auth, authInstructor, validateCreateCourse, validate, this.controller.createCourse);

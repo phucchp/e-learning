@@ -635,7 +635,7 @@ paths:
     get:
       tags:
         - course
-      summary: Get course details by courseId
+      summary: Get pre-signed URL to upload poster
       parameters:
         - name: courseId
           in: path
@@ -655,11 +655,59 @@ paths:
           description: Can not get category
       security:
         - bearerAuth: []
+  /courses/{courseId}/presigned-url-to-upload-trailer:
+    get:
+      tags:
+        - course
+      summary: Get pre-signed URL to upload video trailer
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get
+      security:
+        - bearerAuth: []
   /courses/{courseId}/clear-cache-poster:
     get:
       tags:
         - course
-      summary: Get course details by courseId
+      summary: Clear cache cloudfront poster
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category
+      security:
+        - bearerAuth: []
+  /courses/{courseId}/clear-cache-trailer:
+    get:
+      tags:
+        - course
+      summary: Clear cache cloudfront trailer
       parameters:
         - name: courseId
           in: path
@@ -2586,7 +2634,7 @@ paths:
               schema:
                 type: number
                 default: 1
-          summary: Get list instructor
+          summary: Get instructor information details
           responses:
             '200':
               description: Successful

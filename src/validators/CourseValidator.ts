@@ -100,7 +100,18 @@ export const validateGetListInstructors= [
 ]
 
 export const validateGetInstructorDetail = [
-  param('instructorId').notEmpty().isInt({ min: 1 }).withMessage('instructorId must be an integer greater than or equal to 1')
+  param('instructorId').notEmpty().isInt({ min: 1 }).withMessage('instructorId must be an integer greater than or equal to 1'),
+  query('search').trim().optional().isString().withMessage('Search must be a string'),
+  query('category').optional().isString().withMessage('Category must be a string').trim(),
+  query('averageRating').optional().isFloat({ min: 0.0, max: 5.0 }).withMessage('Average rating must be a float between 0.0 and 5.0'),
+  query('languageId').optional().isInt({ min: 1 }).withMessage('languageId is min 1').custom(languageIdExists),
+  query('level').optional().isInt({ min: 1 }).withMessage('Level instructorId be an integer greater than or equal to 1'),
+  query('duration').optional().isArray().isIn(['extraShort', 'short', 'medium', 'long', 'extraLong']).withMessage(`Invalid duration, duration is one of 'extraShort', 'short', 'medium', 'long', 'extraLong'`),
+  query('sort').optional().isIn(['price', 'discount', 'duration', 'averageRating', 'totalStudents', 'createdAt']).withMessage('Invalid sort parameter'),
+  query('sortType').optional().isIn(['ASC', 'DESC']).withMessage('Invalid sortType parameter'),
+  query('price').optional().isIn(['free', 'paid']).withMessage('Invalid price parameter, price is free or paid'),
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1'),
+  query('pageSize').optional().isInt({ min: 1 }).withMessage('PageSize must be an integer greater than or equal to 1'),
 ]
 
 export const validateUpdateProfile = [
