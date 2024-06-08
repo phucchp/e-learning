@@ -12,6 +12,7 @@ class CategoryRoutes extends BaseRoutes {
 	}
 	public routes(): void {
 		this.router.get('/', this.controller.getCategories);
+		this.router.get('/course-by-category', this.controller.getCourseByCategory);
         this.router.get('/:categoryId',validateGetCategory, validate, this.controller.getCategory);
         this.router.post('/',auth, authAdmin, this.controller.createCategory);
         this.router.delete('/:categoryId',auth, authAdmin, validateDeleteCategory, validate, this.controller.deleteCategory);

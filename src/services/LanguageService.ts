@@ -8,6 +8,7 @@ import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../ut
 import * as crypto from 'crypto';
 import { LanguageRepository } from '../repositories/LanguageRepository';
 import { ILanguageRepository } from '../repositories/interfaces/ILanguageRepository';
+import { RedisService } from './RedisService';
 
 @Service()
 export class LanguageService implements ILanguageService {
@@ -15,8 +16,18 @@ export class LanguageService implements ILanguageService {
     @Inject(() => LanguageRepository)
 	private languageRepository!: ILanguageRepository;
 
+
+    @Inject(() => RedisService)
+	private redisService!: RedisService;
+
     async getLanguages(): Promise<Language[]> {
+        const cacheKey = 'getLanguages';
+        const cachedResult = await this.redisService.getCache(cacheKey);
+        if (cachedResult) {
+            return cachedResult;
+        }
         const languages = await this.languageRepository.getAll();
+        await this.redisService.setCache(cacheKey, languages, 10*60);
         return languages;
     }
 
@@ -39,6 +50,7 @@ export class LanguageService implements ILanguageService {
         const newLanguage = await this.languageRepository.create({
             languageName: name
         });
+        await this.redisService.clearAllCache();
         return newLanguage; 
     }
 
@@ -59,6 +71,7 @@ export class LanguageService implements ILanguageService {
                 languageName: languageName
             });
             if(newLanguage){
+                await this.redisService.clearAllCache();
                 return newLanguage;
             }
             throw new NotFound('Faild');
@@ -72,6 +85,7 @@ export class LanguageService implements ILanguageService {
         });
         if(language){
             await this.languageRepository.delete(language.getDataValue('id'));
+            await this.redisService.clearAllCache();
             return;
         }
         throw new NotFound('Language not found!');

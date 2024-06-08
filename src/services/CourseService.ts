@@ -33,6 +33,7 @@ import { CourseTag } from '../models/CourseTag';
 import { CourseTagRepository } from '../repositories/CourseTagRepository';
 import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
 import { ContentBasedRecommendSystem } from './ContentBasedRecommendSystem';
+import { RedisService } from './RedisService';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -75,6 +76,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => S3Service)
 	private s3Service!: S3Service;
+
+    @Inject(() => RedisService)
+	private redisService!: RedisService;
 
     @Inject(() => CollaborativeFiltering)
 	private collaborativeFiltering!: CollaborativeFiltering;
@@ -321,6 +325,12 @@ export class CourseService implements ICourseService {
     }
 
     async getCourse(courseId: string): Promise<Course> {
+        const cacheKey = `courses:${courseId}`;
+        const cachedResult = await this.redisService.getCache(cacheKey);
+        if (cachedResult) {
+            // If cached data is available, return it
+            return cachedResult;
+        }
         let course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
@@ -342,7 +352,8 @@ export class CourseService implements ICourseService {
                 }
             }
         }
-
+        //Save course to cache
+		await this.redisService.setCache(cacheKey, JSON.stringify(course), 60 * 5);
         return course;
     }
 
@@ -411,6 +422,8 @@ export class CourseService implements ICourseService {
         if(!courseUpdate){
             throw new NotFound('Course not found');
         }
+        const cacheKey = `courses:${courseId}`;
+        await this.redisService.clearCacheByKey(cacheKey);
         return courseUpdate;
     }
 

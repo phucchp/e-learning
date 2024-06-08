@@ -8,13 +8,22 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import { ContentNotFound, NotFound, RecordExistsError, ServerError } from '../utils/CustomError';
 import * as crypto from 'crypto';
+import { RedisService } from './RedisService';
+import { HandleS3 } from './utils/HandleS3';
 
 @Service()
 export class CategoryService implements ICategoryService {
+    
 
     @Inject(() => CategoryRepository)
 	private categoryRepository!: ICategoryRepository;
+    
+    @Inject(() => RedisService)
+	private redisService!: RedisService;
 
+    @Inject(() => HandleS3)
+	private handleS3!: HandleS3;
+    
     private generateCategoryId(name: string): string {
         // Chuyển tên thành viết thường và thêm dấu gạch ngang
         const lowerCaseName = name.toLowerCase();
@@ -29,7 +38,33 @@ export class CategoryService implements ICategoryService {
       }
 
     async getAll(): Promise<Category[]> {
+        const cacheKey = `getAllCategory`;
+        const cacheResult = await this.redisService.getCache(cacheKey);
+        if (cacheResult) {
+            return cacheResult;
+        }
         const categories = await this.categoryRepository.getAll();
+        await this.redisService.setCache(cacheKey, categories, 10*60);
+        return categories;
+    }
+
+    async getCourseByCategory(): Promise<Category[]> {
+        const cacheKey = `getCourseByCategory`;
+        const cacheResult = await this.redisService.getCache(cacheKey);
+        if (cacheResult) {
+            return cacheResult;
+        }
+        const categories = await this.categoryRepository.getCourseByCategory();
+        for(const category of categories) {
+            category.setDataValue('courses', await this.handleS3.getResourceCourses(category.courses));
+        }
+        // Sort categories by the number of courses
+        categories.sort((a, b) => {
+            const aCourseCount = a.courses ? a.courses.length : 0;
+            const bCourseCount = b.courses ? b.courses.length : 0;
+            return bCourseCount - aCourseCount;
+        });
+        await this.redisService.setCache(cacheKey, categories, 10*60);
         return categories;
     }
 
@@ -58,6 +93,7 @@ export class CategoryService implements ICategoryService {
             categoryId: categoryId,
             name: name
         });
+        await this.redisService.clearAllCache();
         return newCategory; 
     }
 
@@ -78,6 +114,7 @@ export class CategoryService implements ICategoryService {
                 name: name
             });
             if(newCategory){
+                await this.redisService.clearAllCache();
                 return newCategory;
             }
             throw new ContentNotFound('Faild');
@@ -91,6 +128,7 @@ export class CategoryService implements ICategoryService {
         });
         if(category){
             await this.categoryRepository.delete(category.getDataValue('id'));
+            await this.redisService.clearAllCache();
             return;
         }
         throw new ContentNotFound('Category not found!');
