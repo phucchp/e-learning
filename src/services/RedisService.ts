@@ -32,7 +32,7 @@ export class RedisService {
     async getCache(cacheKey: string): Promise<any> {
         const cachedResults = await this.redis.get(cacheKey);
         if (cachedResults) {
-            console.log('Get from cache redis');
+            console.log(`Get cache: ${cacheKey} from cache redis`);
             return JSON.parse(cachedResults);
         }
 
