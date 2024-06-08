@@ -26,7 +26,7 @@ interface Matrix {
     [key: number]: Row; // Định dạng cụ thể của các hàng trong ma trận
 }
 @Service()
-export class RecommenderSystem {
+export class RecommenderSystem { // Content based recommender system based on course and category
 
     @Inject(() => CourseRepository)
 	private courseRepository!: ICourseRepository;
@@ -154,7 +154,7 @@ export class RecommenderSystem {
     }
 
     /**
-     * Get the rest matrix from the matrix and movieIds
+     * Get the rest matrix from the matrix and courseIds
      * Function will remove course with courseId in courseIds array 
      */
     public async getTheRestMatrix(matrix: Matrix, courseIds: number[]): Promise<Matrix> {
