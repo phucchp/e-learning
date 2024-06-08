@@ -55,9 +55,7 @@ export class CategoryController{
 
     getCourseByCategory = async (req: Request, res: Response) => {
         const categories = await this.categoryService.getCourseByCategory();
-        for(const category of categories) {
-            category.setDataValue('courses', await this.handleS3.getResourceCourses(category.courses));
-        }
+        
         return res.status(200).json({
             message: "success",
             data: categories
