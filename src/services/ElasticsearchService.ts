@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SearchRequest } from '@elastic/elasticsearch/lib/api/types';
 import { S3Service } from './S3Service';
+import { Course } from '../models/Course';
 
 @Service()
 export class ElasticsearchService {
@@ -419,6 +420,7 @@ export class ElasticsearchService {
       
           console.log(`Index ${indexName} đã được tạo thành công.`);
         } catch (error) {
+            throw new ServerError('error');
           console.error('Lỗi khi tạo index:', error);
         }
     }
@@ -492,5 +494,57 @@ export class ElasticsearchService {
             // Add a 3-second wait before the next iteration
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
+    }
+
+    async addCourse(course: Course) {
+        const courseData = {
+            courseId: course.courseId,
+            title: course.title,
+            introduction: course.introduction,
+            description: course.description,
+            learnsDescription: course.learnsDescription,
+            requirementsDescription: course.requirementsDescription,
+            price: course.price,
+            discount: course.discount,
+            duration: course.duration,
+            category: {
+              id: 1,
+              name: "Databases"
+            },
+            instructor: {
+              id: 1,
+              name: "John Doe"
+            },
+            averageRating: 4.5,
+            trailerUrl: "http://example.com/trailer",
+            subUrl: "http://example.com/sub",
+            posterUrl: "http://example.com/poster",
+            totalStudents: 100,
+            totalLessons: 10,
+            language: {
+              id: 1,
+              languageName: "English"
+            },
+            level: {
+              id: 1,
+              levelName: "Beginner"
+            },
+            isActive: true,
+            createdAt: "2024-06-11T00:00:00Z",
+            updatedAt: "2024-06-11T00:00:00Z"
+          };
+          try {
+            const indexName = 'courses';
+        
+            // Chèn dữ liệu
+            const response = await ElasticsearchService.elasticClient.index({
+              index: indexName,
+              document: courseData
+            });
+        
+            console.log('Dữ liệu đã được chèn thành công:', response);
+          } catch (error) {
+            console.error('Lỗi khi chèn dữ liệu:', error);
+          }
     }
 }
