@@ -68,7 +68,7 @@ export class HandleS3 {
 			await this.redisService.setCache(trailerUrl, urlTrailer, 10*60);
 		}
 
-		const posterUrlCached = await this.redisService.getCache(trailerUrl);
+		const posterUrlCached = await this.redisService.getCache(posterUrl);
 		if (posterUrlCached) {
 			// If cached data is available, return it
 			course.setDataValue('posterUrl', posterUrlCached);

@@ -33,7 +33,6 @@ export class ElasticsearchService {
         const projectRoot = path.resolve(__dirname, '../../');
         // Kết hợp đường dẫn gốc với đường dẫn tương đối của tệp chứng chỉ
         const caCertFullPath = path.join(projectRoot, 'ca.crt');
-        console.log(caCertFullPath);
 
         this.ES_NODE = process.env.ES_NODE || 'https://es01:9200';
         this.ELASTIC_USERNAME = process.env.ELASTIC_USERNAME || 'elastic';

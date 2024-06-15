@@ -353,7 +353,7 @@ export class CourseService implements ICourseService {
             }
         }
         //Save course to cache
-		await this.redisService.setCache(cacheKey, JSON.stringify(course), 60 * 5);
+		await this.redisService.setCache(cacheKey, course, 60 * 5);
         return course;
     }
 
