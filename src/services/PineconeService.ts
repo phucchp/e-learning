@@ -10,8 +10,9 @@ import { Document } from "langchain/document";
 
 @Service()
 export class PineconeService {
-      /* Function to simulate fetching data from the database */
-    fetchFakeData = async () => {
+
+  /* Function to simulate fetching data from the database */
+  fetchFakeData = async () => {
       return [
         { id: 1, content: 'This is the content of the first document.' },
         { id: 2, content: 'Here is some text for the second document.' },
@@ -54,4 +55,10 @@ export class PineconeService {
             throw new Error('Failed to ingest your data');
         }
     }
+
+    async deleteNamespace(namespace: string) {
+      const index = pinecone.index(PINECONE_INDEX_NAME);
+      await index.namespace(namespace).deleteAll();
+    }
+
 }

@@ -1,4 +1,4 @@
-import { PineconeController } from "../controllers/PineconeController";
+import { ChatController } from "../controllers/ChatController";
 import { auth } from "../middlewares/AuthMiddleware";
 import { validate } from "../validators/Validate";
 import BaseRoutes from "./base/BaseRouter";
@@ -6,11 +6,10 @@ import BaseRoutes from "./base/BaseRouter";
 
 class PineconeRoutes extends BaseRoutes {
 	constructor() {
-		super(new PineconeController());
+		super(new ChatController());
 	}
 	public routes(): void {
-		this.router.get('/',this.controller.pushDataToPinecone);
-		this.router.get('/deleteNamespace',this.controller.deleteNamespace);
+		this.router.post('/',this.controller.chat);
 	}
 }
 

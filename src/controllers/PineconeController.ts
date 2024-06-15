@@ -17,4 +17,19 @@ export class PineconeController{
             "message": "Success",
         });
     }
+
+    deleteNamespace = async (req: Request, res: Response) => {
+        const namespace = req.query.namespace;
+        if (!namespace) {
+            return res.status(404).json({
+                "message" : "Missing namespace"
+            })
+        }
+        console.log(`deleteNamespace ${namespace}`);
+        await this.pineconeService.deleteNamespace(namespace.toString());
+        return res.json({
+            "message" : "Success"
+        });
+    }
+
 }
