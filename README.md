@@ -15,7 +15,22 @@ e-learning is an online learning platform built with Node.js, designed to provid
 ### Prerequisites
 
 - Docker installed and running
-
+- Make command installed
+### Project structure
+   ```bash
+   E-learning-nodejs-app/
+   │
+   ├── swagger-api.yaml
+   ├── makefile (All command here)
+   ├── .env
+   ├── Dockerfile
+   ├── docker-compose.yml
+   ├── src/
+   │   └── ... (Mã nguồn của ứng dụng Node.js)
+   ├── nginx/
+   │   └── nginx.conf
+   └── postgres-data/ (Thư mục chứa dữ liệu của PostgreSQL)
+   ```
 ### Installation
 
 1. Clone the repository:
@@ -31,14 +46,22 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    sudo docker compose build
    ```
-3. Run project:
+   >Or using make command
    ```
-   docker compose up
+   make build
    ```
-4. Set up environment:
+3. Set up environment:
    >Copy environment example to .env and fill values in .env file
    ```
    cp .env.example .env
+   ```
+4. Run project:
+   ```
+   docker compose up
+   ```
+   >Or using make command (For Linux, Window and MacOs)
+   ```
+   make up
    ```
 5. Open new terminal and run commands below:
    ```
