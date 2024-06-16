@@ -61,4 +61,21 @@ export class PineconeService {
       await index.namespace(namespace).deleteAll();
     }
 
+    async splitText(text: string) {
+      const textSplitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1000,
+        chunkOverlap: 200,
+      });
+    
+      const chunks =await textSplitter.splitDocuments([
+        new Document({ pageContent: text }),
+      ]);
+
+      for(const chunk of chunks) {
+        console.log(chunk.pageContent);
+      }
+      
+      return chunks;
+    }
+
 }

@@ -32,4 +32,9 @@ export class PineconeController{
         });
     }
 
+    createDataChat = async (req: Request, res: Response) => {
+        const content = req.body.content;
+        const rs = await this.pineconeService.splitText(content);
+        return res.status(200).json(rs);
+    }
 }

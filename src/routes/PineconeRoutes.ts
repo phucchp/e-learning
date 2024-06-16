@@ -11,6 +11,7 @@ class PineconeRoutes extends BaseRoutes {
 	public routes(): void {
 		this.router.get('/',this.controller.pushDataToPinecone);
 		this.router.get('/deleteNamespace',this.controller.deleteNamespace);
+		this.router.post('/courses/add-data-for-chatbot',this.controller.createDataChat);
 	}
 }
 
