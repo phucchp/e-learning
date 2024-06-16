@@ -9,6 +9,18 @@ services:
       - 9229:9229
     volumes:
       - .:/usr/src/app
+    networks:
+      - nodejs-exa
+  app2:
+    build:
+      context: .
+    container_name: E-learning-nodejs-app2
+    ports:
+      - 8002:8000
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - nodejs-exa
     # depends_on:
     #   - db
   # db:
@@ -30,15 +42,20 @@ services:
       - "6379:6379"
     volumes:
       - data-redis:/data
-  # pgadmin:
-  #   container_name: pgadmin4
-  #   image: dpage/pgadmin4
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
-  #     PGADMIN_DEFAULT_PASSWORD: admin@admin.com
-  #   ports:
-  #     - '5050:80'
+    networks:
+      - nodejs-exa
+  nginx:
+      image: nginx:latest
+      container_name: nginx
+      ports:
+        - 80:80
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      depends_on:
+        - app
+        - app2
+      networks:
+        - nodejs-exa
 networks:
   nodejs-exa:
     driver: bridge
