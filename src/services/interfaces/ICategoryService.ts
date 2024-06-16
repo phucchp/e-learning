@@ -7,4 +7,5 @@ export interface ICategoryService {
     createCategory(req: Request): Promise<Category>;
     updateCategory(req: Request): Promise<Category>;
     deleteCategory(categoryId: string): Promise<void>;
+    getCourseByCategory(): Promise<Category[]>;
 }

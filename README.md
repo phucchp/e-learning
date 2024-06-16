@@ -136,3 +136,30 @@ Reinstall npm dependencies and restart the application container.
 ```
 make fix
 ```
+## Set up Elasticsearch
+Set up Elasticsearch with docker:
+## Prerequisites
+- [Docker](https://www.docker.com/)
+- [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+### Usage
+
+#### 1. Setup "vm.max_map_count" on your system
+##### Permanent Change.
+1.1 Open the /etc/sysctl.conf file in a text editor with root privileges. For example:
+```
+sudo nano /etc/sysctl.conf
+```
+1.2 Add the following line to the file:
+```
+vm.max_map_count=262144
+```
+1.3 Save the file and exit the editor.
+1.4 Apply the changes:
+```
+sudo sysctl -p
+```
+##### Docker Environment.
+If you are running Elasticsearch inside a Docker container, you need to ensure the host system has the correct vm.max_map_count setting. You can achieve this by running the following command on the host machine:
+```
+sudo sysctl -w vm.max_map_count=262144
+```

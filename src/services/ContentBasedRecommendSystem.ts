@@ -29,7 +29,7 @@ interface Matrix {
     [key: number]: Row; // Định dạng cụ thể của các hàng trong ma trận
 }
 @Service()
-export class ContentBasedRecommendSystem {
+export class ContentBasedRecommendSystem { //Content based recommender system based on course and tags
 
     @Inject(() => CourseRepository)
 	private courseRepository!: ICourseRepository;

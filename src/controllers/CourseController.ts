@@ -16,6 +16,11 @@ import { QAService } from "../services/QAService";
 import { IQAService } from "../services/interfaces/IQAService";
 import { EnrollmentService } from "../services/EnrollmentService";
 import { IEnrollmentService } from "../services/interfaces/IEnrollmentService";
+import { LevelService } from "../services/LevelService";
+import { ILevelService } from "../services/interfaces/ILevelService";
+import { ILanguageService } from "../services/interfaces/ILanguageService";
+import { LanguageService } from "../services/LanguageService";
+import { ElasticsearchService } from "../services/ElasticsearchService";
 
 export class CourseController{
 	private courseService: ICourseService;
@@ -26,6 +31,9 @@ export class CourseController{
 	private tfidfService: TFIDFService;
 	private qaService: IQAService;
 	private enrollmentService: IEnrollmentService;
+	private levelService: ILevelService;
+	private languageService: ILanguageService;
+	private elasticsearchService: ElasticsearchService;
 
 	constructor() {
 		this.courseService = Container.get(CourseService);
@@ -36,6 +44,9 @@ export class CourseController{
 		this.tfidfService = Container.get(TFIDFService);
 		this.qaService = Container.get(QAService);
 		this.enrollmentService = Container.get(EnrollmentService);
+		this.levelService = Container.get(LevelService);
+		this.languageService = Container.get(LanguageService);
+		this.elasticsearchService = Container.get(ElasticsearchService);
 	}
 
     getCourses = async (req: Request, res: Response) => {
@@ -210,6 +221,44 @@ export class CourseController{
             throw new NotEnoughAuthority('User is not owner course or user is not admin!');
         }
         const link = await this.courseService.getPresignedUrlToUploadPoster(courseId.toString());
+        return res.status(200).json({
+            message: "Successful",
+            data: link
+        });
+    }
+
+    clearCacheTrailer = async (req: Request, res: Response) => {
+        const courseId = req.params.courseId;
+        const userId = req.payload.userId;
+        if (!courseId) {
+            return res.status(400).json({
+                message: "courseId is required!",
+            });
+        }
+        const course = await this.courseService.getCourse(courseId)
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
+
+        await this.courseService.clearCacheTrailer(courseId.toString());
+        return res.status(200).json({
+            message: "Successful",
+        });
+    }
+
+    getPresignedUrlToUploadTrailer = async (req: Request, res: Response) => {
+        const courseId = req.params.courseId;
+        const userId = req.payload.userId;
+        if (!courseId) {
+            return res.status(400).json({
+                message: "courseId is required!",
+            });
+        }
+        const course = await this.courseService.getCourse(courseId)
+        if(course.instructorId !== userId && !await this.userService.isAdmin(userId)){
+            throw new NotEnoughAuthority('User is not owner course or user is not admin!');
+        }
+        const link = await this.courseService.getPresignedUrlToUploadTrailer(courseId.toString());
         return res.status(200).json({
             message: "Successful",
             data: link
@@ -506,4 +555,91 @@ export class CourseController{
         })
     }
 
+    getAllFilterFoSearchCourse = async (req: Request, res: Response) => {
+        const levels = await this.levelService.getLevels();
+        const languages = await this.languageService.getLanguages();
+        const ratings = [
+            3, 3.5, 4, 4.5
+        ];
+
+        const videoDurations = [
+            'extraShort', 'short', 'medium', 'long', 'extraLong'
+        ];
+
+        const prices = [
+            'paid', 'free'
+        ];
+
+        return res.status(200).json({
+            levels,
+            languages,
+            ratings,
+            videoDurations,
+            prices
+        });
+    }
+
+    getCourseByElasticsearch = async (req: Request, res: Response) => {
+        await this.elasticsearchService.checkConnection();
+    }
+
+    searchCourses = async (req: Request, res: Response) => {
+        const search = req.query.search;
+        const page = Number(req.query.page) || 1;
+        const size = Number(req.query.pageSize) || 15;
+
+        let languages = req.query.languages;
+        let levels = req.query.levels;
+        let prices = req.query.prices;
+        let durations = req.query.durations;
+
+        let languagesArr: string[] = [];
+        let levelsArr: string[] = [];
+        let pricesArr: string[] = [];
+        let durationsArr: string[] = [];
+
+        if(languages && Array.isArray(languages)) {
+            for(const language of languages) {
+                languagesArr.push(language.toString());
+            }
+        }
+
+        if(levels && Array.isArray(levels)) {
+            for(const level of levels) {
+                levelsArr.push(level.toString());
+            }
+        }
+
+        if(prices && Array.isArray(prices)) {
+            for(const price of prices) {
+                pricesArr.push(price.toString());
+            }
+        }
+
+        if(durations && Array.isArray(durations)) {
+            for(const duration of durations) {
+                durationsArr.push(duration.toString());
+            }
+        }
+
+        // querySearch: string,
+        // languages?: string[],
+        // levels?: string[],
+        // price?: string[],
+        // durations?: string[],
+        // page: number = 1,
+        // pageSize: number = 10,
+        const sortField = req.query.sortField?.toString() || 'averageRating';
+        const sortOrder = req.query.sortOrder?.toString() || 'desc';
+        const results = await this.elasticsearchService.searchCourses(
+            search?.toString() || '',
+            languagesArr,
+            levelsArr,
+            pricesArr,
+            durationsArr,
+            page,
+            size
+        );
+        return res.status(200).json(results);
+    }
 }

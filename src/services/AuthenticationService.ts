@@ -7,7 +7,7 @@ import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 import { ProfileRepository } from '../repositories/ProfileRepository';
 import { IProfileRepository } from '../repositories/interfaces/IProfileRepository';
 import { IAuthenticationService } from './interfaces/IAuthenticationService';
-import { DuplicateError, BadRequestError, UnauthorizedError, NotFound } from '../utils/CustomError';
+import { DuplicateError, BadRequestError, UnauthorizedError, NotFound, NotEnoughAuthority } from '../utils/CustomError';
 import Mail from '../utils/Mail';
 
 @Service()
@@ -28,6 +28,43 @@ export class AuthenticationService implements IAuthenticationService {
         });
         if(!user){
             throw new BadRequestError('Invalid email or password');
+        }
+        // check password
+        let compare = await Authentication.passwordCompare(
+            password,
+            user.password
+        );
+        // generate token
+        if (compare) {
+            if (!user.isActive) {
+                throw new UnauthorizedError('Account is not actived');
+            }
+            return {
+                accessToken: Authentication.generateAccessToken(
+                    user.id,
+                    user.roleId,
+                    user.userName,
+                    user.email,
+                ),
+                refreshToken: Authentication.generateRefreshToken(
+                    user.email
+                ),
+            };
+        }else {
+            throw new BadRequestError('Invalid email or password');
+        }
+    }
+
+    async loginAdmin(email: string, password: string): Promise<any> {
+        const user = await this.userRepository.findOneByCondition({
+            email: email,
+        });
+        if(!user){
+            throw new BadRequestError('Invalid email or password');
+        }
+
+        if(user.roleId != 3) {
+            throw new NotEnoughAuthority('User is not admin');
         }
         // check password
         let compare = await Authentication.passwordCompare(

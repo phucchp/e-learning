@@ -33,6 +33,7 @@ import { CourseTag } from '../models/CourseTag';
 import { CourseTagRepository } from '../repositories/CourseTagRepository';
 import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
 import { ContentBasedRecommendSystem } from './ContentBasedRecommendSystem';
+import { RedisService } from './RedisService';
 
 @Service()
 export class CourseService implements ICourseService {
@@ -75,6 +76,9 @@ export class CourseService implements ICourseService {
 
     @Inject(() => S3Service)
 	private s3Service!: S3Service;
+
+    @Inject(() => RedisService)
+	private redisService!: RedisService;
 
     @Inject(() => CollaborativeFiltering)
 	private collaborativeFiltering!: CollaborativeFiltering;
@@ -191,6 +195,11 @@ export class CourseService implements ICourseService {
         return courses;
     }
 
+    /**
+     * For instructor
+     * @param req 
+     * @returns 
+     */
     async getAllCourseOfInstructors(req: Request ): Promise<{ rows: Course[]; count: number}> {
         let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
         const instructorId = req.payload.userId;
@@ -251,7 +260,77 @@ export class CourseService implements ICourseService {
         return courses;
     } 
 
+    /**
+     * For user
+     * @param req 
+     * @returns 
+     */
+    async getAllCourseOfInstructorsForUser(req: Request, instructorId: number ): Promise<{ rows: Course[]; count: number}> {
+        let { search, category, averageRating, languageId, level, duration,sort, sortType ,price, page, pageSize} = req.query;
+        const whereCondition: any = {};
+        if(search){
+            whereCondition[Op.or] = [
+                { title: { [Op.iLike]: `%${search}%` } },
+                // { description: { [Op.iLike]: `%${search}%` } },
+                // { learnsDescription: { [Op.iLike]: `%${search}%` } },
+            ];
+        }
+
+        if(category){
+            const categoryDb = await this.categoryRepository.findOneByCondition({categoryId: category});
+            if(!categoryDb){
+                throw new NotFound('Category Not Found!');
+            }
+            whereCondition['categoryId'] = categoryDb.id;
+        }
+
+        if(averageRating){
+            whereCondition['averageRating'] = {[Op.gt]: averageRating};
+        }
+
+        if(languageId){
+            whereCondition['languageId'] = {[Op.eq]: languageId};
+        }
+
+        if(instructorId){
+            whereCondition['instructorId'] = {[Op.eq]: instructorId};
+        }
+
+        if(level){
+            whereCondition['levelId'] = {[Op.eq]: level};
+        }
+
+        if(duration){
+            whereCondition[Op.and] = this.scopeFilterByDuration(duration);
+        }
+
+        if(price){
+            if(price === 'free'){
+                whereCondition['price'] = {[Op.eq]: 0};
+            }else if(price==='paid'){
+                whereCondition['price'] = {[Op.gt]: 0};
+            }
+        }
+
+        const options = {
+            page: page || 1,
+            pageSize: pageSize || 10,
+            whereCondition: whereCondition,
+            sortType: sortType || 'ASC',
+            sort : sort || 'createdAt'
+        }
+        let courses = await this.courseRepository.getCourses(options);
+        courses.rows = await this.handleS3.getResourceCourses(courses.rows);
+        return courses;
+    }
+
     async getCourse(courseId: string): Promise<Course> {
+        const cacheKey = `courses:${courseId}`;
+        const cachedResult = await this.redisService.getCache(cacheKey);
+        if (cachedResult) {
+            // If cached data is available, return it
+            return cachedResult;
+        }
         let course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
@@ -273,7 +352,8 @@ export class CourseService implements ICourseService {
                 }
             }
         }
-
+        //Save course to cache
+		await this.redisService.setCache(cacheKey, course, 60 * 5);
         return course;
     }
 
@@ -342,6 +422,8 @@ export class CourseService implements ICourseService {
         if(!courseUpdate){
             throw new NotFound('Course not found');
         }
+        const cacheKey = `courses:${courseId}`;
+        await this.redisService.clearCacheByKey(cacheKey);
         return courseUpdate;
     }
 
@@ -517,14 +599,14 @@ export class CourseService implements ICourseService {
         const favorite = await this.favoriteRepository.findOneByCondition({
             courseId: course.id,
             userId: userId
-        }, true);
+        });
 
         if(!favorite){
             // Return error if user is not favorited course
             throw new NotFound('The user is not favorited the course before.');
         }
         
-        await this.favoriteRepository.deleteInstance(favorite);
+        await this.favoriteRepository.deleteInstance(favorite, true);
         return true;
     }
 
@@ -600,16 +682,33 @@ export class CourseService implements ICourseService {
     }
 
     async getPresignedUrlToUploadPoster(courseId: string): Promise<string> {
-        let course = await this.courseRepository.getCourse(courseId);
+        const course = await this.courseRepository.getCourse(courseId);
         if(!course){
             throw new NotFound('Course not found');
         }
 
         if(!course.posterUrl) {
-            course.posterUrl = `course/${course.id}/poster.jpg`;
+            course.posterUrl = `courses/${course.id}/poster.jpg`;
+            await this.courseRepository.updateInstance(course);
         }
 
+
         return await this,this.s3Service.generatePresignedUrlUpdate(course.posterUrl, 'image/jpeg');
+    }
+
+    async getPresignedUrlToUploadTrailer(courseId: string): Promise<string> {
+        const course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.trailerUrl) {
+            course.trailerUrl = `courses/${course.id}/trailer.mp4`;
+            await this.courseRepository.updateInstance(course);
+        }
+
+
+        return await this,this.s3Service.generatePresignedUrlUpdate(course.trailerUrl, 'video/mp4');
     }
 
     async clearCachePoster(courseId: string): Promise<void> {
@@ -622,6 +721,18 @@ export class CourseService implements ICourseService {
             throw new NotFound('No poster to clear');
         }
         return await this.s3Service.clearCacheCloudFront(course.posterUrl);
+    }
+
+    async clearCacheTrailer(courseId: string): Promise<void> {
+        let course = await this.courseRepository.getCourse(courseId);
+        if(!course){
+            throw new NotFound('Course not found');
+        }
+
+        if(!course.trailerUrl) {
+            throw new NotFound('No poster to clear');
+        }
+        return await this.s3Service.clearCacheCloudFront(course.trailerUrl);
     }
 
     /**

@@ -9,6 +9,18 @@ services:
       - 9229:9229
     volumes:
       - .:/usr/src/app
+    networks:
+      - nodejs-exa
+  app2:
+    build:
+      context: .
+    container_name: E-learning-nodejs-app2
+    ports:
+      - 8002:8000
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - nodejs-exa
     # depends_on:
     #   - db
   # db:
@@ -23,16 +35,29 @@ services:
   #     POSTGRES_DB: elearning_database
   #   volumes:
   #     - ./postgres-data:/var/lib/postgresql/data
-
-  pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin@admin.com
+  redis:
+    image: redis:alpine
+    container_name: elearning-redis
     ports:
-      - '5050:80'
+      - "6379:6379"
+    volumes:
+      - data-redis:/data
+    networks:
+      - nodejs-exa
+  nginx:
+      image: nginx:latest
+      container_name: nginx
+      ports:
+        - 80:80
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      depends_on:
+        - app
+        - app2
+      networks:
+        - nodejs-exa
 networks:
   nodejs-exa:
     driver: bridge
+volumes:  # Add a volumes section to define named volumes
+  data-redis:  # Define the named volume

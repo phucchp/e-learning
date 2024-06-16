@@ -66,6 +66,32 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+  /auth/admin/login:
+    post:
+      summary: Admin login
+      tags:
+        - authentication
+      requestBody:
+        description: User credentials for login
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: "admin@gmail.com"
+                password:
+                  type: string
+                  default: "123456"
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
   /auth/register:
     post:
       summary: User registration
@@ -609,7 +635,7 @@ paths:
     get:
       tags:
         - course
-      summary: Get course details by courseId
+      summary: Get pre-signed URL to upload poster
       parameters:
         - name: courseId
           in: path
@@ -629,11 +655,59 @@ paths:
           description: Can not get category
       security:
         - bearerAuth: []
+  /courses/{courseId}/presigned-url-to-upload-trailer:
+    get:
+      tags:
+        - course
+      summary: Get pre-signed URL to upload video trailer
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get
+      security:
+        - bearerAuth: []
   /courses/{courseId}/clear-cache-poster:
     get:
       tags:
         - course
-      summary: Get course details by courseId
+      summary: Clear cache cloudfront poster
+      parameters:
+        - name: courseId
+          in: path
+          description: Enter courseId
+          required: true
+          schema:
+            type: string
+            default: 'introduction-to-programing'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get category
+      security:
+        - bearerAuth: []
+  /courses/{courseId}/clear-cache-trailer:
+    get:
+      tags:
+        - course
+      summary: Clear cache cloudfront trailer
       parameters:
         - name: courseId
           in: path
@@ -1073,6 +1147,22 @@ paths:
           schema:
             type: string
             default: 'Can you recommend me some courses about hacking?'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+        '400':
+          description: Can not get courses
+      security:
+        - bearerAuth: []
+  /courses/filters:
+    get:
+      tags:
+        - course
+      summary: Get filters for API search course
       responses:
         '200':
           description: successful operation
@@ -2544,7 +2634,7 @@ paths:
               schema:
                 type: number
                 default: 1
-          summary: Get list instructor
+          summary: Get instructor information details
           responses:
             '200':
               description: Successful
