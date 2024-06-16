@@ -70,6 +70,11 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    docker compose exec app sh -c "npx sequelize-cli db:create"
    ```
+6. Check project is running:
+   >Once all containers are up and running, you can access the applications through the following URLs:
+   ```
+   http://localhost:80/api
+   ```
 ### If you get an error
    ###### Try this command
    ```
@@ -79,6 +84,7 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    make fix
    ```
+This README provides a clear and concise guide to setting up, configuring, and running the E-learning NodeJS project using Docker Compose. If any issues arise, double-check the configuration steps and ensure that Docker services are running correctly.
 ## Project Makefile Guide
 This Makefile provides a set of convenient commands to manage a Dockerized application. It simplifies the execution of various tasks related to building, starting, stopping, and managing the database of your application. Below are the available commands and their descriptions:
 ## Prerequisites
