@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SearchRequest } from '@elastic/elasticsearch/lib/api/types';
 import { S3Service } from './S3Service';
+import { Course } from '../models/Course';
 
 @Service()
 export class ElasticsearchService {
@@ -33,7 +34,6 @@ export class ElasticsearchService {
         const projectRoot = path.resolve(__dirname, '../../');
         // Kết hợp đường dẫn gốc với đường dẫn tương đối của tệp chứng chỉ
         const caCertFullPath = path.join(projectRoot, 'ca.crt');
-        console.log(caCertFullPath);
 
         this.ES_NODE = process.env.ES_NODE || 'https://es01:9200';
         this.ELASTIC_USERNAME = process.env.ELASTIC_USERNAME || 'elastic';
@@ -67,11 +67,12 @@ export class ElasticsearchService {
     public async checkConnection(): Promise<void> {
         let attempts = 0;
         const maxAttempts = 5;
-
         while (attempts < maxAttempts) {
             try {
                 const health = await ElasticsearchService.elasticClient.cluster.health();
                 console.log('Elasticsearch cluster health:', health);
+                await this.addCourses();
+                console.log('Add course done');
                 return;
             } catch (error: any) {
                 attempts++;
@@ -281,7 +282,7 @@ export class ElasticsearchService {
                     aggs: {
                         language_id: {
                             terms: {
-                                field: "language.id"
+                                field: "language.name.keyword"
                             }
                         }
                     }
@@ -293,7 +294,7 @@ export class ElasticsearchService {
                     aggs: {
                         level_id: {
                             terms: {
-                                field: "level.id"
+                                field: "level.name.keyword"
                             }
                         }
                     }
@@ -348,8 +349,83 @@ export class ElasticsearchService {
         }
     }
 
+    async createIndex() {
+        try {
+          const indexName = 'courses';
+      
+          // Kiểm tra nếu index đã tồn tại
+          const indexExists = await ElasticsearchService.elasticClient.indices.exists({ index: indexName });
+          if (indexExists) {
+            console.log(`Index ${indexName} đã tồn tại.`);
+            return;
+          }
+      
+          // Tạo index mới với mapping
+          await ElasticsearchService.elasticClient.indices.create({
+            index: indexName,
+            body: {
+              mappings: {
+                properties: {
+                  courseId: { type: 'text' },
+                  title: { type: 'text' },
+                  introduction: { type: 'text' },
+                  description: { type: 'text' },
+                  learnsDescription: { type: 'text' },
+                  requirementsDescription: { type: 'text' },
+                  price: { type: 'float' },
+                  discount: { type: 'integer' },
+                  duration: { type: 'integer' },
+                  category: {
+                    type: 'nested',
+                    properties: {
+                      id: { type: 'integer' },
+                      name: { type: 'text' }
+                    }
+                  },
+                  instructor: {
+                    type: 'nested',
+                    properties: {
+                      id: { type: 'integer' },
+                      name: { type: 'text' }
+                    }
+                  },
+                  averageRating: { type: 'float' },
+                  trailerUrl: { type: 'text' },
+                  subUrl: { type: 'text' },
+                  posterUrl: { type: 'text' },
+                  totalStudents: { type: 'integer' },
+                  totalLessons: { type: 'integer' },
+                  language: {
+                    type: 'nested',
+                    properties: {
+                      id: { type: 'integer' },
+                      languageName: { type: 'text' }
+                    }
+                  },
+                  level: {
+                    type: 'nested',
+                    properties: {
+                      id: { type: 'integer' },
+                      levelName: { type: 'text' }
+                    }
+                  },
+                  isActive: { type: 'boolean' },
+                  createdAt: { type: 'date' },
+                  updatedAt: { type: 'date' }
+                }
+              }
+            }
+          });
+      
+          console.log(`Index ${indexName} đã được tạo thành công.`);
+        } catch (error) {
+            throw new ServerError('error');
+          console.error('Lỗi khi tạo index:', error);
+        }
+    }
 
     public async addCourses() {
+        await this.createIndex();
         for(let page=1; page <18; page++) {
             const options = {
                 page:  page,
@@ -417,5 +493,57 @@ export class ElasticsearchService {
             // Add a 3-second wait before the next iteration
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
+    }
+
+    async addCourse(course: Course) {
+        const courseData = {
+            courseId: course.courseId,
+            title: course.title,
+            introduction: course.introduction,
+            description: course.description,
+            learnsDescription: course.learnsDescription,
+            requirementsDescription: course.requirementsDescription,
+            price: course.price,
+            discount: course.discount,
+            duration: course.duration,
+            category: {
+              id: 1,
+              name: "Databases"
+            },
+            instructor: {
+              id: 1,
+              name: "John Doe"
+            },
+            averageRating: 4.5,
+            trailerUrl: "http://example.com/trailer",
+            subUrl: "http://example.com/sub",
+            posterUrl: "http://example.com/poster",
+            totalStudents: 100,
+            totalLessons: 10,
+            language: {
+              id: 1,
+              languageName: "English"
+            },
+            level: {
+              id: 1,
+              levelName: "Beginner"
+            },
+            isActive: true,
+            createdAt: "2024-06-11T00:00:00Z",
+            updatedAt: "2024-06-11T00:00:00Z"
+          };
+          try {
+            const indexName = 'courses';
+        
+            // Chèn dữ liệu
+            const response = await ElasticsearchService.elasticClient.index({
+              index: indexName,
+              document: courseData
+            });
+        
+            console.log('Dữ liệu đã được chèn thành công:', response);
+          } catch (error) {
+            console.error('Lỗi khi chèn dữ liệu:', error);
+          }
     }
 }

@@ -15,7 +15,22 @@ e-learning is an online learning platform built with Node.js, designed to provid
 ### Prerequisites
 
 - Docker installed and running
-
+- Make command installed
+### Project structure
+   ```bash
+   E-learning-nodejs-app/
+   │
+   ├── swagger-api.yaml
+   ├── makefile (All command here)
+   ├── .env
+   ├── Dockerfile
+   ├── docker-compose.yml
+   ├── src/
+   │   └── ... (Mã nguồn của ứng dụng Node.js)
+   ├── nginx/
+   │   └── nginx.conf
+   └── postgres-data/ (Thư mục chứa dữ liệu của PostgreSQL)
+   ```
 ### Installation
 
 1. Clone the repository:
@@ -31,14 +46,22 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    sudo docker compose build
    ```
-3. Run project:
+   >Or using make command
    ```
-   docker compose up
+   make build
    ```
-4. Set up environment:
+3. Set up environment:
    >Copy environment example to .env and fill values in .env file
    ```
    cp .env.example .env
+   ```
+4. Run project:
+   ```
+   docker compose up
+   ```
+   >Or using make command (For Linux, Window and MacOs)
+   ```
+   make up
    ```
 5. Open new terminal and run commands below:
    ```
@@ -46,6 +69,11 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    ```
    docker compose exec app sh -c "npx sequelize-cli db:create"
+   ```
+6. Check project is running:
+   >Once all containers are up and running, you can access the applications through the following URLs:
+   ```
+   http://localhost:80/api
    ```
 ### If you get an error
    ###### Try this command
@@ -56,6 +84,7 @@ e-learning is an online learning platform built with Node.js, designed to provid
    ```
    make fix
    ```
+This README provides a clear and concise guide to setting up, configuring, and running the E-learning NodeJS project using Docker Compose. If any issues arise, double-check the configuration steps and ensure that Docker services are running correctly.
 ## Project Makefile Guide
 This Makefile provides a set of convenient commands to manage a Dockerized application. It simplifies the execution of various tasks related to building, starting, stopping, and managing the database of your application. Below are the available commands and their descriptions:
 ## Prerequisites
