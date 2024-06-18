@@ -753,7 +753,7 @@ export class CourseService implements ICourseService {
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
 
         rows = await this.handleS3.getResourceCourses(rows);
-		await this.redisService.setCache(cacheKey, {rows, count}, 60 * 5);
+		await this.redisService.setCache(cacheKey, {rows, count}, 60 * 60);
         return {rows, count};
     }
 
@@ -855,7 +855,7 @@ export class CourseService implements ICourseService {
         }
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
         rows = await this.handleS3.getResourceCourses(rows);
-        await this.redisService.setCache(cacheKey, {rows, count}, 60 * 5);
+        await this.redisService.setCache(cacheKey, {rows, count}, 60 * 60);
         return {rows, count};
     }
 

@@ -18,6 +18,8 @@ import RemindRoutes from './routes/RemindRoutes';
 import CommentRoutes from './routes/CommentRoutes';
 import OtherRoutes from './routes/OtherRoutes';
 import EWalletRoutes from './routes/EWalletRoutes';
+import PineconeRoutes from './routes/PineconeRoutes';
+import ChatRoutes from './routes/ChatRoutes';
 class App {
 	public app: Application;
 
@@ -58,6 +60,8 @@ class App {
 		this.app.use('/api/comments', CommentRoutes);
 		this.app.use('/api/others', OtherRoutes);
 		this.app.use('/api/e-wallets', EWalletRoutes);
+		this.app.use('/api/pinecone', PineconeRoutes)
+		this.app.use('/api/chat', ChatRoutes);
 
 		// Middleware cuối cùng để xử lý khi không có route nào khớp
 		this.app.use((req, res) => {
