@@ -8,6 +8,7 @@ import { PineconeStore } from "@langchain/pinecone";
 import { PINECONE_INDEX_NAME,PINECONE_NAME_SPACE } from '../config/pinecone';
 import { pinecone } from '../utils/pinecone-client';
 import { makeChain } from '../utils/langchain/makeChain';
+import { BadRequestError } from '../utils/CustomError';
 
 
 
@@ -15,10 +16,14 @@ import { makeChain } from '../utils/langchain/makeChain';
 export class ChatService {
     async chat(req: Request): Promise<string> {
         try{
-            const { question, history } = req.body;
+            const { question, history, courseId } = req.body;
             if (!question) {
                 throw new Error('No question in the request');
-              }
+            }
+
+            if (!courseId) {
+                throw new BadRequestError('Missing courseId');
+            }
             const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
             const index = pinecone.Index(PINECONE_INDEX_NAME);
                 /* create vectorstore*/
@@ -27,7 +32,7 @@ export class ChatService {
                 {
                 pineconeIndex: index,
                 textKey: 'text',
-                namespace: PINECONE_NAME_SPACE, //namespace comes from your config folder
+                namespace: courseId, //namespace comes from your config folder
                 },
             );
 
