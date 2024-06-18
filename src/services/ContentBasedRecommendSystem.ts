@@ -20,6 +20,7 @@ import { IUserRepository } from '../repositories/interfaces/IUserRepository';
 import { CourseTag } from '../models/CourseTag';
 import { CourseTagRepository } from '../repositories/CourseTagRepository';
 import { ICourseTagRepository } from '../repositories/interfaces/ICourseTagRepository';
+import { RedisService } from './RedisService';
 
 interface Row {
     [key: number]: number; // Định dạng cụ thể của các giá trị trong hàng
@@ -46,6 +47,9 @@ export class ContentBasedRecommendSystem { //Content based recommender system ba
     @Inject(() => UserRepository)
 	private userRepository!: IUserRepository;
 
+    @Inject(() => RedisService)
+	private redisService!: RedisService;
+    
     private favoritePoint = 5;
     private viewedPoint = 4;
     private enrollmentPoint = 2;
@@ -81,6 +85,12 @@ export class ContentBasedRecommendSystem { //Content based recommender system ba
      * Create full matrix between courses and categories
      */
     async createMatrix(): Promise<Matrix> {
+        const cacheKey = 'ContentBasedMatrix';
+        const cachedResult = await this.redisService.getCache(cacheKey);
+        if (cachedResult) {
+            // If cached data is available, return it
+            return cachedResult;
+        }
         const matrix: number[][] = [];
         const matrixRcm : Matrix = {};
         const dataRows : Row = {};
@@ -118,7 +128,7 @@ export class ContentBasedRecommendSystem { //Content based recommender system ba
             matrixRcm[courseId][tagId] = 1;
         }
         // console.log(matrixRcm);
-
+        await this.redisService.setCache(cacheKey, matrixRcm, 60 * 5);
         return matrixRcm;
     }
 

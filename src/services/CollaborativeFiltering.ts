@@ -6,6 +6,7 @@ import { ContentNotFound, RecordExistsError, ServerError } from '../utils/Custom
 import * as crypto from 'crypto';
 import { EnrollmentRepository } from '../repositories/EnrollmentRepository';
 import { IEnrollmentRepository } from '../repositories/interfaces/IEnrollmentRepository';
+import { RedisService } from './RedisService';
 
 interface Row {
     [key: number]: number; // Định dạng cụ thể của các giá trị trong hàng
@@ -20,6 +21,9 @@ export class CollaborativeFiltering {
 
     @Inject(() => EnrollmentRepository)
 	private enrollmentRepository!: IEnrollmentRepository;
+
+    @Inject(() => RedisService)
+	private redisService!: RedisService;
 
     private enrollmentPoint = 1;
 
@@ -53,6 +57,12 @@ export class CollaborativeFiltering {
      */
     async createMatrix(): Promise<any> {
         // 
+        const cacheKey = 'CollaborativeFilteringMatrix';
+        const cachedResult = await this.redisService.getCache(cacheKey);
+        if (cachedResult) {
+            // If cached data is available, return it
+            return cachedResult;
+        }
         let matrix: Matrix = {} ;
         const dataRows : Row = {};
         let uniqueCourseIds = new Set<number>();
@@ -79,7 +89,11 @@ export class CollaborativeFiltering {
             const courseId = enrollment.getDataValue('courseId');
             matrix[userId][courseId] = this.enrollmentPoint;
         }
-
+        await this.redisService.setCache(cacheKey, {
+            matrix: matrix,
+            uniqueUserIds: uniqueUserIds,
+            uniqueCourseIds: uniqueCourseIds
+        }, 60 * 5);
         return {
             matrix: matrix,
             uniqueUserIds: uniqueUserIds,
