@@ -97,11 +97,15 @@ export class CartService implements ICartService {
             userId: userId,
             courseId: courseId
         },[], false);
-
+        console.log(cart);
         if(!cart){ // Check course is already in cart
-            return true;
+            return false;
+        }
+
+        if(cart.deletedAt != null){ // Check course is already in cart
+            return false;
         }
         
-        return false;
+        return true;
     }
 }
