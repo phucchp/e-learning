@@ -7,6 +7,7 @@ info:
   contact:
     email: phucchp@gmail.com
 servers:
+  - url: 'http://alpha-elearning.southeastasia.cloudapp.azure.com/api'
   - url: 'http://localhost:8000/api'
 tags:
   - name: authentication
