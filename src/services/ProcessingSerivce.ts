@@ -30,7 +30,7 @@ export class ProcessingService implements IProcessingService {
         // check user is enrolled course
         const courseId = await this.courseService.getCourseIdByLessonId(lessonId);
 
-        if(await this.enrollmentService.isUserEnrollmentCourse(userId, courseId)){
+        if(!await this.enrollmentService.isUserEnrollmentCourse(userId, courseId)){
             throw new NotEnoughAuthority('The user has not yet enrolled in the course!');
         }
 
