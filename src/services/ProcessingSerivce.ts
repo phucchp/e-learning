@@ -34,6 +34,18 @@ export class ProcessingService implements IProcessingService {
             throw new NotEnoughAuthority('The user has not yet enrolled in the course!');
         }
 
+        const process = await this.processingRepository.findOneByCondition({
+            userId: userId,
+            lessonId: lessonId
+        });
+        
+        if(process) {
+            process.time = time ;
+            process.isDone = true;
+            await this.processingRepository.updateInstance(process);
+            return process;
+        }
+
         return await this.processingRepository.create({
             userId: userId,
             lessonId: lessonId,
