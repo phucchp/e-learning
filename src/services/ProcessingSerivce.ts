@@ -38,7 +38,7 @@ export class ProcessingService implements IProcessingService {
             userId: userId,
             lessonId: lessonId
         });
-        
+
         if(process) {
             process.time = time ;
             process.isDone = true;
@@ -105,7 +105,7 @@ export class ProcessingService implements IProcessingService {
                 lessonId: {
 					[Op.in]:lessonIds
 				},
-                isDone: true,
+                // isDone: true,
             },
             order: [
                 ['updatedAt', 'DESC']
