@@ -5,6 +5,8 @@ import { BaseRepository } from "./BaseRepository";
 import { Note } from "../models/Note";
 import { Remind } from "../models/Remind";
 import { Comment } from "../models/Comment";
+import { User } from "../models/User";
+import { Profile } from "../models/Profile";
 
 @Service()
 export class LessonRepository extends BaseRepository<Lesson> implements ILessonRepository{
@@ -24,6 +26,18 @@ export class LessonRepository extends BaseRepository<Lesson> implements ILessonR
                 },
 				{
                     model: Comment,
+					include: [
+						{
+							model: User,
+							attributes: ['userName', 'id'],
+							include: [
+								{
+									model: Profile,
+									attributes: ['fullName','firstName', 'lastName', 'avatar', 'description'] ,
+								}
+							]
+						}
+					]
                 },
 				{
                     model: Remind,

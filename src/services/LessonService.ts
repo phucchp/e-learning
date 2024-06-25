@@ -43,6 +43,9 @@ export class LessonService implements ILessonService {
        }
        const lessonUrl = lesson.lessonUrl || 'lessons/defaults/video.mp4'
        lesson.lessonUrl = await this.s3Service.getObjectUrl(lessonUrl);
+       for(const comment of lesson.comments) {
+            comment.user.profile.avatar = await this.s3Service.getObjectUrl(comment.user.profile.avatar || 'users/defaults/avatar.jpg');
+       }
        return lesson;
     }   
 

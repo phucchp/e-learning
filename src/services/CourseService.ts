@@ -966,4 +966,9 @@ export class CourseService implements ICourseService {
             attributes: ['id' ,'title']
         });
     }
+
+    // async getFristLessonOfCourse(courseId: string):Promise<Lesson> {
+    //     const lessons = await th
+    // }
+
 }

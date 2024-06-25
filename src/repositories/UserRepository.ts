@@ -120,7 +120,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 	async getListInstructors(page: number, pageSize: number): Promise<{ rows: User[]; count: number; }> {
         const offset = (page - 1) * pageSize;
 		const results = await this.model.findAndCountAll({
-			attributes: ['userName'],
+			attributes: ['userName', 'id'],
 			where: {
 				roleId: {
 					[Op.gte] : 2
