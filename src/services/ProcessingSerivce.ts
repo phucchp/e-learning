@@ -29,9 +29,23 @@ export class ProcessingService implements IProcessingService {
     async addProcessing(userId: number, lessonId: number, time: number, isDone: boolean): Promise<Processing> {
         // check user is enrolled course
         const courseId = await this.courseService.getCourseIdByLessonId(lessonId);
+        const processing = await this.processingRepository.findOneByCondition({
+            userId: userId,
+            lessonId: lessonId
+        });
 
         if(!await this.enrollmentService.isUserEnrollmentCourse(userId, courseId)){
             throw new NotEnoughAuthority('The user has not yet enrolled in the course!');
+        }
+
+        if(processing) {
+            processing.time = time;
+            processing.isDone = isDone;
+            const newProcessing = await this.processingRepository.updateInstance(processing);
+            if(newProcessing) {
+                return newProcessing;
+            }
+            throw new ServerError('Can not update processing');
         }
 
         return await this.processingRepository.create({
