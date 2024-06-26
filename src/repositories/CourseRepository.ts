@@ -132,7 +132,7 @@ export class CourseRepository extends BaseRepository<Course> implements ICourseR
                             include: [
                                 {
                                     model: Resource,
-                                    attributes: ['url' , 'deletedAt'],
+                                    attributes: ['url' ,'id','name','lessonId', 'deletedAt'],
                                 },
                             ],
                         },
