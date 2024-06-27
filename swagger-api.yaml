@@ -39,6 +39,8 @@ tags:
     description: API for payments
   - name: e-wallet
     description: API for electronic wallet
+  - name: other
+    description: Other
   - name: statistical
     description: API for statistical
 paths:
@@ -525,6 +527,29 @@ paths:
         '400':
           description: Can not get courses
   /courses/enrollments/add-user-enrollment-courses: 
+    post:
+      tags:
+        - admin
+      summary: Add new enrollment
+      responses:
+        '200':
+          description: Successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: number
+                  default: 1
+                courseIds:
+                  type: array
+                  items:
+                    type: number
+      security:
+        - bearerAuth: []
+  /courses/enrollments/add-user-enrollment-courses-by-courseIds: 
     post:
       tags:
         - admin
@@ -3471,7 +3496,18 @@ paths:
               schema:
                 type: array
       security:
-        - bearerAuth: [] 
+        - bearerAuth: []
+  /others/redis/clearAllCache:
+    post:
+      tags:
+        - other
+      summary: Clear all cache redis
+      responses:
+        '200':
+          description: Successful
+      security:
+        - bearerAuth: []
+
 components:
   securitySchemes:
     bearerAuth:

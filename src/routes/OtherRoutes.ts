@@ -11,7 +11,10 @@ class OtherRoutes extends BaseRoutes {
 	public routes(): void {
 		this.router.get('/create-data-course', this.controller.createDataCourse);
 		this.router.post('/redis/clearAllCache', this.controller.clearCacheAllCache);
-		this.router.post('/redis/clearByUser', this.controller.clearCacheContentBaseRcm);
+		this.router.post('/redis/clear-cache-recommend', auth, this.controller.clearCacheContentBaseRcm);
+		this.router.get('/recommend/matrix-collaborative', this.controller.getMatrixCollaborative);
+		this.router.get('/recommend/matrix-content-based', this.controller.getMatrixContentBased);
+
 	}
 }
 
