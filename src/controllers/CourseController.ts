@@ -548,6 +548,22 @@ export class CourseController{
         })
     }
 
+    addUserEnrollmentCoursesForAdminV2 = async (req: Request, res: Response) => { 
+        const userId = req.body.userId;
+        const courseIds = req.body.courseIds;
+        const listId: number[] = [];
+        for(const courseId of courseIds) {
+            const course = await this.courseService.getCourse(courseId);
+            if(!await this.enrollmentService.isUserEnrollmentCourse(userId, course.id)) {
+                listId.push(course.id);
+            }
+        }
+        await this.enrollmentService.addEnrollmentCourseInBulk(userId, listId);
+        return res.status(200).json({
+            message: "Successful"
+        })
+    }
+
     getCoursesDebug = async (req: Request, res: Response) => {
         const courses = await this.courseService.getCourseForDebug(req);
         return res.status(200).json({

@@ -8,7 +8,7 @@ import { PineconeStore } from "@langchain/pinecone";
 import { PINECONE_INDEX_NAME,PINECONE_NAME_SPACE } from '../config/pinecone';
 import { pinecone } from '../utils/pinecone-client';
 import { makeChain } from '../utils/langchain/makeChain';
-import { BadRequestError } from '../utils/CustomError';
+import { BadRequestError, NotFound } from '../utils/CustomError';
 
 
 
@@ -23,6 +23,10 @@ export class ChatService {
 
             if (!courseId) {
                 throw new BadRequestError('Missing courseId');
+            }
+
+            if (courseId !== 'nodejs-express-mongodb-more-the-complete-bootcamp-2024-a6d1399f-1714883821097' && courseId !== 'the-ultimate-react-course-2024-react-redux-more-e02ea8e4-1714883821604') {
+                throw new NotFound('No chatbot for course');
             }
             const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
             const index = pinecone.Index(PINECONE_INDEX_NAME);

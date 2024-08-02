@@ -42,6 +42,7 @@ class CourseRoutes extends BaseRoutes {
 		this.router.get('/others/get-courses-by-courseIds' , this.controller.getCoursesByCourseIds);
 		// Admin
 		this.router.post('/enrollments/add-user-enrollment-courses', this.controller.addUserEnrollmentCoursesForAdmin);
+		this.router.post('/enrollments/add-user-enrollment-courses-by-courseIds', this.controller.addUserEnrollmentCoursesForAdminV2);
 	}
 }
 

@@ -743,17 +743,17 @@ export class CourseService implements ICourseService {
      * @returns 
      */
     async getCoursesRecommendBasedOnTags(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}> {
-        const cacheKey = `getCoursesRecommendBasedOnTags/users/${userId}`;
+        // const cacheKey = `getCoursesRecommendBasedOnTags/users/${userId}`;
         const courseIdsRecommend = await this.contentBasedRecommendSystem.getCourseIdsRecommend(userId);
-        const cachedResult = await this.redisService.getCache(cacheKey);
-        if (cachedResult) {
-            // If cached data is available, return it
-            return cachedResult;
-        }
+        // const cachedResult = await this.redisService.getCache(cacheKey);
+        // if (cachedResult) {
+        //     // If cached data is available, return it
+        //     return cachedResult;
+        // }
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
 
         rows = await this.handleS3.getResourceCourses(rows);
-		await this.redisService.setCache(cacheKey, {rows, count}, 60 * 60);
+		// await this.redisService.setCache(cacheKey, {rows, count}, 60 * 60);
         return {rows, count};
     }
 
@@ -843,19 +843,19 @@ export class CourseService implements ICourseService {
     }
     
     async getCoursesRecommendBasedOnCollaborativeFiltering(userId: number, page: number, pageSize: number): Promise<{ rows: Course[]; count: number}|null> {
-        const cacheKey = `getCoursesRecommendBasedOnCollaborativeFiltering/users/${userId}`;
-        const cachedResult = await this.redisService.getCache(cacheKey);
-        if (cachedResult) {
-            // If cached data is available, return it
-            return cachedResult;
-        }
+        // const cacheKey = `getCoursesRecommendBasedOnCollaborativeFiltering/users/${userId}`;
+        // const cachedResult = await this.redisService.getCache(cacheKey);
+        // if (cachedResult) {
+        //     // If cached data is available, return it
+        //     return cachedResult;
+        // }
         const courseIdsRecommend = await this.collaborativeFiltering.getUserSimilarityWights(userId);
         if(!courseIdsRecommend) {
             return null;
         }
         let {rows, count} = await this.courseRepository.getCoursesRecommend(courseIdsRecommend, page, pageSize);
         rows = await this.handleS3.getResourceCourses(rows);
-        await this.redisService.setCache(cacheKey, {rows, count}, 60 * 60);
+        // await this.redisService.setCache(cacheKey, {rows, count}, 60 * 60);
         return {rows, count};
     }
 
@@ -966,4 +966,9 @@ export class CourseService implements ICourseService {
             attributes: ['id' ,'title']
         });
     }
+
+    // async getFristLessonOfCourse(courseId: string):Promise<Lesson> {
+    //     const lessons = await th
+    // }
+
 }
